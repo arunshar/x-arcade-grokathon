@@ -1,0 +1,34 @@
+GUIDE.md
+  s_da6f3933cdb62d::t_48ce01dbcbcd92 856-875
+  s_da6f3933cdb62d::t_1359bdab6ab44e 4203
+  s_da6f3933cdb62d::t_d17cfe67fd0336 1287-1290,1292-1294
+  s_da6f3933cdb62d::t_dc241500b4840f 4198
+cartridges/decoy/rounds/decoy_ai.json
+  s_da6f3933cdb62d::t_d9f7678bc8cfa2 45-48
+cartridges/decoy/rounds/decoy_crypto.json
+  s_da6f3933cdb62d::t_a901431b3700c3 44
+cartridges/decoy/rounds/decoy_food.json
+  s_da6f3933cdb62d::t_4decffe3406402 44
+cartridges/decoy/rounds/decoy_movies.json
+  s_da6f3933cdb62d::t_87d7f6f2bcbb1a 44
+cartridges/decoy/rounds/decoy_music.json
+  s_da6f3933cdb62d::t_88f79787d15d7b 44
+cartridges/decoy/rounds/decoy_sports.json
+  s_da6f3933cdb62d::t_7bb700e1c33d08 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "da925db4bd702f11d4e5e1031a9b08dd1a549a09",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
