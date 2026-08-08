@@ -18,9 +18,7 @@ Token smoke test (prints the response shape, never the secret):
 from __future__ import annotations
 
 import json
-import os
 import sys
-import urllib.request
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 import config  # noqa: E402
+from services.xai_http import post_json, post_raw  # noqa: E402
 
 ASSETS_DIR = REPO_ROOT / "web" / "static-assets"
 
@@ -48,27 +47,6 @@ TTS_VOICE = "Eve"
 TTS_LANGUAGE = "en"
 
 
-def _api_key() -> str:
-    key = os.environ.get("XAI_API_KEY", "")
-    if not key:
-        raise RuntimeError("XAI_API_KEY is not set")
-    return key
-
-
-def _post(path: str, payload: dict[str, Any], timeout: int = 60) -> bytes:
-    """POST JSON to the xAI API and return the raw response body."""
-    request = urllib.request.Request(
-        config.API_BASE + path,
-        data=json.dumps(payload).encode(),
-        headers={
-            "Authorization": f"Bearer {_api_key()}",
-            "Content-Type": "application/json",
-        },
-    )
-    with urllib.request.urlopen(request, timeout=timeout) as response:
-        return response.read()
-
-
 def mint_token() -> dict[str, Any]:
     """Mint an ephemeral realtime client secret for browser-direct voice.
 
@@ -77,13 +55,12 @@ def mint_token() -> dict[str, Any]:
     The caller hands "value" to the browser and nothing else. Never log
     the value. See REALTIME_NOTES.md for the browser wiring.
     """
-    body = _post("/realtime/client_secrets", {}, timeout=15)
-    return json.loads(body)
+    return post_json("/realtime/client_secrets", {}, timeout=15)
 
 
 def _tts(text: str) -> bytes:
     """Render one line to mp3 bytes. The language field is required."""
-    body = _post(
+    body = post_raw(
         "/tts",
         {
             "text": text,

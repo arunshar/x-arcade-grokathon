@@ -330,7 +330,9 @@ async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: s
         display = winner if winner != "house" else "The House"
         path = await asyncio.to_thread(make_share_card, rnd, display)
         url = "/static-assets/cards/" + path.name
-    except Exception:
+    except Exception as exc:
+        # Keep the game moving; log so live Imagine failures are visible.
+        print(f"card_forge failed: {exc}", file=sys.stderr)
         return
     if room.get("reveal") is reveal and room["phase"] == "reveal":
         reveal["share_card_url"] = url
@@ -339,7 +341,12 @@ async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: s
 
 @app.get("/health")
 async def health() -> dict[str, Any]:
-    return {"mode": config.MODE, "rounds_available": _rounds_available()}
+    return {
+        "mode": config.MODE,
+        "rounds_available": _rounds_available(),
+        "voice_model": config.MODEL_VOICE,
+        "image_model": config.MODEL_IMAGE,
+    }
 
 
 @app.get("/token")
@@ -355,13 +362,23 @@ async def token() -> Any:
             "demo": True,
             "value": "",
             "expires_at": None,
+            "model": config.MODEL_VOICE,
             "detail": "demo mode is offline. Run ARCADE_MODE=live to mint a realtime token.",
         }
     try:
         from services.voice_host import mint_token
     except ImportError:
         raise HTTPException(status_code=501, detail="voice_host is not available")
-    return await asyncio.to_thread(mint_token)
+    try:
+        minted = await asyncio.to_thread(mint_token)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"voice token mint failed: {exc}") from exc
+    if not isinstance(minted, dict):
+        raise HTTPException(status_code=502, detail="voice token mint returned unexpected shape")
+    # Always surface the pinned model id so the browser does not hardcode it.
+    out = dict(minted)
+    out.setdefault("model", config.MODEL_VOICE)
+    return out
 
 
 @app.websocket("/ws")

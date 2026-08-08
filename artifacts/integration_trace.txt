@@ -1,9 +1,9 @@
 answer key: 6 servable rounds, gated out: []
 == http checks ==
-GET /health -> 200 {'mode': 'demo', 'rounds_available': 6}
+GET /health -> 200 {'mode': 'demo', 'rounds_available': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'image_model': 'grok-imagine-image'}
   [PASS] /health reports demo mode
   [PASS] /health counts screened rounds
-GET /token -> 200 keys=['demo', 'detail', 'expires_at', 'value']
+GET /token -> 200 keys=['demo', 'detail', 'expires_at', 'model', 'value']
   [PASS] /token returns the offline demo stub
   [PASS] / serves the web client
   [PASS] host_intro.mp3 serves with real bytes

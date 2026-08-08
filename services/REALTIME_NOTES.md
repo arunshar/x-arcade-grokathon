@@ -21,17 +21,20 @@ first live connect. Everything else below is the compatible-API convention.
 
 ### 1. Token endpoint on our server
 
-The FastAPI server exposes a tiny route, for example `GET /api/voice-token`,
-which calls `voice_host.mint_token()` and returns `{"value": ..., "expires_at": ...}`
-to the browser. The real `XAI_API_KEY` never leaves the server. Tokens are
-short-lived, so mint per session, not at page load.
+Implemented route: **`GET /token`** (not `/api/voice-token`).
+It calls `voice_host.mint_token()` and returns
+`{"value": ..., "expires_at": ..., "model": "<MODEL_VOICE>"}` to the browser.
+The real `XAI_API_KEY` never leaves the server. Tokens are short-lived, so mint
+per session (the client warms on first user gesture in live mode).
 
 ### 2. Browser connects
 
+Wired in `web/game.js` (`warmLiveVoice` / `speakLive`). Shape:
+
 ```js
-const { value } = await (await fetch("/api/voice-token")).json();
+const { value, model } = await (await fetch("/token")).json();
 const ws = new WebSocket(
-  "wss://api.x.ai/v1/realtime?model=grok-voice-think-fast-2.0",
+  "wss://api.x.ai/v1/realtime?model=" + encodeURIComponent(model),
   [
     "realtime",
     "openai-insecure-api-key." + value,
