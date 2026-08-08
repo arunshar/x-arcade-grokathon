@@ -1,17 +1,18 @@
-"""Imagine decoy agent — match the human GIFs so the robot is harder to spot.
+"""Imagine decoy agent — original clip, style-matched to the human GIFs.
 
 Pipeline
 --------
-1. Collect the four human reaction GIFs already assigned on the round.
-2. Sample frames from those GIFs (Pillow).
-3. Ask a fast vision chat model for a short *style brief* (palette, subject,
-   grain, motion) — never names people, never marks which is AI.
-4. Call Grok Imagine video with ``reference_images`` = those frames + a prompt
-   that blends the style brief with the decoy reply vibe.
-5. Download the short square MP4 and save it as the decoy's looping "gif".
+1. Collect the four human reaction GIFs already on the round (read-only).
+2. Sample frames and ask vision for a short *style brief* only
+   (palette, grain, motion energy) — never copy those frames into generation.
+3. Grok Imagine **image** → a brand-new still that fits the room's look.
+4. Grok Imagine **video** from that original still (image-to-video), or
+   text-to-video if the still fails — never ``reference_images`` of human GIFs.
+5. Save the short square MP4 as the decoy's looping "gif".
 
-The agent deliberately does **not** invent neon arcade chrome when the human
-GIFs are meme/reaction stock — matching the room is the whole point.
+Human GIFs stay untouched. The decoy is always a new Imagine generation that
+only *resembles* the room (compression, energy, vibe), not a regen/remix of
+any user reply gif.
 
 CLI:
     ARCADE_MODE=live python3 services/imagine_agent.py --round-id decoy-xxx
@@ -52,11 +53,13 @@ VIDEO_POLL_S = float(os.environ.get("ARCADE_IMAGINE_VIDEO_POLL", "300"))
 MAX_REF_IMAGES = int(os.environ.get("ARCADE_IMAGINE_REF_MAX", "4"))
 FRAME_MAX_PX = int(os.environ.get("ARCADE_IMAGINE_FRAME_PX", "512"))
 
-_FALLBACK_STYLE_SYSTEM = """You style-match reaction GIFs for a party game.
-Given still frames from human reply GIFs, write ONE compact style brief for
-video generation: palette, subject type, framing, motion energy, grain/compression.
-Never name real people or celebrities. Never say AI, decoy, robot, or fake.
-No markdown. Under 45 words."""
+_FALLBACK_STYLE_SYSTEM = """You scout visual STYLE only for a party game.
+Given still frames from human reply GIFs, write ONE compact style brief so a
+NEW original reaction clip can match the room without copying those frames:
+palette, lighting, framing, motion energy, grain/compression, meme ugliness.
+Describe abstract qualities only — do NOT describe specific characters, faces,
+or scenes to recreate. Never name real people or celebrities.
+Never say AI, decoy, robot, or fake. No markdown. Under 45 words."""
 
 
 def _slug(value: str) -> str:
@@ -318,6 +321,41 @@ def _sanitize_style_brief(brief: str) -> str:
     return _snippet(text, 220)
 
 
+def build_decoy_still_prompt(
+    *,
+    style_brief: str,
+    topic: str,
+    decoy_text: str,
+    post_text: str = "",
+) -> str:
+    """Prompt for an ORIGINAL still — style-matched, not a copy of human gifs."""
+    skill = _load_skill(
+        "still_prompt",
+        "Create a brand-new square reaction-image still for a group chat. "
+        "Match the room's visual STYLE only. Invent a new subject — do not "
+        "recreate, remix, or trace any specific frame from the human gifs.",
+    )
+    vibe = _snippet(decoy_text, 90)
+    post_bit = _snippet(post_text, 110)
+    brief = _sanitize_style_brief(style_brief)
+    safety = (
+        "CRITICAL SAFETY: no real people, no celebrity likeness, no copyrighted "
+        "cartoon characters, no brand logos, no readable text, no watermarks, "
+        "no UI chrome. Generic anonymous figures, objects, animals, or abstract "
+        "shapes only."
+    )
+    thread = f"Thread vibe (do not render text): {post_bit}. " if post_bit else ""
+    return (
+        f"{skill} "
+        f"Style to match (qualities only, not scenes to copy): {brief} "
+        f"Topic: {topic or 'general'}. {thread}"
+        f"Mood of THIS new reply (abstract): {vibe}. "
+        "Square 1:1, looks like a compressed chat GIF still, not a polished poster. "
+        "ORIGINAL content only — different subject matter from the human replies. "
+        f"{safety}"
+    )
+
+
 def build_decoy_video_prompt(
     *,
     style_brief: str,
@@ -325,12 +363,14 @@ def build_decoy_video_prompt(
     decoy_text: str,
     post_text: str = "",
     abstract_only: bool = False,
+    from_own_still: bool = False,
 ) -> str:
-    """Prompt that steals the human GIF look while carrying the decoy vibe."""
+    """Prompt for an ORIGINAL looping clip (text-to-video or own-still I2V)."""
     skill = _load_skill(
         "video_prompt",
-        "Seamless looping reaction clip that could sit in a group chat next to "
-        "the reference GIFs. Match their visual language exactly.",
+        "Animate into a seamless looping reaction gif for a group chat. "
+        "Match the room's visual language and energy. This must be a NEW clip, "
+        "not a recreation or remix of any human reply gif.",
     )
     vibe = _snippet(decoy_text, 90)
     post_bit = _snippet(post_text, 110)
@@ -346,21 +386,35 @@ def build_decoy_video_prompt(
         if post_bit
         else ""
     )
+    original = (
+        "ORIGINAL Imagine generation only — do not recreate, morph, or collage "
+        "the human reply gifs from this round; invent new subject matter that "
+        "merely fits beside them. "
+    )
     if abstract_only:
         return (
             "Short seamless looping reaction gif, square 1:1, compressed web-meme look. "
             f"Topic mood: {topic or 'general'}. {thread}"
             f"Reply vibe (abstract): {vibe}. "
-            f"Visual energy only (no copying faces): {brief}. "
-            f"{safety}"
+            f"Match style qualities only: {brief}. "
+            f"{original}{safety}"
+        )
+    if from_own_still:
+        return (
+            f"{skill} "
+            "Animate THIS original still into a 3-second seamless loop "
+            "(subtle punchy motion, gif energy, mild compression). "
+            f"Keep the same subject — do not swap in other gifs. "
+            f"Topic: {topic or 'general'}. {thread}"
+            f"Mood: {vibe}. {safety}"
         )
     return (
         f"{skill} "
-        f"Style brief from the human GIFs in this round: {brief} "
+        f"Style qualities to match (not scenes to copy): {brief} "
         f"Topic: {topic or 'general'}. {thread}"
-        f"Mood of this one reply (abstract, no readable text): {vibe}. "
+        f"Mood of this one NEW reply (abstract, no readable text): {vibe}. "
         "Square 1:1, 3-second seamless loop, looks like a compressed chat GIF "
-        f"not a polished film. {safety}"
+        f"not a polished film. {original}{safety}"
     )
 
 
@@ -408,7 +462,16 @@ def _full_video_gen(payload: dict[str, Any]) -> dict[str, Any]:
     return _poll_video(str(rid))
 
 
-def _video_payload(prompt: str, data_urls: list[str]) -> dict[str, Any]:
+def _video_payload(
+    prompt: str,
+    *,
+    own_still_data_url: str | None = None,
+) -> dict[str, Any]:
+    """Build video request. Never attach human GIF frames.
+
+    Optional ``own_still_data_url`` is an Imagine-generated still (ours only)
+    used for image-to-video. Human reply gifs are study-only via the style brief.
+    """
     payload: dict[str, Any] = {
         "model": config.MODEL_VIDEO,
         "prompt": prompt,
@@ -416,16 +479,61 @@ def _video_payload(prompt: str, data_urls: list[str]) -> dict[str, Any]:
         "aspect_ratio": "1:1",
         "resolution": "480p",
     }
-    if data_urls:
-        # API forbids combining image + reference_images. Prefer multi-GIF
-        # reference-to-video so the decoy blends with the whole human set.
-        if len(data_urls) >= 2:
-            payload["reference_images"] = [
-                {"url": u} for u in data_urls[:MAX_REF_IMAGES]
-            ]
-        else:
-            payload["image"] = {"url": data_urls[0]}
+    if own_still_data_url:
+        payload["image"] = {"url": own_still_data_url}
     return payload
+
+
+def generate_own_still(
+    *,
+    style_brief: str,
+    topic: str,
+    decoy_text: str,
+    post_text: str = "",
+) -> str | None:
+    """Create an ORIGINAL square still via Imagine image. Returns data URL or None."""
+    prompt = build_decoy_still_prompt(
+        style_brief=style_brief,
+        topic=topic,
+        decoy_text=decoy_text,
+        post_text=post_text,
+    )
+    request = {
+        "model": config.MODEL_IMAGE,
+        "prompt": prompt,
+        "n": 1,
+        "response_format": "b64_json",
+    }
+
+    def invoke() -> dict[str, Any]:
+        return post_json("/images/generations", request, timeout=120)
+
+    try:
+        if config.MODE == "live" and not config.RECORD:
+            data = invoke()
+        elif config.MODE == "live" and config.RECORD:
+            store = _make_store()
+            fixture_key = {
+                "model": request["model"],
+                "prompt": prompt,
+                "kind": "imagine_decoy_still",
+            }
+            data = store.call(  # type: ignore[union-attr]
+                "imagine_decoy_still",
+                fixture_key,
+                invoke=invoke,
+            )
+        else:
+            return None
+        b64 = (data.get("data") or [{}])[0].get("b64_json") or ""
+        if not b64:
+            return None
+        raw = base64.b64decode(b64)
+        mime = "image/png" if raw[:4] == b"\x89PNG" else "image/jpeg"
+        return f"data:{mime};base64,{b64}"
+    except Exception as exc:
+        print(f"imagine_agent: own still failed: {exc}", file=sys.stderr)
+        return None
 
 
 def decoy_video_path(round_id: str) -> Path:
@@ -538,9 +646,10 @@ def generate_matching_decoy(
     except Exception as exc:
         print(f"imagine_agent: attach_reply_media: {exc}", file=sys.stderr)
 
+    # Study human GIFs for style ONLY — frames never go into video generation.
     frames = collect_reference_frames(round_data)
-    data_urls = frames_to_data_urls(frames)
-    result["n_refs"] = len(data_urls)
+    study_urls = frames_to_data_urls(frames)
+    result["n_study_frames"] = len(study_urls)
 
     human_texts = []
     decoy = _decoy_slot(round_data)
@@ -562,18 +671,37 @@ def generate_matching_decoy(
     decoy_text = str((decoy_rep or {}).get("text") or topic)
 
     style_brief = describe_gif_style(
-        data_urls,
+        study_urls,
         topic=topic,
         reply_texts=human_texts,
         post_text=post_text,
     )
     result["style_brief"] = style_brief
-    prompt = build_decoy_video_prompt(
+
+    # Own still first (original Imagine image), then animate it.
+    own_still = generate_own_still(
         style_brief=style_brief,
         topic=topic,
         decoy_text=decoy_text,
         post_text=post_text,
     )
+    result["own_still"] = bool(own_still)
+
+    if own_still:
+        prompt = build_decoy_video_prompt(
+            style_brief=style_brief,
+            topic=topic,
+            decoy_text=decoy_text,
+            post_text=post_text,
+            from_own_still=True,
+        )
+    else:
+        prompt = build_decoy_video_prompt(
+            style_brief=style_brief,
+            topic=topic,
+            decoy_text=decoy_text,
+            post_text=post_text,
+        )
     result["prompt"] = _snippet(prompt, 200)
 
     def _try_video(p: dict[str, Any], key_extra: dict[str, Any]) -> dict[str, Any]:
@@ -583,7 +711,8 @@ def generate_matching_decoy(
             "duration": p["duration"],
             "aspect_ratio": p["aspect_ratio"],
             "resolution": p["resolution"],
-            "n_refs": len(p.get("reference_images") or ([] if "image" not in p else [1])),
+            "has_own_still": bool(p.get("image")),
+            "n_human_refs": 0,  # never attach human gifs
             "round_id": rid,
             "kind": "imagine_decoy_video",
             **key_extra,
@@ -597,40 +726,30 @@ def generate_matching_decoy(
             invoke=lambda: _full_video_gen(p),
         )
 
-    payload = _video_payload(prompt, data_urls)
+    payload = _video_payload(prompt, own_still_data_url=own_still)
     try:
-        done = _try_video(payload, {"pass": "ref"})
+        done = _try_video(payload, {"pass": "own_still_i2v" if own_still else "t2v"})
     except Exception as exc:
         err = str(exc)
         print(f"imagine_agent: video gen failed: {err}", file=sys.stderr)
-        # Content moderation often trips on meme faces in reference GIFs —
-        # retry once abstract / text-only so the round still gets a unique clip.
-        if "moderat" in err.lower() or "rejected" in err.lower():
-            try:
-                safe_prompt = build_decoy_video_prompt(
-                    style_brief=style_brief,
-                    topic=topic,
-                    decoy_text=decoy_text,
-                    post_text=post_text,
-                    abstract_only=True,
-                )
-                result["prompt"] = _snippet(safe_prompt, 200)
-                done = _try_video(_video_payload(safe_prompt, []), {"pass": "abstract"})
-            except Exception as exc2:
-                print(f"imagine_agent: abstract retry failed: {exc2}", file=sys.stderr)
-                result["status"] = "failed"
-                result["error"] = f"{err} | retry: {exc2}"
-                probe = DECOY_DIR / "_probe.mp4"
-                if probe.is_file():
-                    _stamp_decoy(round_data, probe, ready=False)
-                    result["status"] = "failed_probe_fallback"
-                    result["path"] = str(probe)
-                else:
-                    _mark_decoy_failed(round_data)
-                return result
-        else:
+        # Retry pure text-to-video (still no human frames).
+        try:
+            safe_prompt = build_decoy_video_prompt(
+                style_brief=style_brief,
+                topic=topic,
+                decoy_text=decoy_text,
+                post_text=post_text,
+                abstract_only=True,
+            )
+            result["prompt"] = _snippet(safe_prompt, 200)
+            done = _try_video(
+                _video_payload(safe_prompt, own_still_data_url=None),
+                {"pass": "t2v_retry"},
+            )
+        except Exception as exc2:
+            print(f"imagine_agent: t2v retry failed: {exc2}", file=sys.stderr)
             result["status"] = "failed"
-            result["error"] = err
+            result["error"] = f"{err} | retry: {exc2}"
             probe = DECOY_DIR / "_probe.mp4"
             if probe.is_file():
                 _stamp_decoy(round_data, probe, ready=False)

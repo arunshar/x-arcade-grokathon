@@ -1,0 +1,1 @@
+Create a brand-new square reaction-image still for a group chat. Match the room's visual STYLE only (palette, grain, framing, meme energy). Invent a new subject — do not recreate, remix, or trace any specific frame from the human gifs.

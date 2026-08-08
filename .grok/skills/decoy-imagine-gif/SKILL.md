@@ -1,13 +1,13 @@
 ---
 name: decoy-imagine-gif
 description: >
-  How the Decoy Imagine agent builds the robot's looping "gif" by studying the
-  four human reaction GIFs in the round — style brief via vision, then Grok
-  Imagine video with reference_images so the decoy is harder to distinguish.
-  Use when editing reply GIFs, imagine_agent, reply_gifs decoy generation,
-  MODEL_VIDEO, or /decoy-imagine-gif.
+  How the Decoy Imagine agent builds the robot's looping "gif": study the four
+  human reaction GIFs for style only, then generate an ORIGINAL Imagine still
+  + video that feels similar — never regenerate or reference-to-video the
+  human gifs. Use when editing reply GIFs, imagine_agent, reply_gifs decoy
+  generation, MODEL_VIDEO, or /decoy-imagine-gif.
 metadata:
-  short-description: "Match human GIFs → Imagine decoy video"
+  short-description: "Original Imagine decoy, style-matched to human GIFs"
 ---
 
 # Decoy Imagine GIF agent
@@ -15,39 +15,41 @@ metadata:
 Source of truth for **how the robot gif is forged**. Runtime:
 `services/imagine_agent.py` loads `references/*.md` and drives:
 
-1. Human GIF assignment (`services/reply_gifs.attach_reply_media`)
-2. Frame sample from those GIFs (Pillow)
-3. Vision style brief (`MODEL_AGENT` chat + images)
-4. `POST /v1/videos/generations` with `reference_images` + `image` anchor
-5. Save `web/static-assets/reply-gifs/decoy/{round_id}_decoy.mp4`
+1. Human GIF assignment (`services/reply_gifs.attach_reply_media`) — unchanged pool files
+2. Frame sample from those GIFs **for vision study only** (Pillow)
+3. Vision style brief (`MODEL_AGENT` chat + images) — qualities, not scenes to copy
+4. `POST /v1/images/generations` → **original** still (never human frames as input)
+5. `POST /v1/videos/generations` → animate that still (I2V) or pure T2V fallback
+6. Save `web/static-assets/reply-gifs/decoy/{round_id}_decoy.mp4`
 
 ## Goal
 
-Make the decoy **harder to spot** by matching the visual language of the
-actual human GIFs on the same round — palette, compression, framing, motion —
-not a neon "AI poster" that screams generated.
+- Human replies keep their real reaction GIFs (not regenerated).
+- Decoy is a **new** Grok Imagine clip that blends into the room by style
+  (palette, compression, motion energy) so it is harder to spot.
+- **Never** pass human GIF frames as `reference_images` or `image` to video gen.
 
 ## Architecture
 
 ```
-attach human GIFs
-  → sample frames from those files
+attach human GIFs (disk pool, read-only for agent)
+  → sample frames for vision study only
   → style brief (vision, skill: style_brief.md)
-  → video prompt (skill: video_prompt.md + brief + decoy text vibe)
-  → grok-imagine-video-1.5  (reference_images = human frames)
-  → decoy mp4 looped muted in the client (looks like a gif)
+  → ORIGINAL still (image gen, skill: still_prompt.md)
+  → ORIGINAL video from that still (I2V) or T2V fallback
+  → decoy mp4 looped muted in the client
 ```
 
 - **Never** put `media_source` on the wire during guessing (`server/app.py`).
-- Prefer `reference_images` over bare text-to-video.
-- Fixture keys must **not** embed base64 frames (hash prompt + n_refs + round_id).
+- Fixture keys must **not** embed base64 frames (hash prompt + round_id).
 
 ## Prompt files
 
 | File | Role |
 |------|------|
 | `references/style_brief.md` | System prompt for the vision style pass |
-| `references/video_prompt.md` | Lead-in for the Imagine video prompt |
+| `references/still_prompt.md` | Lead-in for the original Imagine still |
+| `references/video_prompt.md` | Lead-in for Imagine video / I2V |
 
 ## Latency / mode
 

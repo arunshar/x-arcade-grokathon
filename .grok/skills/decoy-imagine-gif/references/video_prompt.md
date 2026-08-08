@@ -1,1 +1,1 @@
-Seamless looping reaction clip that could sit in a group chat next to the reference GIFs. Match their visual language, compression, and energy as closely as possible — do not upgrade to cinematic polish or neon arcade poster style unless the references already look that way.
+Animate into a seamless looping reaction gif for a group chat. Match the room's visual language, compression, and energy so it sits beside the human gifs — but this must be a brand-new Imagine clip. Do not recreate, remix, morph, or collage any human reply gif. Invent original subject matter.
