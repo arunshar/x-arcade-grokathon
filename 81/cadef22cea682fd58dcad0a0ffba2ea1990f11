@@ -1,0 +1,40 @@
+server/app.py
+  s_da6f3933cdb62d::t_509d47f4bdccd0 825-828,833
+integration_check.py
+  s_da6f3933cdb62d::t_4c57b38bf0f6a7 246-271
+cartridges/decoy/queue.py
+  s_da6f3933cdb62d::t_4f1c476707656e 54-58
+  s_da6f3933cdb62d::t_61a45edde1b1fa 17
+artifacts/integration_trace.txt
+  s_da6f3933cdb62d::t_e766981da58f5f 3,29,33-35,58-60,83-85,108-110,129,133-135,154,158-160,179,183-185,196-198
+cartridges/decoy/rounds/decoy_ai.json
+  s_da6f3933cdb62d::t_7f143a3d3b6e54 12-14,18-19,24-25,30-32,36-37,41
+cartridges/decoy/rounds/decoy_food.json
+  s_da6f3933cdb62d::t_ea515171931341 12-13,18-19,24-26,30-31,36-38,41
+cartridges/decoy/rounds/decoy_movies.json
+  s_da6f3933cdb62d::t_817cabe6a3ca76 12-13,18-20,24-25,30-32,36-37,41
+cartridges/decoy/rounds/decoy_music.json
+  s_da6f3933cdb62d::t_e1251c19dc11a8 12-14,18-19,24-25,30-31,36-38,41
+cartridges/decoy/rounds/decoy_sports.json
+  s_da6f3933cdb62d::t_5eb313d9315ca1 12-13,24-25,30-31,36-37
+scripts/abuse_battery.py
+  s_da6f3933cdb62d::t_3530c26ab80b8d 1-200
+server/selfcheck.py
+  s_da6f3933cdb62d::t_8f7d2d23e7901c 31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "81cadef22cea682fd58dcad0a0ffba2ea1990f11",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
