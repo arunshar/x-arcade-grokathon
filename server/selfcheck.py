@@ -28,6 +28,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 os.environ.setdefault("ARCADE_MODE", "demo")
+os.environ["ARCADE_NO_SHUFFLE"] = "1"  # suite asserts against committed round files
 # Pin the server to FALLBACK_ROUND so the scripted guesses below stay valid
 # even after the real queue module is integrated.
 os.environ["ARCADE_FORCE_FALLBACK"] = "1"

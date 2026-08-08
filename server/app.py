@@ -822,12 +822,15 @@ async def ws_endpoint(ws: WebSocket) -> None:
             if not isinstance(msg, dict):
                 continue
             t = msg.get("t")
-            room_id = str(msg.get("room", "")).strip()
+            # Caps mirror the client's maxlength but are enforced here,
+            # because a scripted client can send a megabyte name and every
+            # broadcast to every player would then carry it.
+            room_id = str(msg.get("room", "")).strip()[:16]
             if not t or not room_id:
                 continue
 
             if t == "join":
-                name = str(msg.get("name", "")).strip() or "anon"
+                name = (str(msg.get("name", "")).strip() or "anon")[:24]
                 room = _get_room(room_id)
                 existing = room["players"].get(name)
                 if existing is not None:

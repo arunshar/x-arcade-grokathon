@@ -9,36 +9,36 @@
   "replies": [
     {
       "slot": 0,
-      "text": "insane how bad its gotten",
-      "author": "decoy",
-      "is_decoy": true
-    },
-    {
-      "slot": 1,
-      "text": "Damn okay fam",
-      "author": "@Mar_vel26",
-      "is_decoy": false
-    },
-    {
-      "slot": 2,
-      "text": "They really need to work on this before they lose all their customers",
-      "author": "@youfadedwealth",
-      "is_decoy": false
-    },
-    {
-      "slot": 3,
       "text": "It should get updated",
       "author": "@DefiCrypto11",
       "is_decoy": false
     },
     {
-      "slot": 4,
+      "slot": 1,
       "text": "gotta find some alternative",
       "author": "@theyfwJuice",
       "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Damn okay fam",
+      "author": "@Mar_vel26",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "insane how bad its gotten",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "They really need to work on this before they lose all their customers",
+      "author": "@youfadedwealth",
+      "is_decoy": false
     }
   ],
-  "decoy_slot": 0,
+  "decoy_slot": 3,
   "decoy_rationale": "The missing apostrophe in 'its' plus a polished observational tone feels constructed rather than spontaneous like the others.",
   "safety": {
     "screened": true,

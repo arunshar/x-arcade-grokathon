@@ -9,36 +9,36 @@
   "replies": [
     {
       "slot": 0,
-      "text": "why was he recast tho",
-      "author": "@Silverstar_ot",
-      "is_decoy": false
-    },
-    {
-      "slot": 1,
-      "text": "Ça le faisait tellement j’ai trop le seum",
-      "author": "@hyakkimaruu__",
-      "is_decoy": false
-    },
-    {
-      "slot": 2,
       "text": "I still think this show should have done ALL of Kratos’s story, and not just part skip to the Norse trilogy \n\nLike there’s 7 games and a canonical crossover bossfight that should be covered before this",
       "author": "@Adventuremaker7",
       "is_decoy": false
     },
     {
-      "slot": 3,
+      "slot": 1,
       "text": "dude nailed the kratos look already wild they bounced him",
       "author": "decoy",
       "is_decoy": true
     },
     {
-      "slot": 4,
+      "slot": 2,
+      "text": "Ça le faisait tellement j’ai trop le seum",
+      "author": "@hyakkimaruu__",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
       "text": "I'm not Grok but apparently he effed his shoulder up in a scene. But he's also a newly remade Muslim or some shit, and I think that might have something to do with it. Cheers, Drinker! Keep up the good work, Legend!",
       "author": "@DonDrawsStuff",
       "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "why was he recast tho",
+      "author": "@Silverstar_ot",
+      "is_decoy": false
     }
   ],
-  "decoy_slot": 3,
+  "decoy_slot": 1,
   "decoy_rationale": "The verb 'bounced' feels slightly off-register and forced as slang for recasting compared to the thread's more natural casual phrasing.",
   "safety": {
     "screened": true,

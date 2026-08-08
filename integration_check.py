@@ -27,6 +27,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 os.environ["ARCADE_MODE"] = "demo"
+os.environ["ARCADE_NO_SHUFFLE"] = "1"  # suite asserts against committed round files
 os.environ.pop("ARCADE_FORCE_FALLBACK", None)
 
 # Any connection attempt that leaves loopback is an integration failure.
@@ -241,6 +242,32 @@ async def main() -> int:
 
     server.should_exit = True
     await serve_task
+
+    log("== serve-time shuffle invariants (bypassed above via ARCADE_NO_SHUFFLE) ==")
+    import copy as _copy
+
+    from cartridges.decoy import queue as _q
+
+    _no_shuffle = os.environ.pop("ARCADE_NO_SHUFFLE", None)
+    try:
+        base = json.loads((ROUNDS_DIR / "decoy_music.json").read_text(encoding="utf-8"))
+        seen_slots: set[int] = set()
+        sound = True
+        for _ in range(20):
+            shuffled = _q.randomize_decoy_position(_copy.deepcopy(base))
+            slots = sorted(r["slot"] for r in shuffled["replies"])
+            decoys = [r for r in shuffled["replies"] if r.get("is_decoy")]
+            sound &= slots == [0, 1, 2, 3, 4]
+            sound &= len(decoys) == 1 and decoys[0]["slot"] == shuffled["decoy_slot"]
+            sound &= decoys[0]["text"] == next(
+                r["text"] for r in base["replies"] if r.get("is_decoy")
+            )
+            seen_slots.add(shuffled["decoy_slot"])
+        check(sound, "20 shuffles keep slots a permutation and decoy_slot true")
+        check(len(seen_slots) >= 2, "shuffle actually moves the decoy across slots")
+    finally:
+        if _no_shuffle is not None:
+            os.environ["ARCADE_NO_SHUFFLE"] = _no_shuffle
 
     verdict = "ALL CHECKS PASSED" if not FAILURES else f"FAILURES: {FAILURES}"
     log(f"\nintegration: {verdict} ({len(served_ids)} rounds played, zero network egress)")

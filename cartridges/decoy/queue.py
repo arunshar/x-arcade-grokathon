@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import random
 from pathlib import Path
 from typing import Any
@@ -50,6 +51,11 @@ def randomize_decoy_position(
     Uses a CSPRNG by default so each play of the same round can put the
     robot on a different card (REPLY 1–5), not always the third option.
     """
+    # Deterministic serving for the check suites, which assert against the
+    # committed round files. Play keeps the shuffle.
+    if os.environ.get("ARCADE_NO_SHUFFLE") == "1":
+        return round_data
+
     replies = [r for r in (round_data.get("replies") or []) if isinstance(r, dict)]
     if len(replies) < 2:
         return round_data
