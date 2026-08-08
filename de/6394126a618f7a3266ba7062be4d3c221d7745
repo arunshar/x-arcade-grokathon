@@ -1,0 +1,26 @@
+server/app.py
+  s_da6f3933cdb62d::t_cced4867dd58c2 443-449
+web/game.js
+  s_da6f3933cdb62d::t_61dd9b77dac3be 344-355,358,364,366-371
+  s_da6f3933cdb62d::t_8fb67cff1a7cc8 379-381
+GUIDE.md
+  s_da6f3933cdb62d::t_f78862c7014703 1870-1872,1877-1882
+  s_da6f3933cdb62d::t_66af062c8998be 1513
+  s_da6f3933cdb62d::t_c04491bcd5d3be 1883
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "de6394126a618f7a3266ba7062be4d3c221d7745",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
