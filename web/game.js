@@ -401,7 +401,7 @@ function connect() {
   sock = ws;
   ws.addEventListener("open", () => {
     setConn("LINKED");
-    if (joined) send({ t: "join", room: myRoom, name: myName });
+    if (joined) send({ t: "join", room: myRoom, name: myName, arena: iAmHost });
   });
   ws.addEventListener("message", (ev) => handleRaw(ev.data));
   ws.addEventListener("close", () => { setConn("LINK LOST, RETRYING..."); setTimeout(connect, 1500); });
@@ -943,7 +943,9 @@ function doJoin(opts) {
   if ($("modeJoinBtn")) $("modeJoinBtn").disabled = true;
   if ($("backToModeBtn")) $("backToModeBtn").hidden = true;
 
-  send({ t: "join", room: myRoom, name: myName });
+  // arena:true asks the server to make this a host driven room, so it does
+  // not auto-start the moment a second phone scans in.
+  send({ t: "join", room: myRoom, name: myName, arena: iAmHost });
 
   // Hosts see QR + START; guests wait.
   $("lobbyQr").hidden = false;

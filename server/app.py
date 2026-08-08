@@ -554,6 +554,13 @@ async def ws_endpoint(ws: WebSocket) -> None:
             if t == "join":
                 name = str(msg.get("name", "")).strip() or "anon"
                 room = _get_room(room_id)
+                # A room made with CREATE ROOM is host driven like the stage
+                # arena: it must not auto-start the moment a second phone
+                # scans in, and only its creator advances it. The flag is
+                # honored once, by whoever opens the room. Later joiners
+                # cannot flip an existing room's behavior.
+                if msg.get("arena") and not room["players"] and room["host"] is None:
+                    room["arena"] = True
                 existing = room["players"].get(name)
                 if existing is not None:
                     # Reconnect under the same name keeps score and streak.
@@ -608,12 +615,15 @@ async def ws_endpoint(ws: WebSocket) -> None:
                     # player tapping NEXT must not skip the room forward.
                     continue
                 in_reveal = room["phase"] == "reveal"
-                # A duel needs both players before the first round. An arena is
-                # driven by the host, who must be able to open a round on stage
-                # before anyone has scanned in. The client enables START at one
-                # player, so requiring two here made the button silently dead.
+                # The host may always open a round, alone or not, in any room.
+                # The client shows START to the host, so any stricter rule here
+                # produces a button that looks live and does nothing. A duel
+                # between two people who both typed the same code still needs
+                # both of them before the first round, since it has no host on
+                # a stage waiting to begin.
+                is_host = joined is not None and joined[1] == room["host"]
                 lobby_ready = room["phase"] == "lobby" and (
-                    room["arena"] or len(room["players"]) >= 2
+                    room["arena"] or is_host or len(room["players"]) >= 2
                 )
                 if in_reveal or lobby_ready:
                     await _start_round(room)
