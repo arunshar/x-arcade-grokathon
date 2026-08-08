@@ -1,0 +1,42 @@
+ONBOARDING.md
+  s_da6f3933cdb62d::t_a796b49568be6c 143-146
+  s_da6f3933cdb62d::t_c39e95dd099133 432-434
+  s_da6f3933cdb62d::t_4cf00d2faa4412 318
+  s_da6f3933cdb62d::t_3d06ebd59e671e 70
+  s_da6f3933cdb62d::t_84ade5ffda64ab 388
+  s_da6f3933cdb62d::t_e5260a24594c7a 575
+  s_da6f3933cdb62d::t_458f338ff1f49a 274-275
+  s_da6f3933cdb62d::t_34a547e84c676a 89,91-93
+  s_da6f3933cdb62d::t_fbaeda52448453 400-402
+  s_da6f3933cdb62d::t_0c8b187e9ff6c9 346
+  s_da6f3933cdb62d::t_59ea7adff0e0eb 416
+  s_da6f3933cdb62d::t_8b5f039e1e9db9 183-185
+  s_da6f3933cdb62d::t_fc65c58510775b 374-376
+  s_da6f3933cdb62d::t_5794204f034c02 193-194
+  s_da6f3933cdb62d::t_d3e0963a5b03e9 68-69,71
+  s_da6f3933cdb62d::t_db57af32a6dbb8 290-291
+  s_da6f3933cdb62d::t_a79de8e1aec95c 1-67,72-88,90,94-142,147-182,186-192,195-273,276-289,292-317,319-345,347-373,377-387,389-399,403-415,417-431,435-574,576-628
+README.md
+  s_da6f3933cdb62d::t_0b873e834577a3 41-48
+  s_da6f3933cdb62d::t_3897fb80874e94 36
+cartridges/decoy/round_builder.py
+  s_da6f3933cdb62d::t_2f8a342126133a 451
+run.sh
+  s_da6f3933cdb62d::t_1408e3257ddffa 5-7,9,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "7a4e0126bcb483b583ef2c64a51e7235136ff37a",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
