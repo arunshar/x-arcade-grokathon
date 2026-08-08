@@ -302,11 +302,25 @@ def describe_gif_style(
     )
 
 
+def _sanitize_style_brief(brief: str) -> str:
+    """Strip names / IP that often trip video moderation."""
+    text = brief or ""
+    # Drop obvious proper-name tokens the vision model sometimes emits.
+    text = re.sub(
+        r"\b(Homer|Simpson|Simpsons|Kratos|celebrity|famous|actor|actress)\b",
+        "figure",
+        text,
+        flags=re.I,
+    )
+    return _snippet(text, 220)
+
+
 def build_decoy_video_prompt(
     *,
     style_brief: str,
     topic: str,
     decoy_text: str,
+    abstract_only: bool = False,
 ) -> str:
     """Prompt that steals the human GIF look while carrying the decoy vibe."""
     skill = _load_skill(
@@ -315,15 +329,27 @@ def build_decoy_video_prompt(
         "the reference GIFs. Match their visual language exactly.",
     )
     vibe = _snippet(decoy_text, 90)
+    brief = _sanitize_style_brief(style_brief)
+    safety = (
+        "CRITICAL SAFETY: no real people, no celebrity likeness, no copyrighted "
+        "cartoon characters, no brand logos, no readable text, no watermarks, "
+        "no UI chrome. Use generic anonymous silhouettes, objects, animals, or "
+        "abstract shapes only."
+    )
+    if abstract_only:
+        return (
+            "Short seamless looping reaction gif, square 1:1, compressed web-meme look. "
+            f"Topic mood: {topic or 'general'}. Reply vibe (abstract): {vibe}. "
+            f"Visual energy only (no copying faces): {brief}. "
+            f"{safety}"
+        )
     return (
         f"{skill} "
-        f"Style brief from the human GIFs in this round: {style_brief} "
+        f"Style brief from the human GIFs in this round: {brief} "
         f"Topic: {topic or 'general'}. "
         f"Mood of this one reply (abstract, no readable text): {vibe}. "
         "Square 1:1, 3-second seamless loop, looks like a compressed chat GIF "
-        "not a polished film. No readable text, no logos, no watermarks, "
-        "no UI chrome, no 'AI' labels. Prefer stylized / meme subjects; "
-        "if a face appears keep it generic — never a real celebrity likeness."
+        f"not a polished film. {safety}"
     )
 
 
@@ -531,42 +557,68 @@ def generate_matching_decoy(
     )
     result["prompt"] = _snippet(prompt, 200)
 
-    payload = _video_payload(prompt, data_urls)
-    # Fixture key must not include megabytes of base64.
-    fixture_key = {
-        "model": payload["model"],
-        "prompt": prompt,
-        "duration": payload["duration"],
-        "aspect_ratio": payload["aspect_ratio"],
-        "resolution": payload["resolution"],
-        "n_refs": len(data_urls),
-        "round_id": rid,
-        "kind": "imagine_decoy_video",
-    }
-
-    store = _make_store()
-    try:
+    def _try_video(p: dict[str, Any], key_extra: dict[str, Any]) -> dict[str, Any]:
+        fixture_key = {
+            "model": p["model"],
+            "prompt": p["prompt"],
+            "duration": p["duration"],
+            "aspect_ratio": p["aspect_ratio"],
+            "resolution": p["resolution"],
+            "n_refs": len(p.get("reference_images") or ([] if "image" not in p else [1])),
+            "round_id": rid,
+            "kind": "imagine_decoy_video",
+            **key_extra,
+        }
+        store = _make_store()
         if store is None:
-            done = _full_video_gen(payload)
-        else:
-            done = store.call(
-                "imagine_decoy_video",
-                fixture_key,
-                invoke=lambda: _full_video_gen(payload),
-            )
+            return _full_video_gen(p)
+        return store.call(
+            "imagine_decoy_video",
+            fixture_key,
+            invoke=lambda: _full_video_gen(p),
+        )
+
+    payload = _video_payload(prompt, data_urls)
+    try:
+        done = _try_video(payload, {"pass": "ref"})
     except Exception as exc:
-        print(f"imagine_agent: video gen failed: {exc}", file=sys.stderr)
-        result["status"] = "failed"
-        result["error"] = str(exc)
-        # Shared probe only — never copy it onto the per-round path.
-        probe = DECOY_DIR / "_probe.mp4"
-        if probe.is_file():
-            _stamp_decoy(round_data, probe, ready=False)
-            result["status"] = "failed_probe_fallback"
-            result["path"] = str(probe)
+        err = str(exc)
+        print(f"imagine_agent: video gen failed: {err}", file=sys.stderr)
+        # Content moderation often trips on meme faces in reference GIFs —
+        # retry once abstract / text-only so the round still gets a unique clip.
+        if "moderat" in err.lower() or "rejected" in err.lower():
+            try:
+                safe_prompt = build_decoy_video_prompt(
+                    style_brief=style_brief,
+                    topic=topic,
+                    decoy_text=decoy_text,
+                    abstract_only=True,
+                )
+                result["prompt"] = _snippet(safe_prompt, 200)
+                done = _try_video(_video_payload(safe_prompt, []), {"pass": "abstract"})
+            except Exception as exc2:
+                print(f"imagine_agent: abstract retry failed: {exc2}", file=sys.stderr)
+                result["status"] = "failed"
+                result["error"] = f"{err} | retry: {exc2}"
+                probe = DECOY_DIR / "_probe.mp4"
+                if probe.is_file():
+                    _stamp_decoy(round_data, probe, ready=False)
+                    result["status"] = "failed_probe_fallback"
+                    result["path"] = str(probe)
+                else:
+                    _mark_decoy_failed(round_data)
+                return result
         else:
-            _mark_decoy_failed(round_data)
-        return result
+            result["status"] = "failed"
+            result["error"] = err
+            probe = DECOY_DIR / "_probe.mp4"
+            if probe.is_file():
+                _stamp_decoy(round_data, probe, ready=False)
+                result["status"] = "failed_probe_fallback"
+                result["path"] = str(probe)
+            else:
+                _mark_decoy_failed(round_data)
+            return result
 
     url = (done.get("video") or {}).get("url") or done.get("url")
     if not url:
