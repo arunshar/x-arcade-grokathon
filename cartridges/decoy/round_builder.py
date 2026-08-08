@@ -121,25 +121,12 @@ class RoundBuildError(RuntimeError):
 
 
 def _http_json(path: str, payload: dict[str, Any], timeout: int) -> dict[str, Any]:
-    key = os.environ.get("XAI_API_KEY", "")
-    if not key:
-        raise RoundBuildError("XAI_API_KEY is not set, live mode needs it")
-    request = urllib.request.Request(
-        config.API_BASE + path,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json",
-        },
-    )
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            return json.loads(response.read())
-    except urllib.error.HTTPError as error:
-        body = error.read()[:600].decode(errors="replace")
-        raise RoundBuildError(f"xAI {path} returned {error.code}: {body}") from error
-    except (urllib.error.URLError, TimeoutError) as error:
-        raise RoundBuildError(f"xAI {path} failed: {error}") from error
+        from services.xai_http import post_json
+
+        return post_json(path, payload, timeout=timeout)
+    except RuntimeError as error:
+        raise RoundBuildError(str(error)) from error
 
 
 def _make_store(live: bool) -> FixtureStore | None:

@@ -10,7 +10,15 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.request
+
+# Prefer shared SSL helper (certifi) so macOS python.org installs work.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+try:
+    from services.xai_http import ssl_context
+except Exception:
+    ssl_context = None  # type: ignore
 
 KEY = os.environ.get("XAI_API_KEY", "")
 if not KEY:
@@ -28,8 +36,9 @@ def call(path, payload, timeout=120):
         headers={"Authorization": f"Bearer {KEY}", "Content-Type": "application/json"},
     )
     t0 = time.time()
+    ctx = ssl_context() if ssl_context else None
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as r:
             body = r.read()
             return time.time() - t0, r.status, body
     except urllib.error.HTTPError as e:
