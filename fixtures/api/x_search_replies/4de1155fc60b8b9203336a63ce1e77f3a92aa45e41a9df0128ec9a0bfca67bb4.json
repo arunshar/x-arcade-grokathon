@@ -1,0 +1,262 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/Cointelegraph/status/2085793340247671084 (post id 2085793340247671084, posted by @Cointelegraph). A reliable way is searching with the query conversation_id:2085793340247671084 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "4de1155fc60b8b9203336a63ce1e77f3a92aa45e41a9df0128ec9a0bfca67bb4",
+  "response": {
+    "background": false,
+    "completed_at": 1786127161,
+    "created_at": 1786127161,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "89ac54d0-5510-9cad-816c-5d5f5ed83f88",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_89ac54d0-5510-9cad-816c-5d5f5ed83f88",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/Cointelegraph/status/2085793340247671084 (post id 2085793340247671084, posted by @Cointelegraph).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-e530bb45-a326-4907-bb04-28292adebadb-0",
+        "id": "ctc_89ac54d0-5510-9cad-816c-5d5f5ed83f88_call-e530bb45-a326-4907-bb04-28292adebadb-0",
+        "input": "{\"query\":\"conversation_id:2085793340247671084 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_89ac54d0-5510-9cad-816c-5d5f5ed83f88_call-e530bb45-a326-4907-bb04-28292adebadb-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793971771486720",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793971771486720"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794223723614432",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794223723614432"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794435884085295",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794435884085295"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794123068412012",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794123068412012"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794063022743715",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794063022743715"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794005149696412",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794005149696412"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793888141545699",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793888141545699"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793956579995677",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793956579995677"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794172536008792",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794172536008792"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794270980567204",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794270980567204"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@jacksgrossbeard\",\n      \"text\": \"Pocahontas!\"\n    },\n    {\n      \"author\": \"@tedtradingclub\",\n      \"text\": \"Good regulation should protect people, not just protect crypto companies\"\n    },\n    {\n      \"author\": \"@CryptoJee_\",\n      \"text\": \"It\u2019s the hypocrisy for me. VOTE THEM OUT\"\n    },\n    {\n      \"author\": \"@secondorderdesk\",\n      \"text\": \"When both sides agree legislation is needed, the debate has already moved forward\"\n    },\n    {\n      \"author\": \"@Nae5000\",\n      \"text\": \"Elizabeth Dear should go to honeymoon and chill.\"\n    },\n    {\n      \"author\": \"@realparkerchris\",\n      \"text\": \"She means it needs legislation written by her masters in the banking industry!\"\n    },\n    {\n      \"author\": \"@peach___RRR\",\n      \"text\": \"The Clarity Act at least provides some certainty to the market, which is better than the current state of ambiguity\"\n    },\n    {\n      \"author\": \"@BasedTurtleX\",\n      \"text\": \"So the goal isn't to help foster new industry and create fair rules?\\n\\nIts to attack and prevent the crypto industry?\\n\\nWhy does the federal government exist at all?\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_89ac54d0-5510-9cad-816c-5d5f5ed83f88",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3906,
+        "output_tokens": 712
+      },
+      "cost_in_usd_ticks": 166064000,
+      "input_tokens": 5788,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 948,
+      "output_tokens_details": {
+        "reasoning_tokens": 638
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6736
+    },
+    "user": null
+  },
+  "response_sha256": "ff0109f9a62a17e0b9ad99cc7e30ddc5622959cde6e5219e2a0c27d5168b34e6",
+  "surface": "x_search_replies"
+}

@@ -1,0 +1,262 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/peegzy1/status/2085306680955334992 (post id 2085306680955334992, posted by @peegzy1). A reliable way is searching with the query conversation_id:2085306680955334992 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "50f1e1f4f32edf2f8b2432125b3b2cc5b1578b8ee17db211280f4e2cdbef1f9a",
+  "response": {
+    "background": false,
+    "completed_at": 1786127330,
+    "created_at": 1786127330,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "b8aa4516-7a3b-9fbf-b857-d7991850b514",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_b8aa4516-7a3b-9fbf-b857-d7991850b514",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/peegzy1/status/2085306680955334992 (post id 2085306680955334992, posted by @peegzy1).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-a0f80496-5b61-4d7f-b724-a53015aacd1a-0",
+        "id": "ctc_b8aa4516-7a3b-9fbf-b857-d7991850b514_call-a0f80496-5b61-4d7f-b724-a53015aacd1a-0",
+        "input": "{\"query\":\"conversation_id:2085306680955334992 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b8aa4516-7a3b-9fbf-b857-d7991850b514_call-a0f80496-5b61-4d7f-b724-a53015aacd1a-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085788945208787063",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085788945208787063"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792077720301959",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792077720301959"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085767918608851283",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085767918608851283"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085778834465378646",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085778834465378646"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085770086334226744",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085770086334226744"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085787090764140947",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085787090764140947"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789779489165701",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789779489165701"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085769047140900929",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085769047140900929"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085788659500867942",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085788659500867942"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793940477780332",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793940477780332"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@oluwasegun84872\",\n      \"text\": \"Tope alabi songs\"\n    },\n    {\n      \"author\": \"@chizymusik\",\n      \"text\": \"It get stored in your head forever\"\n    },\n    {\n      \"author\": \"@Gee_fund_\",\n      \"text\": \"Nbl\"\n    },\n    {\n      \"author\": \"@devops_prashant\",\n      \"text\": \"Facts \u2014 hearing one old song and suddenly you\u2019re back in the backseat of their car.\"\n    },\n    {\n      \"author\": \"@Ogologoxx\",\n      \"text\": \"Not true\"\n    },\n    {\n      \"author\": \"@OlajideJ7\",\n      \"text\": \"I can't even lie, I no fit leave Ayefele songs.\"\n    },\n    {\n      \"author\": \"@YX_cellency\",\n      \"text\": \"It\u2019s true for all hues of music. Sound and character.\"\n    },\n    {\n      \"author\": \"@c_isiah_rich\",\n      \"text\": \"True\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_b8aa4516-7a3b-9fbf-b857-d7991850b514",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3955,
+        "output_tokens": 589
+      },
+      "cost_in_usd_ticks": 161984000,
+      "input_tokens": 5839,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 863,
+      "output_tokens_details": {
+        "reasoning_tokens": 608
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6702
+    },
+    "user": null
+  },
+  "response_sha256": "59dbc3cba02590355c8c8fa87ff005bb50105b4c82eb233c0294b24477f02cf4",
+  "surface": "x_search_replies"
+}

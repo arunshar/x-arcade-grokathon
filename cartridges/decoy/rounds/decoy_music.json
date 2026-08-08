@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-63ce6cb6a7de",
+  "source": {
+    "post_text": "tbh the music your parents played growing up stays with you for the rest of your life.",
+    "post_author": "@peegzy1",
+    "post_url": "https://x.com/peegzy1/status/2085306680955334992",
+    "topic": "music"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "I can't even lie, I no fit leave Ayefele songs.",
+      "author": "@OlajideJ7",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "It get stored in your head forever",
+      "author": "@chizymusik",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Facts — hearing one old song and suddenly you’re back in the backseat of their car.",
+      "author": "@devops_prashant",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Ebenezer Obey songs still dey my head",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Tope alabi songs",
+      "author": "@oluwasegun84872",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The mix of correct artist capitalization with dropped articles feels slightly over-crafted compared to the uneven casual typos in the real replies.",
+  "safety": {
+    "screened": false,
+    "gate_codes": []
+  },
+  "seed": 6214443
+}

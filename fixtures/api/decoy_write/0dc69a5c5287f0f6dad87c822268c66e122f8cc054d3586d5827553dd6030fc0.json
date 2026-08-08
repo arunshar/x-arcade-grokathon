@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"\ud83d\udea8 Chelsea have been linked with a surprise move for Arsenal midfielder Mart\u00edn Zubimendi.\\n\\nNew Blues boss Xabi Alonso is reportedly keen on the World Cup winner, but Arsenal have no intention of letting him leave \u2014 despite the \u00a375M arrival of Bruno Guimar\u00e3es.\\n\\n(Source: Mundo Deportivo\",\n  \"real_replies\": [\n    \"What happened to the shin kicker??\ud83d\ude02\",\n    \"Chelsea targeting Zubimendi? Arsenal fans just laughed and carried on with their day. \ud83d\ude02\ud83d\udd34\",\n    \"No chance Arsenal let him walk straight to a rival, especially with how crucial he\u2019s been for the midfield engine.\",\n    \"Is Chelsea mad? What\u2019s wiry going after anyrhing Arsenal? Can\u2019t they stand on their own?\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "0dc69a5c5287f0f6dad87c822268c66e122f8cc054d3586d5827553dd6030fc0",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\"reply_text\":\"Chelsea want Zubimendi now? Absolute clowns thinking arsenal will just hand him over \ud83d\ude02\",\"rationale\":\"The phrase \u201cabsolute clowns\u201d feels slightly too generic and polished as banter, lacking the specific quirky typos or abrupt slang shifts seen in the real replies.\"}",
+          "reasoning_content": "The task is to write one fake reply that hides among real replies to a real X post. I must match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typ...{\n  \"reply_text\": \"Arsenal fans are just chilling knowing Zubimendi is staying put. Chelsea's not getting him anytime soon, especially with that new signing already in place.\",\n  \"rationale\": \"The subtle tell is the overly polished phrasing and lack of any typos or emoji, which stands out against 3 of the 4 real replies that mix casual slang with imperfect spelling and punctuation.\"\n}turn\n\n{\n  \"reply_text\": \"Zubimendi to Chelsea? Arsenal fans are just laughing knowing he's staying put. Especially with Bruno Guimar\u00e3es already there.\",\n  \"rationale\": \"The subtle tell is the slightly unnatural 3-part structure mirroring the real replies too closely while using formal football jargon like 'staying put' instead of the raw slang in the others.\"\n}turn\n\n{\n  \"reply_text\": \"Xabi Alonso can dream all he wants but Arsenal aint selling their best midfielder to Chelsea. Bruno Guimar\u00e3es is proof they're building properly.\",\n  \"rationale\": \"The subtle tell is the inconsistent capitalization and the forced double negative 'aint selling' which feels like an attempt at casualness but doesn't match the natural flow of the thread's banter.\"\n}turn\n\n{\n  \"reply_text\": \"No way Chelsea get Zubimendi. Arsenal are 100% keeping him no matter what Alonso says.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786126995,
+    "id": "1eb79dd0-d301-9c4a-8791-060f148dfaaa",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 64,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1427,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 98944000,
+      "num_sources_used": 0,
+      "prompt_tokens": 583,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 583
+      },
+      "total_tokens": 2074
+    }
+  },
+  "response_sha256": "5fa45a405e465fca85efc95e2b939ad967df492c041b5f2242a9b1a2a5625062",
+  "surface": "decoy_write"
+}

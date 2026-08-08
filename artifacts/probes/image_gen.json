@@ -1,0 +1,7 @@
+{
+ "surface": "image_gen",
+ "status": 200,
+ "latency_s": 6.49817681312561,
+ "image_bytes": 317412,
+ "saved": "probe_card.png"
+}

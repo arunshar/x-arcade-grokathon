@@ -1,0 +1,470 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Search X for one engaging post from the last 48 hours about sports with a healthy reply count, at least 5 replies. Pick a post whose replies are substantive full thoughts, not just emoji or tags. Return the numeric post id, the post text verbatim, the author handle, and the canonical x.com post url.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_post",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "post_author": {
+              "description": "Handle like @name",
+              "type": "string"
+            },
+            "post_id": {
+              "description": "Numeric status id of the post",
+              "type": "string"
+            },
+            "post_text": {
+              "type": "string"
+            },
+            "post_url": {
+              "description": "Canonical https://x.com/.../status/... url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_id",
+            "post_text",
+            "post_author",
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "92051200858abfddd8d2f67290829d9718a722a776a0f8d48cd5e2eac2ab58bf",
+  "response": {
+    "background": false,
+    "completed_at": 1786126976,
+    "created_at": 1786126976,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "a7f3f46c-bc87-9710-8f76-f874e19d2402",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_a7f3f46c-bc87-9710-8f76-f874e19d2402",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to search X for one engaging post from the last 48 hours about sports with a healthy reply count, at least 5 replies. Pick a post whose replies are substantive full thoughts, not jus...",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7900544e-d201-42bc-a120-f78e31e1e8a3-0",
+        "id": "ctc_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-0",
+        "input": "{\"query\":\"(sports OR NFL OR NBA OR soccer OR football OR baseball OR NHL OR \\\"world cup\\\" OR olympics) min_replies:5 within_time:2d -filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7900544e-d201-42bc-a120-f78e31e1e8a3-1",
+        "id": "ctc_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-1",
+        "input": "{\"post_id\":\"2085793093144731845\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "xs_call-7900544e-d201-42bc-a120-f78e31e1e8a3-2",
+        "id": "ctc_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-2",
+        "input": "{\"post_id\":\"2085791911306989806\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-1",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "id": "tco_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-2",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7900544e-d201-42bc-a120-f78e31e1e8a3-3",
+        "id": "ctc_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-3",
+        "input": "{\"post_id\":\"2085791483152794065\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7900544e-d201-42bc-a120-f78e31e1e8a3-4",
+        "id": "ctc_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-4",
+        "input": "{\"query\":\"conversation_id:2085791911306989806 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7900544e-d201-42bc-a120-f78e31e1e8a3-5",
+        "id": "ctc_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-5",
+        "input": "{\"query\":\"conversation_id:2085793093144731845 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a7f3f46c-bc87-9710-8f76-f874e19d2402_call-7900544e-d201-42bc-a120-f78e31e1e8a3-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791911306989806",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791911306989806"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793780892876957",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793780892876957"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793246794453319",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793246794453319"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792071659487685",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792071659487685"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793452625916124",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793452625916124"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793093144731845",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793093144731845"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793651720880407",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793651720880407"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793202817106364",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793202817106364"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793436784083033",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793436784083033"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791483152794065",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791483152794065"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793684688400876",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793684688400876"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793728199901295",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793728199901295"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793524918661594",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793524918661594"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793790082617735",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793790082617735"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791570067071319",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791570067071319"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793469168316704",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793469168316704"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793528458658023",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793528458658023"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793663825985917",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793663825985917"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791996007026705",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791996007026705"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793421093151201",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793421093151201"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793673082806543",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793673082806543"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792164273930284",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792164273930284"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793692183298317",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793692183298317"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793024307769525",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793024307769525"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793311596388386",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793311596388386"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793132231135631",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793132231135631"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793733728243842",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793733728243842"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793754678497705",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793754678497705"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792205235494992",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792205235494992"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793710143631708",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793710143631708"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"post_id\": \"2085793093144731845\",\n  \"post_text\": \"\ud83d\udea8 Chelsea have been linked with a surprise move for Arsenal midfielder Mart\u00edn Zubimendi.\\n\\nNew Blues boss Xabi Alonso is reportedly keen on the World Cup winner, but Arsenal have no intention of letting him leave \u2014 despite the \u00a375M arrival of Bruno Guimar\u00e3es.\\n\\n(Source: Mundo Deportivo\",\n  \"post_author\": \"@DeadlineDayLive\",\n  \"post_url\": \"https://x.com/DeadlineDayLive/status/2085793093144731845\"\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_a7f3f46c-bc87-9710-8f76-f874e19d2402",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "post_author": {
+              "description": "Handle like @name",
+              "type": "string"
+            },
+            "post_id": {
+              "description": "Numeric status id of the post",
+              "type": "string"
+            },
+            "post_text": {
+              "type": "string"
+            },
+            "post_url": {
+              "description": "Canonical https://x.com/.../status/... url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_id",
+            "post_text",
+            "post_author",
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 12905,
+        "output_tokens": 503
+      },
+      "cost_in_usd_ticks": 733264000,
+      "input_tokens": 45137,
+      "input_tokens_details": {
+        "cached_tokens": 33408
+      },
+      "num_server_side_tools_used": 6,
+      "num_sources_used": 0,
+      "output_tokens": 1641,
+      "output_tokens_details": {
+        "reasoning_tokens": 1502
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 6
+      },
+      "total_tokens": 46778
+    },
+    "user": null
+  },
+  "response_sha256": "bd6e0a23435857dd67342bc199c120c1de2521fc2c1e45213becb30bfb6ba6ec",
+  "surface": "x_search_post"
+}

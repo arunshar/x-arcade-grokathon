@@ -1,0 +1,241 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/Variety/status/2085779253677707374 (post id 2085779253677707374, posted by @Variety). A reliable way is searching with the query conversation_id:2085779253677707374 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "7f7db988f826bbd9be6acfb157d5ef57a6ee9722f8e13a9f6e2daecbfd704ebd",
+  "response": {
+    "background": false,
+    "completed_at": 1786127600,
+    "created_at": 1786127600,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "d995f5e7-35b7-9ddc-b3d5-de3679a44517",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_d995f5e7-35b7-9ddc-b3d5-de3679a44517",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/Variety/status/2085779253677707374 (post id 2085779253677707374, posted by @Variety).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-8fc39a13-18a8-4d90-a1b5-fbb7d8096afa-0",
+        "id": "ctc_d995f5e7-35b7-9ddc-b3d5-de3679a44517_call-8fc39a13-18a8-4d90-a1b5-fbb7d8096afa-0",
+        "input": "{\"query\":\"conversation_id:2085779253677707374 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_d995f5e7-35b7-9ddc-b3d5-de3679a44517_call-8fc39a13-18a8-4d90-a1b5-fbb7d8096afa-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792781872578654",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792781872578654"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792609121763475",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792609121763475"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791541541363785",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791541541363785"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791297223422038",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791297223422038"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792244775412191",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792244775412191"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792883614064869",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792883614064869"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791825004986536",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791825004986536"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@_HECTORARRIOLA_\",\n      \"text\": \"still funny that nolan\u2019s first billion-dollar movie in 14 years is a 3,000-year-old poem about a guy who just wants to go home\"\n    },\n    {\n      \"author\": \"@Hedgehog_SWE\",\n      \"text\": \"The Odyssey have not released in china either. Its inflation most people dont remember to take into account\"\n    },\n    {\n      \"author\": \"@Hedgehog_SWE\",\n      \"text\": \"No wrong. Take into inflation into account when you compare movies 14 years apart.\"\n    },\n    {\n      \"author\": \"@eren81416622\",\n      \"text\": \"the dark knight rises did 1.08 billion without china rereleases or premium screens in half its markets\"\n    },\n    {\n      \"author\": \"@UGPolls\",\n      \"text\": \"https://t.co/aSpV4zseam\"\n    },\n    {\n      \"author\": \"@SeanNicol\",\n      \"text\": \"So how many tickets ? \\n\\n100 milllions went decades ago, now it\u2019s 10s of millions at $30-50\"\n    },\n    {\n      \"author\": \"@snoszkaho\",\n      \"text\": \"the real odyssey was just a guy trying to get home and nolan somehow made that a billion dollars\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_d995f5e7-35b7-9ddc-b3d5-de3679a44517",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3691,
+        "output_tokens": 757
+      },
+      "cost_in_usd_ticks": 166380000,
+      "input_tokens": 5569,
+      "input_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 990,
+      "output_tokens_details": {
+        "reasoning_tokens": 665
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6559
+    },
+    "user": null
+  },
+  "response_sha256": "4e54f4ca065bf1d2d465d3c1761dad3add987c67739f2ad7c4b9f44bb2ce3b9c",
+  "surface": "x_search_replies"
+}

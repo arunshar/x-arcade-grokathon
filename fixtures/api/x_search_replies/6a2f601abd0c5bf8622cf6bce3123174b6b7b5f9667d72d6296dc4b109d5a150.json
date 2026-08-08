@@ -1,0 +1,255 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/miles_commodore/status/2085787763488502009 (post id 2085787763488502009, posted by @miles_commodore). A reliable way is searching with the query conversation_id:2085787763488502009 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "6a2f601abd0c5bf8622cf6bce3123174b6b7b5f9667d72d6296dc4b109d5a150",
+  "response": {
+    "background": false,
+    "completed_at": 1786127689,
+    "created_at": 1786127689,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "a71736c2-81b1-9852-8e8c-34ebdd60e5c0",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_a71736c2-81b1-9852-8e8c-34ebdd60e5c0",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/miles_commodore/status/2085787763488502009 (post id 2085787763488502009, posted by @miles_commodore).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-0f8e4894-4efe-429c-bdaa-bb41c4518696-0",
+        "id": "ctc_a71736c2-81b1-9852-8e8c-34ebdd60e5c0_call-0f8e4894-4efe-429c-bdaa-bb41c4518696-0",
+        "input": "{\"query\":\"conversation_id:2085787763488502009 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a71736c2-81b1-9852-8e8c-34ebdd60e5c0_call-0f8e4894-4efe-429c-bdaa-bb41c4518696-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792960583434701",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792960583434701"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792002185077074",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792002185077074"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794815950635044",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794815950635044"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789002561380637",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789002561380637"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085790932058689687",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085790932058689687"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789170065461677",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789170065461677"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085794604452864133",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085794604452864133"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789420746150356",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789420746150356"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085796521304354940",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085796521304354940"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@JeffGil27225591\",\n      \"text\": \"Don Rickles was hilarious!  I miss him.\"\n    },\n    {\n      \"author\": \"@kwrob24\",\n      \"text\": \"Such a good joke.\"\n    },\n    {\n      \"author\": \"@rickdanna4719\",\n      \"text\": \"I've heard that story. Sinatra really cracked up when this happened.\"\n    },\n    {\n      \"author\": \"@lorikramer58\",\n      \"text\": \"I love that story.\"\n    },\n    {\n      \"author\": \"@Valster57\",\n      \"text\": \"\ud83d\ude02\"\n    },\n    {\n      \"author\": \"@ChristopherMH11\",\n      \"text\": \"Don Rickles very underrated\"\n    },\n    {\n      \"author\": \"@GoodSlainte68\",\n      \"text\": \"Jackie Mason once said on Johnny Carson show:\\n\\n\u201cI love Frank, yaknow he saved my life one time!\u201d \\n\\n\u201cReally?\u201d \\n\\n\u201cYeah! These 3 thugs were beating me to death in an alley\u201d\\n\\n\u201cAnd Sinatra saved you?!!\u201d\\n\\n\u201cYeah\u2026he said, \u2018OK, boys, that\u2019s enough.\u2019\u201d\\n@miles_commodore\"\n    },\n    {\n      \"author\": \"@Mike_Tzu_\",\n      \"text\": \"underrated talent\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_a71736c2-81b1-9852-8e8c-34ebdd60e5c0",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3782,
+        "output_tokens": 757
+      },
+      "cost_in_usd_ticks": 166384000,
+      "input_tokens": 5666,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 994,
+      "output_tokens_details": {
+        "reasoning_tokens": 667
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6660
+    },
+    "user": null
+  },
+  "response_sha256": "d5bf9984a7e89b84b21f4185cfb44893a1513fde311cd230c557b867fcd00908",
+  "surface": "x_search_replies"
+}

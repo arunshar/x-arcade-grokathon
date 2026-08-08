@@ -1,0 +1,501 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Search X for one engaging post from the last 48 hours about food, cooking, restaurants, or recipes. Skip posts that are mainly about sports teams with a healthy reply count, at least 5 replies. Pick a post whose replies are substantive full thoughts, not just emoji or tags. Return the numeric post id, the post text verbatim, the author handle, and the canonical x.com post url. Respond with only a JSON object with keys post_id, post_text, post_author, post_url. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "81264f262b4bb4324e09dc32a45feb4568d048503e3d0e14bc51ac44b1c41dca",
+  "response": {
+    "background": false,
+    "completed_at": 1786127672,
+    "created_at": 1786127672,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "b80f7e32-216c-9bf0-8213-ce850bf62a4d",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_b80f7e32-216c-9bf0-8213-ce850bf62a4d",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to search X for one engaging post from the last 48 hours about food, cooking, restaurants, or recipes. Criteria:\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-0",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-0",
+        "input": "{\"query\":\"food OR cooking OR restaurant OR recipe OR recipes min_replies:5 since:2025-03-08\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-1",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-1",
+        "input": "{\"post_id\":\"2085790608623583266\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-1",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-2",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-2",
+        "input": "{\"post_id\":\"2085791142373732801\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-2",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-3",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-3",
+        "input": "{\"post_id\":\"2085790926954176595\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-4",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-4",
+        "input": "{\"query\":\"(cooking OR recipe OR recipes OR restaurant OR food) min_replies:5 since:2026-08-05 -filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-5",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-5",
+        "input": "{\"query\":\"engaging post about cooking a recipe or restaurant experience or food\",\"limit\":\"5\",\"from_date\":\"2026-08-05\"}",
+        "name": "x_semantic_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-6",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-6",
+        "input": "{\"query\":\"(\\\"recipe\\\" OR \\\"recipes\\\" OR \\\"cooked\\\" OR \\\"cooking\\\" OR \\\"restaurant\\\" OR \\\"delicious food\\\") min_replies:10 since:2026-08-05\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-6",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-7",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-7",
+        "input": "{\"post_id\":\"2085787763488502009\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-7",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-8",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-8",
+        "input": "{\"post_id\":\"2085784466971070918\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-8",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-9",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-9",
+        "input": "{\"post_id\":\"2085790608623583266\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-9",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-10",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-10",
+        "input": "{\"query\":\"recipe OR recipes min_replies:5 since:2026-08-06\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-10",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-11",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-11",
+        "input": "{\"post_id\":\"2085773393882689619\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-11",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-12",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-12",
+        "input": "{\"post_id\":\"2085790632195588432\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-12",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9b6361ee-90a0-4141-a84a-ce0186424854-13",
+        "id": "ctc_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-13",
+        "input": "{\"post_id\":\"2085789143552889121\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_b80f7e32-216c-9bf0-8213-ce850bf62a4d_call-9b6361ee-90a0-4141-a84a-ce0186424854-13",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085765552539050481",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085765552539050481"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789143552889121",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789143552889121"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085773393882689619",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085773393882689619"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085198380846706738",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085198380846706738"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085790926954176595",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085790926954176595"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085790507628954020",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085790507628954020"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085030289613430908",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085030289613430908"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085777529898676407",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085777529898676407"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085785374627160106",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085785374627160106"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085785789330284637",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085785789330284637"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791094714048979",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791094714048979"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793043622330817",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793043622330817"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085795342436466819",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085795342436466819"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791241749324274",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791241749324274"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085790608623583266",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085790608623583266"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085787763488502009",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085787763488502009"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085784466971070918",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085784466971070918"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789261597700539",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789261597700539"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085790632195588432",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085790632195588432"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085784361970872488",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085784361970872488"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085773342359929235",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085773342359929235"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085225422233698760",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085225422233698760"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791142373732801",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791142373732801"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085298983594016916",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085298983594016916"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085528317529104628",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085528317529104628"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793181866582282",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793181866582282"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085786541851627718",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085786541851627718"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"post_id\": \"2085787763488502009\",\n  \"post_text\": \"Sinatra once told the story of eating at a restaurant and Don Rickles asked if he could come by his table to impress his date and prove he knows him.\\n\\nA few minutes later Frank walks up and says hey Don how are you? \\n\\nRickles said hey Frank, do you mind we\u2019re eating.\",\n  \"post_author\": \"@miles_commodore\",\n  \"post_url\": \"https://x.com/miles_commodore/status/2085787763488502009\"\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_b80f7e32-216c-9bf0-8213-ce850bf62a4d",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 20825,
+        "output_tokens": 326
+      },
+      "cost_in_usd_ticks": 1703916000,
+      "input_tokens": 188215,
+      "input_tokens_details": {
+        "cached_tokens": 168192
+      },
+      "num_server_side_tools_used": 14,
+      "num_sources_used": 0,
+      "output_tokens": 1648,
+      "output_tokens_details": {
+        "reasoning_tokens": 1487
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 14
+      },
+      "total_tokens": 189863
+    },
+    "user": null
+  },
+  "response_sha256": "dda5dbf5892a7cb3c30f11f86e694f2ca070c8c1fc90675602261682d235ce28",
+  "surface": "x_search_post"
+}

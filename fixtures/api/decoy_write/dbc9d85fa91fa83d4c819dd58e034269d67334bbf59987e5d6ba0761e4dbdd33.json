@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"\ud83c\uddfa\ud83c\uddf8  INSIGHT: Senator Elizabeth Warren says the U.S. needs crypto legislation, but not legislation \\\"written by the crypto industry to protect and advance the crypto industry.\\\"\",\n  \"real_replies\": [\n    \"Good regulation should protect people, not just protect crypto companies\",\n    \"It\u2019s the hypocrisy for me. VOTE THEM OUT\",\n    \"When both sides agree legislation is needed, the debate has already moved forward\",\n    \"Elizabeth Dear should go to honeymoon and chill.\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "dbc9d85fa91fa83d4c819dd58e034269d67334bbf59987e5d6ba0761e4dbdd33",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\"reply_text\":\"Nobody in congress understands crypto enough to write good laws anyway\",\"rationale\":\"The subtle tell is the absolute 'nobody' generalization paired with perfect grammar that feels polished compared to the rawer real replies.\"}",
+          "reasoning_content": "The user wants me to write one fake reply that hides among real replies to a real X post. I need to match the register: typical reply length, tone, capitalization, punctuation habits, typo level, and ...{\n  \"reply_text\": \"Warren's always been anti-crypto, this is just her way to keep the narrative going\",\n  \"rationale\": \"The subtle tell is the overly direct accusation of 'anti-crypto' bias, which feels more pointed and less conversational than the real replies' varied tones.\"\n} 1. \"Good regulation should protect people, not just protect crypto companies\"\n2. \"It\u2019s the hypocrisy for me. VOTE THEM OUT\"\n3. \"When both sides agree legislation is needed, the debate has already moved forward\"\n4. \"Elizabeth Dear should go to honeymoon and chill.\"\n\nI need to write 1 fake reply that hides among the real ones. It should match the register: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible. Don't copy phrases from real replies. Never hint I'm an AI.\n\nAlso, a one sentence rationale naming the subtle tell that makes my reply artificial. Players see rationale after reveal.\n\nResponse format: JSON with reply_text and rationale.\n\nReal replies:\n\n1. \"Good regulation should protect people, not just protect crypto companies\"\n\n2. \"It\u2019s the hypocrisy for me. VOTE THEM OUT\"\n\n3. \"When both sides agree legislation is needed, the debate has already moved forward\"\n\n4. \"Elizabeth Dear should go to honeymoon and chill.\"\n\nPost is about Elizabeth Warren saying US needs crypto legislation but not written by the crypto industry.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786127161,
+    "id": "42e68fb9-e84d-97f2-b6d9-91965e8b8df8",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 48,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1371,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 93364000,
+      "num_sources_used": 0,
+      "prompt_tokens": 520,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 520
+      },
+      "total_tokens": 1939
+    }
+  },
+  "response_sha256": "4c357948537f20c2cc90638a94973671e67ecdc6b9e9479f226ace588a01e042",
+  "surface": "decoy_write"
+}

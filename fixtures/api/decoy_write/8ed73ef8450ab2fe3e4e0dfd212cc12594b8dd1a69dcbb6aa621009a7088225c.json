@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"\u201cThe Odyssey\u201d has officially crossed $1 billion in global ticket sales after just three weeks of release:\\n\\n\u2022 This is the first Christopher Nolan movie to hit the milestone since 2012\u2019s \u201cThe Dark Knight Rises\u201d\\n\\n\u2022 In a matter of days, \u201cThe Odyssey\u201d will become Nolan\u2019s highest-grossing release of all time, eclipsing the long-held records of \u201cThe Dark Knight Rises\u201d ($1.08B) and \u201cThe Dark Knight\u201d ($1.008B)\",\n  \"real_replies\": [\n    \"still funny that nolan\u2019s first billion-dollar movie in 14 years is a 3,000-year-old poem about a guy who just wants to go home\",\n    \"The Odyssey have not released in china either. Its inflation most people dont remember to take into account\",\n    \"the dark knight rises did 1.08 billion without china rereleases or premium screens in half its markets\",\n    \"So how many tickets ? \\n\\n100 milllions went decades ago, now it\u2019s 10s of millions at $30-50\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "8ed73ef8450ab2fe3e4e0dfd212cc12594b8dd1a69dcbb6aa621009a7088225c",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\"reply_text\":\"hit a billion without china and still climbing nolan just different fr\",\"rationale\":\"The subtle tell is the slightly forced slang closer 'fr' that feels tacked on rather than organic to the thread's natural mix of typos and incomplete thoughts.\"}",
+          "reasoning_content": "The user wants me to write one fake reply that hides among real replies to a real X post. I need to match the register: typical reply length, tone, capitalization, punctuation habits, typo level, and ...{\n  \"reply_text\": \"nolan's first billion dollar movie in 14 years is a 3000 year old poem about a guy who just wants to go home\",\n  \"rationale\": \"The subtle tell is the exact phrasing '3000 year old poem about a guy who just wants to go home 14 years' which mirrors reply 1 too closely while ignoring the China/inflation angle that dominates the real replies.\"\n}turn\n\n{\n  \"reply_text\": \"nolan's first billion dollar movie in 14 years is a 3000 year old poem about a guy who just wants to go home\",\n  \" \"rationale\": \"The subtle tell is the exact phrasing '3000 year old poem about a guy who just wants to go home 14 years' which mirrors reply 1 too closely while ignoring the China/inflation angle that dominates the real replies.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786127600,
+    "id": "07928e82-8113-9253-990d-52f4bec8e84c",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 57,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 930,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 70104000,
+      "num_sources_used": 0,
+      "prompt_tokens": 653,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 653
+      },
+      "total_tokens": 1640
+    }
+  },
+  "response_sha256": "ce121660bb79ab6cddd9615f46569b39aa5eaf4d0a119867a6656c54fed668a6",
+  "surface": "decoy_write"
+}

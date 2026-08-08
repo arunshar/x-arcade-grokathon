@@ -1,0 +1,215 @@
+{
+  "summary": "X Arcade pitch deck",
+  "result": {
+    "slides": [
+      {
+        "n": 1,
+        "section": "OPENING",
+        "kicker": "X ARCADE / GROKATHON",
+        "title": "X's biggest embarrassment, *now a game*",
+        "layout": "title",
+        "body": [
+          "X suspends about 208 bot accounts a minute (reported, Apr 2026)",
+          "Spotting the fake is already entertainment on X",
+          "X Arcade turns it into a two-player game"
+        ],
+        "highlights": [
+          {"label": "Bot suspensions, reported", "value": "~208/min"},
+          {"label": "Flagship cartridge", "value": "Decoy"},
+          {"label": "One round", "value": "30s"}
+        ],
+        "chartRef": "",
+        "figureRef": "",
+        "equations": [],
+        "notes": "Open on the number. In April 2026 Nikita Bier said X was suspending roughly 208 bot accounts every minute (x.com/nikitabier/status/2042121229998682517). That figure and the other market claims in this deck come from the 7 August research sweep of public reporting. They are quoted as reported, not measured by us. Second beat: in November 2025 the About this account feature went viral as spot-the-fake entertainment. People already play this game for free in the quote tweets. X Arcade gives it a scoreboard. The line to land: we turned X's biggest embarrassment into a game."
+      },
+      {
+        "n": 2,
+        "section": "THE GAP",
+        "kicker": "AN UNOWNED ROADMAP",
+        "title": "Nobody owns games at X *this week*",
+        "layout": "default",
+        "body": [
+          "X has never shipped a game in twenty years",
+          "Musk promised an xAI-studio AI game by end of 2026",
+          "That promise is still unshipped",
+          "X's head of product resigned on 5 August",
+          "WeChat shows mini-games can anchor a super app",
+          "Source: 7 Aug research sweep, public reporting"
+        ],
+        "highlights": [
+          {"label": "Games shipped by X", "value": "0"},
+          {"label": "The 2026 promise", "value": "Unshipped"},
+          {"label": "Product head resigned", "value": "Aug 5"}
+        ],
+        "chartRef": "",
+        "figureRef": "",
+        "equations": [],
+        "notes": "Three reported facts make the lane. First, X has never shipped a game on the platform in twenty years. Second, Musk publicly promised an AI-generated game from an xAI studio by the end of 2026, and nothing has shipped. Third, the head of product resigned two days ago, on 5 August, so the roadmap that would own this is unowned this week. WeChat is the model to name: its mini-game layer is a load-bearing part of the super-app moat. Hold the AI21 precedent for questions: Human or Not drew a reported ten million conversations in a month in 2023, then shut down. Appetite proven, surface abandoned. All of these are external claims from the research sweep, not our measurements."
+      },
+      {
+        "n": 3,
+        "section": "DECOY",
+        "kicker": "CARTRIDGE 01",
+        "title": "Decoy: spot the machine in *30 seconds*",
+        "layout": "split",
+        "body": [
+          "One real trending thread, pulled live from X",
+          "Four real replies, read verbatim from the thread",
+          "One Grok-written imposter hidden among them",
+          "Two players race to tap the fake",
+          "Reveal shows real authors and the imposter's rationale"
+        ],
+        "highlights": [
+          {"label": "Rounds built live, 7 Aug", "value": "6"},
+          {"label": "Grok voice host lines", "value": "5"},
+          {"label": "Share card, Imagine", "value": "1"}
+        ],
+        "chartRef": "loop",
+        "figureRef": "",
+        "equations": [],
+        "notes": "This slide matches the lobby the judges will see: near-black, neon cyan, CRT scanlines, all CSS. The loop is one breath long. Real threads, pulled live on 7 August: deedydas on AI, Cointelegraph on crypto, Variety on movies, DeadlineDayLive on sports. Four replies are read verbatim from the thread, with post URLs preserved in the round files under cartridges/decoy/rounds/. Grok writes the fifth in the same register. Thirty seconds on the clock, two players, first correct tap wins. At reveal the real handles come back and Grok explains how it faked the register. The host voice is Grok TTS, five lines pre-rendered on 7 August."
+      },
+      {
+        "n": 4,
+        "section": "LIVE DEMO",
+        "kicker": "TWO PLAYERS, ONE ROOM",
+        "title": "Let's *play*",
+        "layout": "title",
+        "body": [
+          "Room code GROK",
+          "First correct tap wins"
+        ],
+        "highlights": [
+          {"label": "Room code", "value": "GROK"},
+          {"label": "On the clock", "value": "30s"}
+        ],
+        "chartRef": "",
+        "figureRef": "",
+        "equations": [],
+        "notes": "Stop talking and play. Open two tabs, both join room GROK, and the round starts the moment the second player joins. Hand a judge player two. If the venue network dies, the demo runs entirely offline from committed fixtures, and ?mock=1 puts the stage into a scripted state as the worst-case fallback."
+      },
+      {
+        "n": 5,
+        "section": "HOW IT WORKS",
+        "kicker": "X_SEARCH TO REVEAL",
+        "title": "Live thread in, *five gates* before play",
+        "layout": "chart",
+        "body": [],
+        "highlights": [
+          {"label": "x_search probe", "value": "42s"},
+          {"label": "Image gen probe", "value": "6.5s"},
+          {"label": "TTS probe", "value": "1.78s"},
+          {"label": "Voice token mint", "value": "0.13s"}
+        ],
+        "chartRef": "pipeline",
+        "figureRef": "",
+        "equations": [],
+        "notes": "The pipeline in five beats. x_search finds a trending thread, a second grounded call reads its replies, and the builder rejects any response that made no x_search call. Grok writes the imposter. Five deterministic gates screen every round, fail closed, no override. The queue serves only clean rounds. The four numbers below are probes measured the morning of 7 August, saved under artifacts/probes/. The 42 second x_search latency is exactly why rounds pre-build into a queue and are never fetched inline. The proof beat: integration_check.py plays a full two-player round offline with a socket guard active, zero network egress, trace at artifacts/integration_trace.txt. Voice runs browser-direct over an ephemeral token endpoint, minted in 0.13 seconds, and no secret ever reaches the client."
+      },
+      {
+        "n": 6,
+        "section": "FLYWHEEL",
+        "kicker": "THESIS, NOT A RESULT",
+        "title": "Every guess is a *labeled judgment*",
+        "layout": "split",
+        "body": [
+          "A guess marks which reply reads machine-written",
+          "Wrong guesses flag real replies that read like bots",
+          "Aggregate signal is what bot detection wants",
+          "This is a thesis. No flywheel number is measured."
+        ],
+        "highlights": [
+          {"label": "Labeled as such", "value": "Thesis"},
+          {"label": "Flywheel metrics measured", "value": "0"}
+        ],
+        "chartRef": "flywheel",
+        "figureRef": "",
+        "equations": [],
+        "notes": "Label this slide honestly and it gets stronger, not weaker. Every guess is a human judgment about what reads as machine-written, attached to real content, at game speed. Correct guesses say this text reads human. Wrong guesses are the interesting half: a real person whose reply reads like a bot. Aggregated, that is the labeled signal a bot-detection stack is starved for, the 208-a-minute problem from the first slide. We have measured none of it. The claim is that the loop exists and the game produces the labels as a side effect of being fun."
+      },
+      {
+        "n": 7,
+        "section": "PLATFORM",
+        "kicker": "CARTRIDGES + GATES",
+        "title": "One cabinet, *many cartridges*",
+        "layout": "split",
+        "body": [
+          "A cartridge ships rounds behind one small contract",
+          "The cabinet runs rooms, scoring, voice, share cards",
+          "Gates are platform infrastructure, not per-game code",
+          "They rejected 1 of 6 rounds built 7 Aug",
+          "Second cartridge Crux exists as a sketch"
+        ],
+        "highlights": [
+          {"label": "Rounds rejected, 7 Aug", "value": "1/6"},
+          {"label": "Gates, fail closed", "value": "5"}
+        ],
+        "chartRef": "gates",
+        "figureRef": "",
+        "equations": [],
+        "notes": "The platform claim rests on the seam. A cartridge ships rounds that satisfy one small contract in CONTRACT.md, and the cabinet supplies rooms, websocket state, scoring, the voice host, and the share card forge. The gates are what judges should remember: they run at load, deterministic, fail closed, and on 7 August they proved themselves on real content, rejecting the AI-topic round on G_SOURCE and G_URL failures, so five of six rounds serve. A rejected round is not a bug. It is the screen working. Crux, the second cartridge, exists as a sketch only and is claimed as exactly that."
+      },
+      {
+        "n": 8,
+        "section": "BUSINESS",
+        "kicker": "PROJECTIONS, LABELED",
+        "title": "Sponsored arenas, *shareable wins*",
+        "layout": "split",
+        "body": [
+          "Brands sponsor topic arenas with a light skin",
+          "The winner's share card carries the sponsor mark",
+          "Gates screen every round before a brand touches it",
+          "All revenue figures are illustrative, none are measured"
+        ],
+        "highlights": [],
+        "chartRef": "",
+        "figureRef": "share_card",
+        "equations": [],
+        "notes": "Two ad surfaces fall out of the game. Sponsored arenas: a brand picks a topic, gets an accent color and its name on the arena, and the game stays identical. The share card: the winner's card carries the sponsor mark, so every share is brand reach next to the topic the brand chose. The ad module ships with its cpm_note field set to the literal string ILLUSTRATIVE so no invented market figure appears anywhere, and every sponsor name in the demo config is fictional. To be plain: any revenue number attached to this idea is a projection. The safety gates run before any arena is served, which is the brand-safety answer an ads buyer needs first."
+      },
+      {
+        "n": 9,
+        "section": "CLOSE",
+        "kicker": "THE ASK",
+        "title": "Built in *a day* on the API",
+        "layout": "closing",
+        "body": [
+          "Code: github.com/OWNER/x-arcade, public, MIT",
+          "Built 7 August, the day before this event",
+          "Post-back and video are staged, said openly",
+          "The ask: ship one cartridge on X, measure the flywheel"
+        ],
+        "highlights": [
+          {"label": "License", "value": "MIT"},
+          {"label": "On the xAI API", "value": "1 day"}
+        ],
+        "chartRef": "",
+        "figureRef": "",
+        "equations": [],
+        "notes": "Close on candor. The whole thing was built yesterday, the day before the event, on the xAI API surfaces: x_search, Grok 4.5 text, Imagine image, Grok voice TTS. What is real: live rounds from real threads, two-player websocket rooms, gates that rejected real content on 7 August, and an offline proof with zero network egress. What is staged and stated as staged: the post-back to X and the pre-generated video. The ask is small and concrete: ship one cartridge behind a real X surface and instrument the guess stream to test the flywheel thesis for real."
+      }
+    ],
+    "design": {
+      "palette": {
+        "bg": "#04070B",
+        "bgAlt": "#0B141E",
+        "ink": "#E8F6FB",
+        "inkDim": "#93A9B9",
+        "accent": "#22D3EE",
+        "accent2": "#FF2D55",
+        "pcrf": "#67E8F9",
+        "pigrpo": "#FF2D55",
+        "good": "#4ADE80",
+        "warn": "#FBBF24",
+        "grid": "#16303E"
+      },
+      "fonts": {
+        "heading": "Space Grotesk",
+        "body": "Inter",
+        "mono": "JetBrains Mono",
+        "googleFontsHref": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      }
+    }
+  }
+}

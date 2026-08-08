@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>X ARCADE // DECOY</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="crt" aria-hidden="true"></div>
+
+<header id="topbar">
+  <div class="brand">
+    <span class="wordmark">X ARCADE</span>
+    <span class="cart">DECOY</span>
+  </div>
+  <div class="topbar-right">
+    <span class="chip chip-safety" id="safetyChip" hidden>ARENA CLEARED BY SAFETY GATES</span>
+    <span class="chip chip-demo" id="demoBadge" hidden>DEMO</span>
+    <span class="chip" id="roundCounter">RND 00</span>
+    <button class="chip chip-btn" id="muteBtn" type="button">SND ON</button>
+  </div>
+</header>
+
+<main>
+  <!-- Screen 1: lobby -->
+  <section id="screen-lobby" class="screen">
+    <h1 class="lobby-title">DECOY</h1>
+    <p class="lobby-tag">Four real replies. One machine. Spot the imposter.</p>
+    <div class="lobby-form" id="lobbyForm">
+      <label class="field">
+        <span>PLAYER NAME</span>
+        <input id="nameInput" maxlength="16" autocomplete="off" spellcheck="false" placeholder="PLAYER">
+      </label>
+      <label class="field">
+        <span>ROOM CODE</span>
+        <input id="roomInput" maxlength="8" autocomplete="off" spellcheck="false" placeholder="ABC">
+      </label>
+      <button class="big-btn" id="joinBtn" type="button">JOIN ROOM</button>
+    </div>
+    <div class="lobby-qr" id="lobbyQr" hidden>
+      <img src="static-assets/qr.png" alt="scan to join room GROK" class="qr-img">
+      <div class="section-label">SCAN TO PLAY · ROOM GROK</div>
+    </div>
+    <div class="lobby-players">
+      <div class="section-label">PLAYERS PRESENT</div>
+      <ul id="lobbyPlayers" class="player-list"></ul>
+    </div>
+    <button class="big-btn btn-start" id="startBtn" type="button" disabled>START</button>
+    <p class="conn-line" id="connLine">LINKING...</p>
+  </section>
+
+  <!-- Screens 2 and 3: round and reveal share the arena, reveal decorates it -->
+  <section id="screen-game" class="screen" hidden>
+    <div class="arena-top">
+      <article class="post-card" id="postCard">
+        <div class="post-head">
+          <div class="avatar" id="postAvatar">?</div>
+          <div class="post-who">
+            <span class="post-author" id="postAuthor">@handle</span>
+            <span class="post-topic" id="postTopic">topic</span>
+          </div>
+        </div>
+        <p class="post-text" id="postText"></p>
+      </article>
+      <div class="timer-wrap" id="timerWrap">
+        <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"></circle>
+        </svg>
+        <div class="timer-num" id="timerNum">30</div>
+      </div>
+    </div>
+
+    <div class="opp-strip" id="oppStrip"></div>
+
+    <div class="replies" id="replies"></div>
+
+    <div class="reveal-panel" id="revealPanel" hidden>
+      <div class="winner-banner" id="winnerBanner">HOUSE WINS</div>
+      <div class="score-strip" id="scoreStrip"></div>
+      <img class="share-card" id="shareCard" alt="share card" hidden>
+      <button class="big-btn btn-start" id="nextBtn" type="button">NEXT ROUND</button>
+    </div>
+  </section>
+</main>
+
+<script src="game.js"></script>
+</body>
+</html>

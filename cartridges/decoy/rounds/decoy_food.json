@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-07f051a50258",
+  "source": {
+    "post_text": "Sinatra once told the story of eating at a restaurant and Don Rickles asked if he could come by his table to impress his date and prove he knows him.\n\nA few minutes later Frank walks up and says hey Don how are you? \n\nRickles said hey Frank, do you mind we’re eating.",
+    "post_author": "@miles_commodore",
+    "post_url": "https://x.com/miles_commodore/status/2085787763488502009",
+    "topic": "food"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "I love that story.",
+      "author": "@lorikramer58",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Such a good joke.",
+      "author": "@kwrob24",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "I've heard that story. Sinatra really cracked up when this happened.",
+      "author": "@rickdanna4719",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Rickles always had the perfect zinger ready.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Don Rickles was hilarious!  I miss him.",
+      "author": "@JeffGil27225591",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The slightly polished phrasing and word choice 'zinger' stand out as more writerly than the plain, direct praise in the real replies.",
+  "safety": {
+    "screened": false,
+    "gate_codes": []
+  },
+  "seed": 696310936
+}

@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"Sinatra once told the story of eating at a restaurant and Don Rickles asked if he could come by his table to impress his date and prove he knows him.\\n\\nA few minutes later Frank walks up and says hey Don how are you? \\n\\nRickles said hey Frank, do you mind we\u2019re eating.\",\n  \"real_replies\": [\n    \"Don Rickles was hilarious!  I miss him.\",\n    \"Such a good joke.\",\n    \"I've heard that story. Sinatra really cracked up when this happened.\",\n    \"I love that story.\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "52c0f83498d474e993c13cf00d60c73a8565d53169a5b514910e672421ce21cd",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\"reply_text\":\"Rickles always had the perfect zinger ready.\",\"rationale\":\"The slightly polished phrasing and word choice 'zinger' stand out as more writerly than the plain, direct praise in the real replies.\"}",
+          "reasoning_content": "The user wants me to write one fake reply that hides among real replies to a real X post. I need to match the register: typical reply length, tone, capitalization, punctuation habits, typo level, and ...{\n  \"reply_text\": \"Haha classic Don Rickles move.\",\n  \"rationale\": \"The reply uses 'Haha' for casual emphasis and 'move' as slang, but the overall structure is a bit too polished and punchy compared to the real replies' varied lengths and casual phrasing.\"\n}turn 1: {\"reply_text\": \"Haha classic Don Rickles move.\", \"rationale\": \"The reply uses 'Haha' for casual emphasis and 'move' as slang, but the overall structure is a bit too polished and punchy compared to the real replies' varied lengths and casual phrasing.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786127689,
+    "id": "e67c6936-3886-9469-b1a8-8bda510fda80",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 51,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 694,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 53244000,
+      "num_sources_used": 0,
+      "prompt_tokens": 536,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 536
+      },
+      "total_tokens": 1281
+    }
+  },
+  "response_sha256": "517fdd62b7e5ecbbf3a395b1ea15d78120dfea079300af21ade337037332715d",
+  "surface": "decoy_write"
+}

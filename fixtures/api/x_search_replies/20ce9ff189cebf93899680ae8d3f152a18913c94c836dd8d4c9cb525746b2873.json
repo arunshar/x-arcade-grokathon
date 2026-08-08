@@ -1,0 +1,262 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/deedydas/status/2085642431723446579 (post id 2085642431723446579, posted by @deedydas). A reliable way is searching with the query conversation_id:2085642431723446579 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "20ce9ff189cebf93899680ae8d3f152a18913c94c836dd8d4c9cb525746b2873",
+  "response": {
+    "background": false,
+    "completed_at": 1786126915,
+    "created_at": 1786126915,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "059ab043-0dc9-9842-b758-ab03cbc2b9d0",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_059ab043-0dc9-9842-b758-ab03cbc2b9d0",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/deedydas/status/2085642431723446579 (post id 2085642431723446579, posted by @deedydas).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7c4a18a4-e98a-440e-b9f6-c2d7a04d1a00-0",
+        "id": "ctc_059ab043-0dc9-9842-b758-ab03cbc2b9d0_call-7c4a18a4-e98a-440e-b9f6-c2d7a04d1a00-0",
+        "input": "{\"query\":\"conversation_id:2085642431723446579 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_059ab043-0dc9-9842-b758-ab03cbc2b9d0_call-7c4a18a4-e98a-440e-b9f6-c2d7a04d1a00-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085783065607950521",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085783065607950521"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085776202485408140",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085776202485408140"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085770682189889957",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085770682189889957"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085769809757925657",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085769809757925657"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085768214147948995",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085768214147948995"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085743253840957772",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085743253840957772"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085774746978005024",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085774746978005024"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085768935492780476",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085768935492780476"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085777642549284928",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085777642549284928"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085758901673406652",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085758901673406652"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@StillTr05207382\",\n      \"text\": \"\\\"Sandboxing\\\" is going to have to mean real physical isolation, for a start.\"\n    },\n    {\n      \"author\": \"@ritsource\",\n      \"text\": \"Reminds me of this video form @tomscott \\nhttps://www.youtube.com/watch?v=-JlxuQ7tPgQ&feature=youtu.be\"\n    },\n    {\n      \"author\": \"@kozhicodian\",\n      \"text\": \"Can it crack 2FA?\"\n    },\n    {\n      \"author\": \"@buildwbhoomika\",\n      \"text\": \"Cybersecurity just lost its rate limit \ud83d\udc80\"\n    },\n    {\n      \"author\": \"@tamisrachrips\",\n      \"text\": \"No large software system is free of unknown 0-days. OpenAI intentionally relaxed controls for a controlled security evaluation. Hugging Face detected and contained the intrusion, and both companies investigated it together. The future of cybersecurity is increasingly AI vs. AI!\"\n    },\n    {\n      \"author\": \"@heyartzy\",\n      \"text\": \"this is why i still want a human approval step for powerful agents\"\n    },\n    {\n      \"author\": \"@maxjean__\",\n      \"text\": \"If it\u2019s so serious pause all ai development and burn the GPUs. Problem solved\"\n    },\n    {\n      \"author\": \"@dadadaistt\",\n      \"text\": \"reality check. agent swarm creates a new attack surface.  \\nsecurity teams must design for distributed autonomous bots\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_059ab043-0dc9-9842-b758-ab03cbc2b9d0",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3931,
+        "output_tokens": 487
+      },
+      "cost_in_usd_ticks": 157356000,
+      "input_tokens": 5813,
+      "input_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 722,
+      "output_tokens_details": {
+        "reasoning_tokens": 363
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6535
+    },
+    "user": null
+  },
+  "response_sha256": "b9560d6daf2f0d7cf3a8f6e8c6303008fb2e9d92566246a375b9cb50ff9bd4cf",
+  "surface": "x_search_replies"
+}

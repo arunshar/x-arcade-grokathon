@@ -1,0 +1,200 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/DeadlineDayLive/status/2085793093144731845 (post id 2085793093144731845, posted by @DeadlineDayLive). A reliable way is searching with the query conversation_id:2085793093144731845 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array. Respond with only a JSON object with one key, replies, an array of {author, text}. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "65d372d552cd7831c113a366b457471569095e3f30310d53c9c92abcd702a3a5",
+  "response": {
+    "background": false,
+    "completed_at": 1786126995,
+    "created_at": 1786126995,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "6b85ad7e-1701-9902-a3dd-075f31e340d4",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_6b85ad7e-1701-9902-a3dd-075f31e340d4",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/DeadlineDayLive/status/2085793093144731845 (post id 2085793093144731845, posted by @DeadlineDayLive).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7a962a1f-16fd-4d21-a869-b6166b14af2a-0",
+        "id": "ctc_6b85ad7e-1701-9902-a3dd-075f31e340d4_call-7a962a1f-16fd-4d21-a869-b6166b14af2a-0",
+        "input": "{\"query\":\"conversation_id:2085793093144731845 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6b85ad7e-1701-9902-a3dd-075f31e340d4_call-7a962a1f-16fd-4d21-a869-b6166b14af2a-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793790082617735",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793790082617735"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793684688400876",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793684688400876"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793780892876957",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793780892876957"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793849360712033",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793849360712033"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793728199901295",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793728199901295"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793692183298317",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793692183298317"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793754678497705",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793754678497705"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793817882484935",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793817882484935"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793733728243842",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793733728243842"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793673082806543",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793673082806543"
+              }
+            ],
+            "logprobs": [],
+            "text": "```json\n{\"replies\":[{\"author\":\"@Clementtimi112\",\"text\":\"https://t.co/1IAXyEk9SK\"},{\"author\":\"@TradeforGoals\",\"text\":\"What happened to the shin kicker??\ud83d\ude02\"},{\"author\":\"@Obynodollar\",\"text\":\"Chelsea targeting Zubimendi? Arsenal fans just laughed and carried on with their day. \ud83d\ude02\ud83d\udd34\"},{\"author\":\"@TacticaHQ\",\"text\":\"No chance Arsenal let him walk straight to a rival, especially with how crucial he\u2019s been for the midfield engine.\"},{\"author\":\"@Richinbodymind\",\"text\":\"Is Chelsea mad? What\u2019s wiry going after anyrhing Arsenal? Can\u2019t they stand on their own?\"},{\"author\":\"@Obynodollar\",\"text\":\"Xabi Alonso wants him, Arsenal need him. This one looks dead on arrival. \ud83d\ude05\ud83d\udd34\"},{\"author\":\"@Damzkid0\",\"text\":\"We no fit buy this one pass \u00a335M\"},{\"author\":\"@Termough_10\",\"text\":\"https://t.co/lvxyoiDGzz\"}]}\n```",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_6b85ad7e-1701-9902-a3dd-075f31e340d4",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 4278,
+        "output_tokens": 743
+      },
+      "cost_in_usd_ticks": 173484000,
+      "input_tokens": 6081,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 974,
+      "output_tokens_details": {
+        "reasoning_tokens": 717
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 7055
+    },
+    "user": null
+  },
+  "response_sha256": "fef48e4079b23461530b173880dfe73ea3fdffe6f7e21b3246cde4d5c0dfa2d8",
+  "surface": "x_search_replies"
+}

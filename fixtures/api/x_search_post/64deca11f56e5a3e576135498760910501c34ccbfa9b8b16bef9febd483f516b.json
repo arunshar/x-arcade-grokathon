@@ -1,0 +1,596 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Search X for one engaging post from the last 48 hours about music with a healthy reply count, at least 5 replies. Pick a post whose replies are substantive full thoughts, not just emoji or tags. Return the numeric post id, the post text verbatim, the author handle, and the canonical x.com post url.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_post",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "post_author": {
+              "description": "Handle like @name",
+              "type": "string"
+            },
+            "post_id": {
+              "description": "Numeric status id of the post",
+              "type": "string"
+            },
+            "post_text": {
+              "type": "string"
+            },
+            "post_url": {
+              "description": "Canonical https://x.com/.../status/... url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_id",
+            "post_text",
+            "post_author",
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "64deca11f56e5a3e576135498760910501c34ccbfa9b8b16bef9febd483f516b",
+  "response": {
+    "background": false,
+    "completed_at": 1786127317,
+    "created_at": 1786127317,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "7541ec33-37d1-9878-b842-e9697d9ee177",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_7541ec33-37d1-9878-b842-e9697d9ee177",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to search X for one engaging post from the last 48 hours about music with a healthy reply count, at least 5 replies. Pick a post whose replies are substantive full thoughts, not just...",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-0",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-0",
+        "input": "{\"query\":\"music min_replies:5 within_time:2d\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-1",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-1",
+        "input": "{\"post_id\":\"2085789310582685961\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-1",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-2",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-2",
+        "input": "{\"post_id\":\"2085792907466781163\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-2",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-3",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-3",
+        "input": "{\"post_id\":\"2085791278625661032\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-4",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-4",
+        "input": "{\"query\":\"music (taste OR song OR album OR artist OR band) min_replies:10 within_time:2d\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-5",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-5",
+        "input": "{\"post_id\":\"2085788060311073151\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-6",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-6",
+        "input": "{\"query\":\"engaging discussion about music\",\"limit\":\"5\",\"from_date\":\"2026-08-05\"}",
+        "name": "x_semantic_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-6",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-7",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-7",
+        "input": "{\"query\":\"\\\"music\\\" min_replies:5 within_time:2d -filter:replies\",\"limit\":\"10\",\"mode\":\"Top\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-7",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-8",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-8",
+        "input": "{\"query\":\"music min_replies:5 within_time:48h\",\"limit\":\"10\",\"mode\":\"Top\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-8",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-9",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-9",
+        "input": "{\"post_id\":\"2085306680955334992\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-9",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-10",
+        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-10",
+        "input": "{\"query\":\"conversation_id:2085306680955334992\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-10",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2084885714051690734",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2084885714051690734"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792907466781163",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792907466781163"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789786212597787",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789786212597787"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789779489165701",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789779489165701"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085774457634000908",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085774457634000908"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792922364957017",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792922364957017"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085784699767570783",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085784699767570783"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792280711958867",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792280711958867"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085781013922476049",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085781013922476049"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792261468758091",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792261468758091"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085778834465378646",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085778834465378646"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085790602701291883",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085790602701291883"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085306680955334992",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085306680955334992"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085779179795050793",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085779179795050793"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085348679091954142",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085348679091954142"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085784596235379122",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085784596235379122"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085783523768594811",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085783523768594811"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791595186545083",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791595186545083"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789560043155847",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789560043155847"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085789310582685961",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085789310582685961"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085782339976679796",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085782339976679796"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085690167252156445",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085690167252156445"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085783678001750519",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085783678001750519"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085786769107378665",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085786769107378665"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792077720301959",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792077720301959"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085788659500867942",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085788659500867942"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085084335154098645",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085084335154098645"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085770086334226744",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085770086334226744"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791278625661032",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791278625661032"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085788060311073151",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085788060311073151"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085307787807019468",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085307787807019468"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085793940477780332",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085793940477780332"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085788945208787063",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085788945208787063"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085787090764140947",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085787090764140947"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085769047140900929",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085769047140900929"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085767918608851283",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085767918608851283"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085791946040107257",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085791946040107257"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085792523629269138",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085792523629269138"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"post_id\": \"2085306680955334992\",\n  \"post_text\": \"tbh the music your parents played growing up stays with you for the rest of your life.\",\n  \"post_author\": \"@peegzy1\",\n  \"post_url\": \"https://x.com/peegzy1/status/2085306680955334992\"\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_7541ec33-37d1-9878-b842-e9697d9ee177",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "post_author": {
+              "description": "Handle like @name",
+              "type": "string"
+            },
+            "post_id": {
+              "description": "Numeric status id of the post",
+              "type": "string"
+            },
+            "post_text": {
+              "type": "string"
+            },
+            "post_url": {
+              "description": "Canonical https://x.com/.../status/... url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_id",
+            "post_text",
+            "post_author",
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 15753,
+        "output_tokens": 258
+      },
+      "cost_in_usd_ticks": 1217940000,
+      "input_tokens": 104604,
+      "input_tokens_details": {
+        "cached_tokens": 89600
+      },
+      "num_server_side_tools_used": 11,
+      "num_sources_used": 0,
+      "output_tokens": 1651,
+      "output_tokens_details": {
+        "reasoning_tokens": 1562
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 11
+      },
+      "total_tokens": 106255
+    },
+    "user": null
+  },
+  "response_sha256": "fae4986a3df6ef17f9aa90d2b1d6506dc9fe3af8f2e30766b5ff3bf4227e3064",
+  "surface": "x_search_post"
+}
