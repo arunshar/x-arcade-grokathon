@@ -58,10 +58,27 @@ Note the two ports. `run.sh` serves on 8787 for local development. The Space
 Dockerfile serves on 7860, because that is the port a Hugging Face Space
 expects.
 
-The lobby QR in `web/static-assets/qr.png` is a placeholder. It encodes
-`http://localhost:8787/?room=GROK`, which only resolves on the machine running
-the server. A phone cannot reach another machine's localhost, so you must
-regenerate the QR against a hosted URL before any crowd demo:
+### Phone + laptop demo (same Wi‑Fi)
+
+1. Laptop and phones on the **same Wi‑Fi**.
+2. Start the server (`./run.sh` binds `0.0.0.0:8787` by default).
+3. On the **laptop**, open the app via your LAN IP (not `localhost`), e.g.
+   `http://192.168.1.20:8787` — the lobby shows a live QR from `/qr.png` and a
+   copyable join URL from `/join-info`.
+4. Phones scan the QR (or open `http://<laptop-ip>:8787/?room=GROK`), tap JOIN.
+   Guest phones hide START; the laptop host taps START (room `GROK` is an arena).
+5. Optional: pin a public URL with `ARCADE_PUBLIC_URL=https://your-host` (or the
+   HF Space URL) so the QR always encodes that origin.
+
+```sh
+# find your laptop LAN IP (macOS)
+ipconfig getifaddr en0
+./run.sh
+# open http://THAT_IP:8787 on the laptop, scan QR from phones
+```
+
+The committed `web/static-assets/qr.png` is only a fallback. For a permanent
+hosted QR (e.g. HF Space):
 
 ```sh
 python -c "import segno; segno.make('https://YOUR-SPACE.hf.space/?room=GROK', error='h').save('web/static-assets/qr.png', scale=8, border=2, dark='#04070B', light='#FFFFFF')"

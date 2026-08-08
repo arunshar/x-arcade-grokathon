@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04070B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>X ARCADE // DECOY</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -17,6 +21,7 @@
   <div class="topbar-right">
     <span class="chip chip-safety" id="safetyChip" hidden>ARENA CLEARED BY SAFETY GATES</span>
     <span class="chip chip-demo" id="demoBadge" hidden>DEMO</span>
+    <span class="chip chip-conn" id="connChip" title="connection">…</span>
     <span class="chip" id="roundCounter">RND 00</span>
     <button class="chip chip-btn" id="muteBtn" type="button">SND ON</button>
   </div>
@@ -27,26 +32,33 @@
   <section id="screen-lobby" class="screen">
     <h1 class="lobby-title">DECOY</h1>
     <p class="lobby-tag">Four real replies. One machine. Spot the imposter.</p>
-    <div class="lobby-form" id="lobbyForm">
+    <form class="lobby-form" id="lobbyForm" action="#" method="get">
       <label class="field">
         <span>PLAYER NAME</span>
-        <input id="nameInput" maxlength="16" autocomplete="off" spellcheck="false" placeholder="PLAYER">
+        <input id="nameInput" name="name" maxlength="16" autocomplete="username"
+          autocapitalize="characters" autocorrect="off" spellcheck="false"
+          enterkeyhint="next" placeholder="PLAYER" inputmode="text">
       </label>
       <label class="field">
         <span>ROOM CODE</span>
-        <input id="roomInput" maxlength="8" autocomplete="off" spellcheck="false" placeholder="ABC">
+        <input id="roomInput" name="room" maxlength="8" autocomplete="off"
+          autocapitalize="characters" autocorrect="off" spellcheck="false"
+          enterkeyhint="go" placeholder="ABC" inputmode="text">
       </label>
-      <button class="big-btn" id="joinBtn" type="button">JOIN ROOM</button>
-    </div>
+      <button class="big-btn" id="joinBtn" type="submit">JOIN ROOM</button>
+    </form>
     <div class="lobby-qr" id="lobbyQr" hidden>
-      <img src="static-assets/qr.png" alt="scan to join room GROK" class="qr-img">
+      <img id="qrImg" src="static-assets/qr.png" alt="scan to join room GROK" class="qr-img">
       <div class="section-label">SCAN TO PLAY · ROOM GROK</div>
+      <p class="join-url" id="joinUrl" hidden></p>
+      <p class="join-hint" id="joinHint">Phone and laptop must be on the same Wi‑Fi. Open this page via your laptop’s LAN IP (not localhost) so the QR works.</p>
     </div>
     <div class="lobby-players">
       <div class="section-label">PLAYERS PRESENT</div>
       <ul id="lobbyPlayers" class="player-list"></ul>
     </div>
     <button class="big-btn btn-start" id="startBtn" type="button" disabled>START</button>
+    <p class="wait-line" id="waitLine" hidden>WAITING FOR HOST TO START…</p>
     <p class="conn-line" id="connLine">LINKING...</p>
   </section>
 
@@ -79,18 +91,14 @@
     <div class="reveal-panel" id="revealPanel" hidden>
       <div class="winner-banner" id="winnerBanner">HOUSE WINS</div>
       <div class="score-strip" id="scoreStrip"></div>
-      <img class="share-card" id="shareCard" alt="share card" hidden>
-      <button class="big-btn btn-start" id="nextBtn" type="button">NEXT ROUND</button>
+      <div class="share-card-frame">
+        <img class="share-card" id="shareCard" alt="share card" hidden>
+      </div>
+      <button class="big-btn btn-start btn-next" id="nextBtn" type="button">NEXT ROUND</button>
     </div>
   </section>
 </main>
 
-<!-- Corner QR so latecomers can join mid-round. Hidden on phones, where the
-     player is already in the game and the code would just cover the cards. -->
-<aside class="corner-qr" id="cornerQr" hidden>
-  <img src="static-assets/qr.png" alt="scan to join room GROK">
-  <span>SCAN TO JOIN</span>
-</aside>
 
 <script src="game.js"></script>
 </body>

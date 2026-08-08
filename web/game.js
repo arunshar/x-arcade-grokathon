@@ -408,7 +408,25 @@ function connect() {
   ws.addEventListener("error", () => { try { ws.close(); } catch (e) {} });
 }
 
-function setConn(text) { $("connLine").textContent = text; }
+function setConn(text) {
+  const line = $("connLine");
+  if (line) line.textContent = text;
+  // Top-bar chip stays visible during play (lobby connLine is hidden with the lobby).
+  const chip = $("connChip");
+  if (!chip) return;
+  const short = String(text || "").replace(/\.\.\.$/, "…");
+  chip.textContent = short.length > 18 ? short.slice(0, 16) + "…" : short;
+  chip.title = text || "";
+  chip.classList.remove("ok", "warn", "bad");
+  const u = short.toUpperCase();
+  if (u.indexOf("LINKED") !== -1 || u.indexOf("JOINED") !== -1 || u.indexOf("MOCK") !== -1) {
+    chip.classList.add("ok");
+  } else if (u.indexOf("LOST") !== -1 || u.indexOf("RETRY") !== -1 || u.indexOf("FAIL") !== -1) {
+    chip.classList.add("bad");
+  } else {
+    chip.classList.add("warn");
+  }
+}
 
 // ---------- state handling ----------
 function handleState(s) {
@@ -440,6 +458,14 @@ function handleState(s) {
     const winner = s.reveal && s.reveal.winner;
     const outcome = (!winner || winner === "house") ? "lose" : "win";
     playHost("reveal", () => playHost(outcome));
+    // Phone layout: replies push the banner below the fold — scroll it into view.
+    requestAnimationFrame(() => {
+      const panel = $("revealPanel");
+      if (panel && !panel.hidden && panel.scrollIntoView) {
+        try { panel.scrollIntoView({ behavior: "smooth", block: "start" }); }
+        catch (e) { try { panel.scrollIntoView(true); } catch (e2) { /* ignore */ } }
+      }
+    });
   }
   prevPhase = was;
   render(s);
@@ -454,9 +480,6 @@ function render(s) {
   const inLobby = s.phase === "lobby";
   $("screen-lobby").hidden = !inLobby;
   $("screen-game").hidden = inLobby;
-  // Corner QR rides along outside the lobby so latecomers can scan mid-round.
-  // CSS hides it under 768px so it never covers a player's reply cards.
-  try { $("cornerQr").hidden = inLobby; } catch (e) { /* optional */ }
   if (inLobby) renderLobby(s); else renderGame(s);
 }
 
@@ -479,7 +502,24 @@ function renderLobby(s) {
     li.append(who, sc);
     ul.appendChild(li);
   }
-  $("startBtn").disabled = !(joined && players.length >= 1);
+  // Phones that scanned ?room=GROK are guests: hide START (host-only on arena).
+  // Host laptop (no prefill) keeps the button.
+  const start = $("startBtn");
+  const wait = $("waitLine");
+  if (PREFILL_ROOM) {
+    start.hidden = true;
+    start.disabled = true;
+    if (wait) {
+      wait.hidden = !joined;
+      wait.textContent = joined
+        ? ("IN " + PREFILL_ROOM + " · WAITING FOR HOST TO START…")
+        : "WAITING FOR HOST TO START…";
+    }
+  } else {
+    start.hidden = false;
+    start.disabled = !(joined && players.length >= 1);
+    if (wait) wait.hidden = true;
+  }
 }
 
 function renderGame(s) {
@@ -672,16 +712,7 @@ function generatedName() {
   return word + Math.floor(Math.random() * 90 + 10);
 }
 
-if (PREFILL_ROOM) {
-  $("roomInput").value = PREFILL_ROOM;
-  if (!$("nameInput").value.trim()) { $("nameInput").value = generatedName(); }
-}
-// The QR is always on screen in the lobby. It used to appear only without a
-// ?room= param, which hid it in exactly the case that matters: the host opens
-// the room link on the big screen and wants the crowd to scan.
-try { $("lobbyQr").hidden = false; } catch (e) { /* qr block optional */ }
-
-$("joinBtn").addEventListener("click", () => {
+function doJoin() {
   let name = $("nameInput").value.trim().toUpperCase();
   const room = $("roomInput").value.trim().toUpperCase();
   if (!room) { setConn("ENTER A ROOM CODE"); return; }
@@ -699,13 +730,69 @@ $("joinBtn").addEventListener("click", () => {
   send({ t: "join", room: myRoom, name: myName });
   // Clear any stale validation text, otherwise the lobby keeps showing the
   // error from a failed attempt after the join has already succeeded.
-  setConn("JOINED " + myRoom + ". TAP START WHEN READY.");
+  if (PREFILL_ROOM) {
+    setConn("JOINED " + myRoom + ". WAIT FOR HOST.");
+  } else {
+    setConn("JOINED " + myRoom + ". TAP START WHEN READY.");
+  }
+}
+
+if (PREFILL_ROOM) {
+  $("roomInput").value = PREFILL_ROOM;
+  if (!$("nameInput").value.trim()) { $("nameInput").value = generatedName(); }
+  // Guest path: no host START button (arena host is the laptop).
+  try {
+    $("startBtn").hidden = true;
+    $("startBtn").disabled = true;
+  } catch (e) { /* optional */ }
+} else {
+  try { $("lobbyQr").hidden = false; } catch (e) { /* qr block optional */ }
+  // Host laptop: load LAN join URL + dynamic QR so phones can scan in.
+  loadPhoneJoinInfo("GROK");
+}
+
+// Form submit catches phone keyboard "Go" / Enter without a separate keydown map.
+$("lobbyForm").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  if (!joined) doJoin();
 });
 
 // The contract has no separate start message. "next" from the lobby kicks
 // off the first round, the same way it advances rounds after a reveal.
 $("startBtn").addEventListener("click", () => send({ t: "next", room: myRoom }));
 $("nextBtn").addEventListener("click", () => send({ t: "next", room: myRoom }));
+
+/** Populate QR + copyable URL for phone players on the same Wi‑Fi. */
+function loadPhoneJoinInfo(room) {
+  const code = (room || "GROK").toUpperCase();
+  fetch("/join-info?room=" + encodeURIComponent(code))
+    .then((r) => r.json())
+    .then((j) => {
+      if (!j) return;
+      const primary = j.primary || (j.urls && j.urls[0]) || "";
+      const urlEl = $("joinUrl");
+      const hint = $("joinHint");
+      const img = $("qrImg");
+      if (primary && urlEl) {
+        urlEl.hidden = false;
+        urlEl.textContent = primary;
+      }
+      if (img && j.qr_path) {
+        img.src = j.qr_path + (j.qr_path.indexOf("?") >= 0 ? "&" : "?") + "t=" + Date.now();
+        img.alt = "scan to join room " + code;
+      }
+      if (hint) {
+        if (j.localhost_only) {
+          hint.textContent =
+            "Open this page as http://<your-laptop-ip>:8787 (not localhost), same Wi‑Fi as the phones, then rescan. Or set ARCADE_PUBLIC_URL.";
+        } else {
+          hint.textContent =
+            "Phone and laptop on the same Wi‑Fi. Scan the code or open the URL above. Room " + code + ".";
+        }
+      }
+    })
+    .catch(() => { /* offline static qr.png still shows */ });
+}
 
 // ---------- mock mode: the last-ditch stage fallback ----------
 // Emulates just enough server: join adds you plus a bot, next starts a round,
@@ -811,7 +898,7 @@ function mockSocket(onMessage) {
       decoy_slot: r.decoy_slot,
       rationale: r.decoy_rationale,
       winner: winner || "house",
-      share_card_url: "static-assets/share_card.png",
+      share_card_url: "static-assets/cards/decoy-3f2710c0a9e6_demo.jpg",
     };
     push();
   }

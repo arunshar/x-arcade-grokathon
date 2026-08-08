@@ -21,7 +21,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -349,6 +350,128 @@ async def health() -> dict[str, Any]:
     }
 
 
+def _lan_base_urls(port: int) -> list[str]:
+    """Best-effort LAN origins a phone on the same Wi‑Fi can open.
+
+    Avoids socket.getaddrinfo(hostname) — on macOS that can stall on mDNS and
+    block the lobby QR for seconds.
+    """
+    import socket
+
+    bases: list[str] = []
+    seen: set[str] = set()
+
+    def add_origin(origin: str) -> None:
+        origin = origin.strip().rstrip("/")
+        if not origin or origin in seen:
+            return
+        seen.add(origin)
+        bases.append(origin)
+
+    def add_host(host: str) -> None:
+        host = host.strip().strip("[]")
+        if not host:
+            return
+        # Skip loopback and link-local IPv6 noise.
+        if host.startswith("127.") or host == "localhost" or host.startswith("::"):
+            return
+        if ":" in host:
+            add_origin(f"http://[{host}]:{port}")
+        else:
+            add_origin(f"http://{host}:{port}")
+
+    public = os.environ.get("ARCADE_PUBLIC_URL", "").strip().rstrip("/")
+    if public:
+        add_origin(public)
+
+    # UDP trick: pick the interface used for outbound traffic (no packets sent).
+    try:
+        probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        probe.settimeout(0.2)
+        probe.connect(("8.8.8.8", 80))
+        add_host(probe.getsockname()[0])
+        probe.close()
+    except OSError:
+        pass
+
+    return bases
+
+
+@app.get("/join-info")
+async def join_info(
+    request: Request, room: str = Query(default="GROK", min_length=1, max_length=16)
+) -> dict[str, Any]:
+    """URLs + QR path for phone players. Used by the host lobby."""
+    room_code = room.strip().upper() or "GROK"
+    port = request.url.port or (443 if request.url.scheme == "https" else 80)
+    # When bound on 8787 behind uvicorn, port is usually set on the request.
+    if port in (80, 443) and os.environ.get("ARCADE_PORT"):
+        try:
+            port = int(os.environ["ARCADE_PORT"])
+        except ValueError:
+            port = 8787
+    if port in (80, 443):
+        # Local dev default from run.sh.
+        port = 8787
+
+    urls: list[str] = []
+    for base in _lan_base_urls(port):
+        urls.append(f"{base.rstrip('/')}/?room={room_code}")
+
+    # Prefer a non-localhost request base when the host already opened via LAN IP.
+    host = request.headers.get("host", "")
+    if host and not host.startswith("127.") and not host.startswith("localhost"):
+        scheme = request.url.scheme or "http"
+        candidate = f"{scheme}://{host}/?room={room_code}"
+        if candidate not in urls:
+            urls.insert(0, candidate)
+
+    localhost_only = not urls
+    if localhost_only:
+        urls = [f"http://127.0.0.1:{port}/?room={room_code}"]
+
+    primary = urls[0]
+    return {
+        "room": room_code,
+        "primary": primary,
+        "urls": urls,
+        "qr_path": f"/qr.png?room={room_code}",
+        "localhost_only": localhost_only,
+    }
+
+
+@app.get("/qr.png")
+async def qr_png(
+    request: Request, room: str = Query(default="GROK", min_length=1, max_length=16)
+) -> Response:
+    """Dynamic join QR encoding a phone-reachable URL when possible."""
+    info = await join_info(request, room=room)
+    target = str(info["primary"])
+    try:
+        import io
+
+        import segno
+
+        buf = io.BytesIO()
+        qr = segno.make(target, error="h")
+        qr.save(buf, kind="png", scale=8, border=2, dark="#04070B", light="#FFFFFF")
+        return Response(
+            content=buf.getvalue(),
+            media_type="image/png",
+            headers={"Cache-Control": "no-store"},
+        )
+    except Exception:
+        # Fall back to the committed static asset so the lobby never blanks.
+        static_path = REPO_ROOT / "web" / "static-assets" / "qr.png"
+        if static_path.is_file():
+            return Response(
+                content=static_path.read_bytes(),
+                media_type="image/png",
+                headers={"Cache-Control": "no-store"},
+            )
+        raise HTTPException(status_code=501, detail="qr generation unavailable") from None
+
+
 @app.get("/token")
 async def token() -> Any:
     """Mint a realtime voice token via services.voice_host.
@@ -488,7 +611,6 @@ async def ws_endpoint(ws: WebSocket) -> None:
                         ROOMS.pop(joined[0], None)
 
 
-# Mounted last so /ws, /health, and /token win the route match. The web agent
-# fills this directory in parallel. An empty directory serves 404s, which is
-# fine for a standalone server run.
+# Mounted last so /ws, /health, /token, /join-info, and /qr.png win the route
+# match. An empty directory serves 404s, which is fine for a standalone run.
 app.mount("/", StaticFiles(directory=str(REPO_ROOT / "web"), html=True), name="web")

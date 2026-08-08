@@ -6,6 +6,7 @@
   --panel-2: #0e1621;
   --line: #14222f;
   --cyan: #00e5ff;
+  --accent: #00e5ff;
   --cyan-soft: rgba(0, 229, 255, 0.14);
   --cyan-glow: rgba(0, 229, 255, 0.45);
   --red: #ff2d55;
@@ -14,6 +15,10 @@
   --mut: #64808f;
   --font-display: "Impact", "Arial Black", "Franklin Gothic Medium", sans-serif;
   --font-ui: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -31,6 +36,11 @@ body {
   font-size: 15px;
   line-height: 1.45;
   min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  /* Keep UI clear of notch / home indicator on phones */
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  padding-bottom: var(--safe-bottom);
 }
 
 /* Scanlines and vignette, pure CSS, no assets */
@@ -54,7 +64,7 @@ body {
   justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 10px 14px;
+  padding: calc(10px + var(--safe-top)) 14px 10px;
   background: rgba(4, 7, 11, 0.97);
   border-bottom: 1px solid var(--line);
   box-shadow: 0 0 24px rgba(0, 229, 255, 0.08);
@@ -106,8 +116,23 @@ body {
 .chip-btn:active { transform: translateY(1px); }
 .chip-btn.off { color: var(--mut); }
 
+.chip-conn {
+  color: var(--mut);
+  border-color: var(--line);
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-conn.ok { color: #7dffb0; border-color: rgba(125, 255, 176, 0.35); }
+.chip-conn.warn { color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
+.chip-conn.bad { color: var(--red); border-color: rgba(255, 45, 85, 0.45); }
+
 /* ---------- layout ---------- */
-main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 18px 14px calc(60px + var(--safe-bottom));
+}
 
 .screen { display: flex; flex-direction: column; gap: 18px; }
 
@@ -156,12 +181,15 @@ main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
   border: 1px solid var(--line);
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 20px;
+  /* 16px+ avoids iOS Safari auto-zoom on focus */
+  font-size: 16px;
   letter-spacing: 3px;
   text-transform: uppercase;
   padding: 14px 12px;
   min-height: 54px;
   outline: none;
+  border-radius: 0;
+  width: 100%;
 }
 
 .field input:focus { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan), 0 0 18px var(--cyan-soft); }
@@ -202,6 +230,35 @@ main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
 .player-list .empty { border-left-color: var(--line); color: var(--mut); }
 
 .conn-line { text-align: center; font-size: 11px; letter-spacing: 2px; color: var(--mut); }
+
+.wait-line {
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.join-url {
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--cyan);
+  word-break: break-all;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+.join-hint {
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--mut);
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
 
 /* ---------- arena top: post + timer ---------- */
 .arena-top {
@@ -387,6 +444,8 @@ main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
   align-items: center;
   border-top: 1px solid var(--line);
   padding-top: 18px;
+  padding-bottom: calc(12px + var(--safe-bottom));
+  scroll-margin-top: 72px;
 }
 
 .winner-banner {
@@ -415,48 +474,80 @@ main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
 
 .score b { color: var(--cyan); margin-left: 8px; }
 
-.share-card { max-width: min(440px, 100%); border: 1px solid var(--line); border-radius: 10px; }
+/* Reserve card space so NEXT does not jump when the image lands */
+.share-card-frame {
+  width: min(440px, 100%);
+  aspect-ratio: 16 / 10;
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
 
-/* small screens */
+.share-card {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  border-radius: 0;
+  display: block;
+}
+
+.share-card[hidden] { display: none !important; }
+
+/* Host can always reach NEXT on a long phone reveal */
+.btn-next {
+  position: sticky;
+  bottom: calc(10px + var(--safe-bottom));
+  z-index: 30;
+  width: min(420px, 100%);
+  background: rgba(4, 7, 11, 0.92);
+  backdrop-filter: blur(6px);
+}
+
+/* small screens / phones */
 @media (max-width: 620px) {
   .wordmark { font-size: 18px; letter-spacing: 2px; }
   .replies { grid-template-columns: 1fr; }
   .timer-wrap { width: 96px; height: 96px; }
   .timer-ring { width: 96px; height: 96px; }
   .timer-num { font-size: 32px; }
+  .lobby-title { margin-top: 8px; letter-spacing: 6px; }
+  .card.tappable .card-front { min-height: 120px; }
+  /* Larger tap targets on the join form */
+  .big-btn { min-height: 54px; }
+  main { padding-left: 12px; padding-right: 12px; }
 }
 
-/* QR join block on the big screen */
+/* QR join block on the big screen / host laptop */
 .lobby-qr { text-align: center; margin: 18px 0 6px; }
 .qr-img {
-  width: 180px; height: 180px; image-rendering: pixelated;
-  border: 2px solid var(--accent, #22d3ee); border-radius: 8px;
-  padding: 8px; background: #fff;
+  width: min(240px, 70vw);
+  height: auto;
+  aspect-ratio: 1;
+  image-rendering: pixelated;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  padding: 8px;
+  background: #fff;
 }
-.score.leader b { color: var(--accent, #22d3ee); text-shadow: 0 0 8px var(--accent, #22d3ee); }
-/* Corner QR: visible on the projector during a round so people arriving late
-   can still scan in. Suppressed under 768px, because on a phone the player is
-   already in the game and it would sit on top of the reply cards. */
-.corner-qr {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 10px 8px;
-  background: rgba(4, 7, 11, 0.92);
-  border: 1px solid rgba(34, 211, 238, 0.45);
-  border-radius: 10px;
-  box-shadow: 0 0 22px rgba(34, 211, 238, 0.18);
+@media (min-width: 900px) {
+  .qr-img { width: 296px; }
 }
-.corner-qr img { width: 104px; height: 104px; display: block; image-rendering: pixelated; }
-.corner-qr span {
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  color: #93a9b9;
-}
-@media (max-width: 768px) { .corner-qr { display: none !important; } }
 
+.score.leader b { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+
+/* Accessibility: cut motion when requested */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card.locked .card-inner { transition: none; transform: none; }
+  .card.locked .card-front { opacity: 0.35; }
+  .card.locked .card-back { position: relative; transform: none; }
+}
