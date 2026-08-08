@@ -1,18 +1,18 @@
-"""Imagine decoy agent — original clip, style-matched to the human GIFs.
+"""Imagine decoy agent — original Grok Imagine clip from the thread replies.
 
 Pipeline
 --------
-1. Collect the four human reaction GIFs already on the round (read-only).
-2. Sample frames and ask vision for a short *style brief* only
-   (palette, grain, motion energy) — never copy those frames into generation.
-3. Grok Imagine **image** → a brand-new still that fits the room's look.
-4. Grok Imagine **video** from that original still (image-to-video), or
-   text-to-video if the still fails — never ``reference_images`` of human GIFs.
-5. Save the short square MP4 as the decoy's looping "gif".
+1. Read the **post + four human reply texts + decoy reply text** (content only).
+2. Optional short text style brief from those vibes (no human GIF files as input).
+3. Grok Imagine **image** → brand-new still invented for this decoy reply.
+4. Grok Imagine **video** animates that still (I2V), or pure text-to-video.
+5. Save ``web/static-assets/reply-gifs/decoy/{round_id}_decoy.mp4``.
 
-Human GIFs stay untouched. The decoy is always a new Imagine generation that
-only *resembles* the room (compression, energy, vibe), not a regen/remix of
-any user reply gif.
+Hard rules
+----------
+- Never load, remix, or regenerate GIFs from the human reply pool.
+- Never pass human GIF frames as ``image`` / ``reference_images``.
+- Human cards keep their library GIFs; only the decoy slot is Imagine-made.
 
 CLI:
     ARCADE_MODE=live python3 services/imagine_agent.py --round-id decoy-xxx
@@ -53,13 +53,12 @@ VIDEO_POLL_S = float(os.environ.get("ARCADE_IMAGINE_VIDEO_POLL", "300"))
 MAX_REF_IMAGES = int(os.environ.get("ARCADE_IMAGINE_REF_MAX", "4"))
 FRAME_MAX_PX = int(os.environ.get("ARCADE_IMAGINE_FRAME_PX", "512"))
 
-_FALLBACK_STYLE_SYSTEM = """You scout visual STYLE only for a party game.
-Given still frames from human reply GIFs, write ONE compact style brief so a
-NEW original reaction clip can match the room without copying those frames:
-palette, lighting, framing, motion energy, grain/compression, meme ugliness.
-Describe abstract qualities only — do NOT describe specific characters, faces,
-or scenes to recreate. Never name real people or celebrities.
-Never say AI, decoy, robot, or fake. No markdown. Under 45 words."""
+_FALLBACK_STYLE_SYSTEM = """You invent visual STYLE for one new reaction GIF
+in a group-chat thread. You get the post and the human reply *texts* only —
+no images. Write ONE compact brief for image/video generation:
+palette mood, framing energy, motion feel, web-GIF grain/compression.
+Abstract qualities only. Never name real people or celebrities.
+Never say AI, decoy, robot, or fake. No markdown. Under 40 words."""
 
 
 def _slug(value: str) -> str:
@@ -225,56 +224,47 @@ def _make_store() -> FixtureStore | None:
     )
 
 
-def describe_gif_style(
-    data_urls: list[str],
+def describe_reply_style(
     *,
     topic: str = "",
     reply_texts: list[str] | None = None,
     post_text: str = "",
+    decoy_text: str = "",
 ) -> str:
-    """Vision pass: one short style brief matching the human GIF room."""
-    if not data_urls:
-        return (
-            "Typical chat reaction GIF look: compressed web meme energy, "
-            "punchy loop, casual framing, mild grain."
-        )
+    """Text-only style brief from the thread replies (no human GIF files)."""
+    human_bits = "; ".join(_snippet(t, 50) for t in (reply_texts or [])[:4] if t)
+    post_bit = _snippet(post_text, 140)
+    decoy_bit = _snippet(decoy_text, 80)
+    fallback = (
+        "Compressed group-chat reaction GIF energy, punchy loop, casual framing, "
+        "mild grain, meme ugliness — original subject, not a stock clip."
+    )
+    if not human_bits and not post_bit:
+        return fallback
 
     system = _load_skill("style_brief", _FALLBACK_STYLE_SYSTEM)
-    content: list[dict[str, Any]] = []
-    # Cap images in the vision call (token cost).
-    for url in data_urls[: min(3, len(data_urls))]:
-        content.append({"type": "image_url", "image_url": {"url": url}})
-
-    human_bits = "; ".join(_snippet(t, 40) for t in (reply_texts or [])[:4] if t)
-    post_bit = _snippet(post_text, 120)
-    content.append(
-        {
-            "type": "text",
-            "text": (
-                f"Topic context: {topic or 'general'}. "
-                f"Original post (do not quote as on-screen text): {post_bit or 'n/a'}. "
-                f"Human reply vibes (text only): {human_bits or 'n/a'}. "
-                "Write the style brief now so a fifth gif blends into this thread."
-            ),
-        }
+    user_text = (
+        f"Topic: {topic or 'general'}.\n"
+        f"Post (do not render as on-screen text): {post_bit or 'n/a'}\n"
+        f"Human replies in the thread: {human_bits or 'n/a'}\n"
+        f"New decoy reply vibe to illustrate: {decoy_bit or 'n/a'}\n"
+        "Write a style brief for ONE brand-new reaction gif that could sit "
+        "next to those replies. Invent original visuals from the vibes only."
     )
-
     request = {
         "model": config.MODEL_AGENT,
         "messages": [
             {"role": "system", "content": system},
-            {"role": "user", "content": content},
+            {"role": "user", "content": user_text},
         ],
         "max_tokens": 100,
-        "temperature": 0.35,
+        "temperature": 0.55,
     }
 
     def invoke() -> dict[str, Any]:
         return post_json("/chat/completions", request, timeout=VISION_TIMEOUT_S)
 
     try:
-        # Live (no RECORD): hit the API. Demo: skip vision unless RECORD is on
-        # with an existing fixture — never block rounds on a fixture miss.
         if config.MODE == "live" and not config.RECORD:
             data = invoke()
         elif config.MODE == "live" and config.RECORD:
@@ -282,16 +272,16 @@ def describe_gif_style(
             fixture_req = {
                 "model": request["model"],
                 "topic": topic,
-                "n_images": len(data_urls),
-                "kind": "imagine_style_brief",
+                "decoy": decoy_bit,
+                "humans": human_bits[:200],
+                "kind": "imagine_reply_style_brief",
             }
             data = store.call(  # type: ignore[union-attr]
-                "imagine_style_brief",
+                "imagine_reply_style_brief",
                 fixture_req,
                 invoke=invoke,
             )
         else:
-            # demo / offline — use the deterministic fallback below
             data = None
         if data:
             choice = (data.get("choices") or [{}])[0]
@@ -300,11 +290,26 @@ def describe_gif_style(
             if brief:
                 return brief
     except Exception as exc:
-        print(f"imagine_agent: style brief failed: {exc}", file=sys.stderr)
+        print(f"imagine_agent: reply style brief failed: {exc}", file=sys.stderr)
 
-    return (
-        "Match the attached reaction-GIF references: same palette, compression, "
-        "framing, and loop energy. Casual meme look, not cinematic."
+    return fallback
+
+
+# Back-compat name used by older call sites / docs.
+def describe_gif_style(
+    data_urls: list[str] | None = None,
+    *,
+    topic: str = "",
+    reply_texts: list[str] | None = None,
+    post_text: str = "",
+    decoy_text: str = "",
+) -> str:
+    """Deprecated: ignores image urls; styles from reply text only."""
+    return describe_reply_style(
+        topic=topic,
+        reply_texts=reply_texts,
+        post_text=post_text,
+        decoy_text=decoy_text,
     )
 
 
@@ -327,16 +332,18 @@ def build_decoy_still_prompt(
     topic: str,
     decoy_text: str,
     post_text: str = "",
+    human_replies: list[str] | None = None,
 ) -> str:
-    """Prompt for an ORIGINAL still — style-matched, not a copy of human gifs."""
+    """Prompt for an ORIGINAL still invented from the thread reply texts."""
     skill = _load_skill(
         "still_prompt",
-        "Create a brand-new square reaction-image still for a group chat. "
-        "Match the room's visual STYLE only. Invent a new subject — do not "
-        "recreate, remix, or trace any specific frame from the human gifs.",
+        "Create a brand-new square reaction GIF still for a group chat using "
+        "Grok Imagine. Invent original visuals from the reply vibes. Never "
+        "reproduce or look up an existing meme GIF file.",
     )
-    vibe = _snippet(decoy_text, 90)
-    post_bit = _snippet(post_text, 110)
+    vibe = _snippet(decoy_text, 100)
+    post_bit = _snippet(post_text, 120)
+    humans = "; ".join(_snippet(t, 45) for t in (human_replies or [])[:4] if t)
     brief = _sanitize_style_brief(style_brief)
     safety = (
         "CRITICAL SAFETY: no real people, no celebrity likeness, no copyrighted "
@@ -344,14 +351,16 @@ def build_decoy_still_prompt(
         "no UI chrome. Generic anonymous figures, objects, animals, or abstract "
         "shapes only."
     )
-    thread = f"Thread vibe (do not render text): {post_bit}. " if post_bit else ""
     return (
         f"{skill} "
-        f"Style to match (qualities only, not scenes to copy): {brief} "
-        f"Topic: {topic or 'general'}. {thread}"
-        f"Mood of THIS new reply (abstract): {vibe}. "
-        "Square 1:1, looks like a compressed chat GIF still, not a polished poster. "
-        "ORIGINAL content only — different subject matter from the human replies. "
+        f"Topic: {topic or 'general'}. "
+        f"Original post vibe (do not render text): {post_bit or 'n/a'}. "
+        f"Other people in the thread said (vibes only): {humans or 'n/a'}. "
+        f"THIS new reply to visualize (abstract mood, no on-screen text): {vibe}. "
+        f"Visual style brief: {brief}. "
+        "Square 1:1 compressed chat-GIF still. "
+        "Brand-new Imagine creation — not a copy of any existing GIF, stock clip, "
+        "or the other replies' media. "
         f"{safety}"
     )
 
@@ -362,18 +371,19 @@ def build_decoy_video_prompt(
     topic: str,
     decoy_text: str,
     post_text: str = "",
+    human_replies: list[str] | None = None,
     abstract_only: bool = False,
     from_own_still: bool = False,
 ) -> str:
-    """Prompt for an ORIGINAL looping clip (text-to-video or own-still I2V)."""
+    """Prompt for an ORIGINAL looping clip from reply vibes (I2V or T2V)."""
     skill = _load_skill(
         "video_prompt",
-        "Animate into a seamless looping reaction gif for a group chat. "
-        "Match the room's visual language and energy. This must be a NEW clip, "
-        "not a recreation or remix of any human reply gif.",
+        "Create a seamless looping reaction gif with Grok Imagine for a group "
+        "chat. Brand-new clip from the reply vibes — never an existing meme file.",
     )
-    vibe = _snippet(decoy_text, 90)
+    vibe = _snippet(decoy_text, 100)
     post_bit = _snippet(post_text, 110)
+    humans = "; ".join(_snippet(t, 40) for t in (human_replies or [])[:4] if t)
     brief = _sanitize_style_brief(style_brief)
     safety = (
         "CRITICAL SAFETY: no real people, no celebrity likeness, no copyrighted "
@@ -381,40 +391,34 @@ def build_decoy_video_prompt(
         "no UI chrome. Use generic anonymous silhouettes, objects, animals, or "
         "abstract shapes only."
     )
-    thread = (
-        f"Original post vibe (do not render text): {post_bit}. "
-        if post_bit
-        else ""
-    )
+    thread = f"Post vibe (no on-screen text): {post_bit}. " if post_bit else ""
+    others = f"Other replies' vibes: {humans}. " if humans else ""
     original = (
-        "ORIGINAL Imagine generation only — do not recreate, morph, or collage "
-        "the human reply gifs from this round; invent new subject matter that "
-        "merely fits beside them. "
+        "ORIGINAL Grok Imagine generation only — do not reproduce any existing "
+        "GIF, stock meme, or another reply's media. "
     )
     if abstract_only:
         return (
             "Short seamless looping reaction gif, square 1:1, compressed web-meme look. "
-            f"Topic mood: {topic or 'general'}. {thread}"
-            f"Reply vibe (abstract): {vibe}. "
-            f"Match style qualities only: {brief}. "
+            f"Topic: {topic or 'general'}. {thread}{others}"
+            f"This reply's mood (abstract): {vibe}. Style: {brief}. "
             f"{original}{safety}"
         )
     if from_own_still:
         return (
             f"{skill} "
-            "Animate THIS original still into a 3-second seamless loop "
-            "(subtle punchy motion, gif energy, mild compression). "
-            f"Keep the same subject — do not swap in other gifs. "
-            f"Topic: {topic or 'general'}. {thread}"
-            f"Mood: {vibe}. {safety}"
+            "Animate THIS original Imagine still into a 3-second seamless loop "
+            "(punchy gif motion, mild compression). Keep this subject — do not "
+            f"replace it with a known meme. Topic: {topic or 'general'}. "
+            f"{thread}Mood: {vibe}. {safety}"
         )
     return (
         f"{skill} "
-        f"Style qualities to match (not scenes to copy): {brief} "
-        f"Topic: {topic or 'general'}. {thread}"
-        f"Mood of this one NEW reply (abstract, no readable text): {vibe}. "
-        "Square 1:1, 3-second seamless loop, looks like a compressed chat GIF "
-        f"not a polished film. {original}{safety}"
+        f"Topic: {topic or 'general'}. {thread}{others}"
+        f"This NEW reply mood (abstract, no readable text): {vibe}. "
+        f"Style brief: {brief}. "
+        "Square 1:1, 3-second seamless loop, chat-GIF energy. "
+        f"{original}{safety}"
     )
 
 
@@ -490,6 +494,7 @@ def generate_own_still(
     topic: str,
     decoy_text: str,
     post_text: str = "",
+    human_replies: list[str] | None = None,
 ) -> str | None:
     """Create an ORIGINAL square still via Imagine image. Returns data URL or None."""
     prompt = build_decoy_still_prompt(
@@ -497,6 +502,7 @@ def generate_own_still(
         topic=topic,
         decoy_text=decoy_text,
         post_text=post_text,
+        human_replies=human_replies,
     )
     request = {
         "model": config.MODEL_IMAGE,
@@ -638,7 +644,7 @@ def generate_matching_decoy(
         result["status"] = "no_live"
         return result
 
-    # Ensure human GIFs are assigned first.
+    # Human library GIFs may already be on the round; we only need their *text*.
     try:
         from services.reply_gifs import attach_reply_media
 
@@ -646,12 +652,7 @@ def generate_matching_decoy(
     except Exception as exc:
         print(f"imagine_agent: attach_reply_media: {exc}", file=sys.stderr)
 
-    # Study human GIFs for style ONLY — frames never go into video generation.
-    frames = collect_reference_frames(round_data)
-    study_urls = frames_to_data_urls(frames)
-    result["n_study_frames"] = len(study_urls)
-
-    human_texts = []
+    human_texts: list[str] = []
     decoy = _decoy_slot(round_data)
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
@@ -661,6 +662,7 @@ def generate_matching_decoy(
                 continue
         except (TypeError, ValueError):
             pass
+        # Never use human media_url paths as generation input — text only.
         if rep.get("text"):
             human_texts.append(str(rep["text"]))
 
@@ -669,21 +671,24 @@ def generate_matching_decoy(
     post_text = str(src.get("post_text") or "")
     decoy_rep = _decoy_reply(round_data)
     decoy_text = str((decoy_rep or {}).get("text") or topic)
+    result["n_human_replies"] = len(human_texts)
+    result["source"] = "reply_text_imagine"
 
-    style_brief = describe_gif_style(
-        study_urls,
+    # Style + media invented from reply/post text — zero human GIF file input.
+    style_brief = describe_reply_style(
         topic=topic,
         reply_texts=human_texts,
         post_text=post_text,
+        decoy_text=decoy_text,
     )
     result["style_brief"] = style_brief
 
-    # Own still first (original Imagine image), then animate it.
     own_still = generate_own_still(
         style_brief=style_brief,
         topic=topic,
         decoy_text=decoy_text,
         post_text=post_text,
+        human_replies=human_texts,
     )
     result["own_still"] = bool(own_still)
 
@@ -693,6 +698,7 @@ def generate_matching_decoy(
             topic=topic,
             decoy_text=decoy_text,
             post_text=post_text,
+            human_replies=human_texts,
             from_own_still=True,
         )
     else:
@@ -701,6 +707,7 @@ def generate_matching_decoy(
             topic=topic,
             decoy_text=decoy_text,
             post_text=post_text,
+            human_replies=human_texts,
         )
     result["prompt"] = _snippet(prompt, 200)
 
@@ -739,6 +746,7 @@ def generate_matching_decoy(
                 topic=topic,
                 decoy_text=decoy_text,
                 post_text=post_text,
+                human_replies=human_texts,
                 abstract_only=True,
             )
             result["prompt"] = _snippet(safe_prompt, 200)

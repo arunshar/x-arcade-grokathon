@@ -466,17 +466,14 @@ def attach_reply_media(
     human_ready = 0
     human_total = 0
 
-    # Prefer a true unique Imagine file. Probe is only a temporary stand-in
-    # while live generation runs — never mark probe clones as ready.
+    # Decoy media: ONLY a real per-round Imagine file. Never a pool GIF, never
+    # the shared probe while live (that looked like "reusing an existing gif").
     decoy_own = existing_decoy_media_url_for_round(round_data, allow_probe=False)
-    decoy_media = decoy_own or existing_decoy_media_url_for_round(round_data, allow_probe=True)
     has_own_decoy = decoy_own is not None
-    # Probe URL alone is not "ready" in live mode (would repeat every round).
-    using_probe_only = (
-        not has_own_decoy
-        and decoy_media is not None
-        and str(decoy_media[0]).endswith("/_probe.mp4")
-    )
+    # Demo-only: probe is allowed so offline play still has motion.
+    decoy_demo = None
+    if not has_own_decoy and config.MODE != "live":
+        decoy_demo = existing_decoy_media_url_for_round(round_data, allow_probe=True)
 
     # One diverse hand of human GIFs for the whole round (post-aware).
     human_map = assign_human_gifs(round_data, recent_stems=recent_stems)
@@ -490,26 +487,26 @@ def attach_reply_media(
             continue
         is_decoy = decoy is not None and slot == decoy
         if is_decoy:
-            if decoy_media:
-                url, mtype = decoy_media
+            # Clear any accidental human-pool path on the decoy slot.
+            rep.pop("art_url", None)
+            if has_own_decoy and decoy_own:
+                url, mtype = decoy_own
                 rep["media_url"] = url
                 rep["media_type"] = mtype
-                if has_own_decoy:
-                    rep["media_status"] = "ready"
-                elif config.MODE == "live":
-                    # Still show something while Imagine runs, but stay pending
-                    # so the server keeps generating a unique clip.
-                    rep["media_status"] = "pending"
-                else:
-                    rep["media_status"] = "ready"
+                rep["media_status"] = "ready"
+                rep["media_source"] = "imagine"
+            elif decoy_demo:
+                url, mtype = decoy_demo
+                rep["media_url"] = url
+                rep["media_type"] = mtype
+                rep["media_status"] = "ready"
                 rep["media_source"] = "imagine"
             else:
-                rep.setdefault("media_url", None)
+                # Live: wait for Imagine — pending with no URL (not a stock gif).
+                rep["media_url"] = None
                 rep["media_type"] = "video"
                 rep["media_status"] = "pending" if config.MODE == "live" else "none"
                 rep["media_source"] = "imagine"
-            if rep.get("media_url"):
-                rep.pop("art_url", None)
             continue
 
         human_total += 1
@@ -531,14 +528,12 @@ def attach_reply_media(
     round_data["format"] = "gif"
     if has_own_decoy:
         round_data["decoy_media_status"] = "ready"
-    elif decoy_media and config.MODE != "live":
-        # Demo: shared probe is acceptable offline.
+    elif decoy_demo and config.MODE != "live":
+        # Demo offline only: shared probe so motion still works without API.
         round_data["decoy_media_status"] = "ready"
     elif config.MODE == "live":
-        # Unique generation still needed (probe stand-in does not count).
+        # Waiting on Grok Imagine — never mark stock/pool media as ready.
         round_data["decoy_media_status"] = "pending"
-        if using_probe_only:
-            round_data["decoy_media_placeholder"] = True
     else:
         round_data["decoy_media_status"] = "none"
     round_data["human_media_status"] = (
@@ -558,16 +553,20 @@ def make_decoy_imagine_gif(
     *,
     force: bool = False,
 ) -> Path | None:
-    """Generate (or reuse) decoy video via the Imagine agent (GIF-matched).
+    """Generate (or reuse) decoy video via the Imagine agent.
 
-    Delegates to ``services.imagine_agent.generate_matching_decoy`` so the
-    robot clip is styled from the human GIFs already on the round.
+    Grok Imagine invents a new clip from the thread's reply texts — never
+    regenerates a human pool GIF file.
     """
-    from services.imagine_agent import decoy_video_path, generate_matching_decoy
+    from services.imagine_agent import (
+        decoy_video_path,
+        generate_matching_decoy,
+        is_real_decoy_media,
+    )
 
     rid = str(round_data.get("round_id") or "round")
     out = decoy_video_path(rid)
-    if not force and out.is_file() and out.stat().st_size > 800:
+    if not force and is_real_decoy_media(out):
         return out
 
     result = generate_matching_decoy(round_data, force=force)

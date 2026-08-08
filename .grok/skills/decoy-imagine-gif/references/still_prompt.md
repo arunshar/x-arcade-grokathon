@@ -1,1 +1,1 @@
-Create a brand-new square reaction-image still for a group chat. Match the room's visual STYLE only (palette, grain, framing, meme energy). Invent a new subject — do not recreate, remix, or trace any specific frame from the human gifs.
+Create a brand-new square reaction GIF still with Grok Imagine from the thread's reply vibes. Invent original visuals. Never reproduce an existing meme GIF file or another reply's media.
