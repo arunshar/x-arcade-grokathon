@@ -123,24 +123,29 @@ def existing_decoy_media_url_for_round(
 ) -> tuple[str, str] | None:
     """Return (url, media_type) for decoy Imagine media on disk.
 
-    Per-round files win. Optional shared ``_probe.mp4`` keeps demo playable
-    while live generation catches up.
+    Only **unique** per-round Imagine clips count as owned media. Files that
+    are byte-identical to ``_probe.mp4`` are placeholders and are ignored
+    (so live mode regenerates a fresh clip every round id).
     """
+    from services.imagine_agent import is_placeholder_decoy, is_real_decoy_media
+
     rid_slug = _slug(str(round_data.get("round_id") or "round"))
-    decoy = _decoy_slot(round_data)
+    # Only motion media from the decoy dir counts. Still round-art JPGs are
+    # not unique "gifs" and must not block Imagine video generation.
     candidates: list[tuple[Path, str]] = [
         (DECOY_DIR / f"{rid_slug}_decoy.mp4", "video"),
         (DECOY_DIR / f"{rid_slug}_decoy.webm", "video"),
         (DECOY_DIR / f"{rid_slug}_decoy.gif", "gif"),
     ]
-    if decoy is not None:
-        art = REPO_ROOT / "web" / "static-assets" / "round-art"
-        for ext in (".jpg", ".jpeg", ".png", ".webp"):
-            candidates.append((art / f"{rid_slug}_r{decoy}{ext}", "image"))
     for path, mtype in candidates:
-        if path.is_file() and path.stat().st_size > 800:
-            rel = path.relative_to(REPO_ROOT / "web")
-            return "/" + str(rel).replace("\\", "/"), mtype
+        if not path.is_file() or path.stat().st_size < 800:
+            continue
+        if is_placeholder_decoy(path):
+            continue
+        if mtype == "video" and not is_real_decoy_media(path):
+            continue
+        rel = path.relative_to(REPO_ROOT / "web")
+        return "/" + str(rel).replace("\\", "/"), mtype
     if allow_probe:
         probe = DECOY_DIR / "_probe.mp4"
         if probe.is_file() and probe.stat().st_size > 800:
@@ -185,10 +190,21 @@ def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
     human_ready = 0
     human_total = 0
 
-    # Prefer a true per-round Imagine file; probe only fills the card until gen finishes.
+    # Prefer a true unique Imagine file. Probe is only a temporary stand-in
+    # while live generation runs — never mark probe clones as ready.
     decoy_own = existing_decoy_media_url_for_round(round_data, allow_probe=False)
     decoy_media = decoy_own or existing_decoy_media_url_for_round(round_data, allow_probe=True)
     has_own_decoy = decoy_own is not None
+    # Probe URL alone is not "ready" in live mode (would repeat every round).
+    using_probe_only = (
+        not has_own_decoy
+        and decoy_media is not None
+        and " /static-assets/reply-gifs/decoy/_probe.mp4" in f" {decoy_media[0]}"
+    ) or (
+        not has_own_decoy
+        and decoy_media is not None
+        and str(decoy_media[0]).endswith("/_probe.mp4")
+    )
 
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
@@ -203,10 +219,11 @@ def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
                 url, mtype = decoy_media
                 rep["media_url"] = url
                 rep["media_type"] = mtype
-                # Probe counts as ready for display, but live still regenerates own file.
                 if has_own_decoy:
                     rep["media_status"] = "ready"
                 elif config.MODE == "live":
+                    # Still show something while Imagine runs, but stay pending
+                    # so the server keeps generating a unique clip.
                     rep["media_status"] = "pending"
                 else:
                     rep["media_status"] = "ready"
@@ -240,10 +257,13 @@ def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
     if has_own_decoy:
         round_data["decoy_media_status"] = "ready"
     elif decoy_media and config.MODE != "live":
-        # Demo: probe (or still) is good enough.
+        # Demo: shared probe is acceptable offline.
         round_data["decoy_media_status"] = "ready"
     elif config.MODE == "live":
+        # Unique generation still needed (probe stand-in does not count).
         round_data["decoy_media_status"] = "pending"
+        if using_probe_only:
+            round_data["decoy_media_placeholder"] = True
     else:
         round_data["decoy_media_status"] = "none"
     round_data["human_media_status"] = (

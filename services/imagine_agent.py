@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import io
 import json
 import os
@@ -394,6 +395,62 @@ def decoy_video_path(round_id: str) -> Path:
     return DECOY_DIR / f"{_slug(round_id)}_decoy.mp4"
 
 
+def _md5_file(path: Path) -> str:
+    h = hashlib.md5()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 16), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def is_placeholder_decoy(path: Path | None) -> bool:
+    """True if path is missing, tiny, named probe, or a byte-clone of _probe.mp4.
+
+    Early seeding copied the same probe clip to every round id — those must
+    not count as unique Imagine generations.
+    """
+    if path is None or not path.is_file() or path.stat().st_size < 800:
+        return True
+    if path.name.startswith("_probe") or path.stem == "_probe":
+        return True
+    probe = DECOY_DIR / "_probe.mp4"
+    if not probe.is_file():
+        return False
+    try:
+        if path.resolve() == probe.resolve():
+            return True
+    except OSError:
+        pass
+    # Fast path: same size then hash.
+    if path.stat().st_size == probe.stat().st_size:
+        try:
+            if _md5_file(path) == _md5_file(probe):
+                return True
+        except OSError:
+            return True
+    return False
+
+
+def is_real_decoy_media(path: Path | None) -> bool:
+    """True when the file is a unique per-round Imagine clip (not the probe)."""
+    return path is not None and path.is_file() and not is_placeholder_decoy(path)
+
+
+def purge_placeholder_decoys() -> list[str]:
+    """Delete per-round files that are still just copies of _probe.mp4."""
+    removed: list[str] = []
+    if not DECOY_DIR.is_dir():
+        return removed
+    for path in DECOY_DIR.glob("*_decoy.mp4"):
+        if is_placeholder_decoy(path):
+            try:
+                path.unlink()
+                removed.append(path.name)
+            except OSError as exc:
+                print(f"imagine_agent: could not remove {path.name}: {exc}", file=sys.stderr)
+    return removed
+
+
 def generate_matching_decoy(
     round_data: dict[str, Any],
     *,
@@ -412,20 +469,26 @@ def generate_matching_decoy(
         "status": "skipped",
     }
 
-    if not force and out.is_file() and out.stat().st_size > 800:
-        # Already have a per-round file — stamp and exit.
+    # Reuse only a *real* unique generation — never a seeded probe clone.
+    if not force and is_real_decoy_media(out):
         _stamp_decoy(round_data, out)
         result["status"] = "exists"
         return result
 
+    # Drop stale probe clones so we do not keep serving the same clip.
+    if out.is_file() and is_placeholder_decoy(out):
+        try:
+            out.unlink()
+        except OSError:
+            pass
+
     if config.MODE != "live" and not force:
+        # Demo: serve probe only as a shared fallback (not copied per-round).
         probe = DECOY_DIR / "_probe.mp4"
         if probe.is_file():
-            if not out.is_file():
-                DECOY_DIR.mkdir(parents=True, exist_ok=True)
-                out.write_bytes(probe.read_bytes())
-            _stamp_decoy(round_data, out if out.is_file() else probe)
+            _stamp_decoy(round_data, probe)
             result["status"] = "demo_probe"
+            result["path"] = str(probe)
             return result
         result["status"] = "no_live"
         return result
@@ -495,14 +558,12 @@ def generate_matching_decoy(
         print(f"imagine_agent: video gen failed: {exc}", file=sys.stderr)
         result["status"] = "failed"
         result["error"] = str(exc)
-        # Fall back to probe so the round still has motion.
+        # Shared probe only — never copy it onto the per-round path.
         probe = DECOY_DIR / "_probe.mp4"
         if probe.is_file():
-            DECOY_DIR.mkdir(parents=True, exist_ok=True)
-            if not out.is_file():
-                out.write_bytes(probe.read_bytes())
-            _stamp_decoy(round_data, out)
+            _stamp_decoy(round_data, probe, ready=False)
             result["status"] = "failed_probe_fallback"
+            result["path"] = str(probe)
         else:
             _mark_decoy_failed(round_data)
         return result
@@ -523,7 +584,14 @@ def generate_matching_decoy(
         _mark_decoy_failed(round_data)
         return result
 
-    _stamp_decoy(round_data, out)
+    if is_placeholder_decoy(out):
+        # Should not happen for a fresh download — refuse to mark ready.
+        result["status"] = "failed"
+        result["error"] = "downloaded file looks like probe placeholder"
+        _mark_decoy_failed(round_data)
+        return result
+
+    _stamp_decoy(round_data, out, ready=True)
     result["status"] = "ready"
     result["bytes"] = out.stat().st_size if out.is_file() else 0
     # Stash brief on the round for debug / reveal flair (not shown pre-reveal).
@@ -531,13 +599,21 @@ def generate_matching_decoy(
     return result
 
 
-def _stamp_decoy(round_data: dict[str, Any], path: Path) -> None:
+def _stamp_decoy(
+    round_data: dict[str, Any],
+    path: Path,
+    *,
+    ready: bool | None = None,
+) -> None:
     decoy = _decoy_slot(round_data)
     if decoy is None or not path.is_file():
         return
     rel = path.relative_to(REPO_ROOT / "web")
     url = "/" + str(rel).replace("\\", "/")
     mtype = "video" if path.suffix.lower() in (".mp4", ".webm") else "gif"
+    is_real = is_real_decoy_media(path)
+    if ready is None:
+        ready = is_real or config.MODE != "live"
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
             continue
@@ -548,11 +624,11 @@ def _stamp_decoy(round_data: dict[str, Any], path: Path) -> None:
             continue
         rep["media_url"] = url
         rep["media_type"] = mtype
-        rep["media_status"] = "ready"
+        rep["media_status"] = "ready" if ready else "pending"
         rep["media_source"] = "imagine"
         break
-    round_data["decoy_media_status"] = "ready"
-    round_data["reply_art_status"] = "ready"
+    round_data["decoy_media_status"] = "ready" if ready else "pending"
+    round_data["reply_art_status"] = round_data["decoy_media_status"]
     round_data["format"] = "gif"
 
 
@@ -587,7 +663,18 @@ def main() -> None:
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--round-id", type=str, default="")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument(
+        "--purge-placeholders",
+        action="store_true",
+        help="Delete per-round files that are still copies of _probe.mp4",
+    )
     args = parser.parse_args()
+
+    if args.purge_placeholders:
+        removed = purge_placeholder_decoys()
+        print(f"purged {len(removed)} placeholder decoys:", ", ".join(removed) or "(none)")
+        if not args.all and not args.round_id:
+            return
 
     rounds = _load_rounds()
     if args.round_id:
