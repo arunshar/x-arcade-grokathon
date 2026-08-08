@@ -1,0 +1,157 @@
+.gitignore
+  s_da6f3933cdb62d::t_9eef96d918705e 1-8
+CONTRACT.md
+  s_da6f3933cdb62d::t_59f3dd9070f82c 1-68
+DEMO.md
+  s_da6f3933cdb62d::t_526e454c1779bb 1-260
+LICENSE
+  s_da6f3933cdb62d::t_fd94111dc07a10 1-21
+X_Arcade_deck_portable.html
+  s_da6f3933cdb62d::t_c8e8a619c57765 1-172
+artifacts/integration_trace.txt
+  s_da6f3933cdb62d::t_bf76acee78f712 1-156
+artifacts/probes/image_gen.json
+  s_da6f3933cdb62d::t_7abefc4824b3f6 1-7
+artifacts/probes/tts.json
+  s_da6f3933cdb62d::t_49785d53c53da4 1-8
+artifacts/probes/voice_token.json
+  s_da6f3933cdb62d::t_d6a9ffbc35d948 1-11
+artifacts/probes/x_search.json
+  s_da6f3933cdb62d::t_bb2e039cc92d62 1-34
+cartridges/decoy/queue.py
+  s_da6f3933cdb62d::t_58f82dfb60b5ec 1-50
+cartridges/decoy/round_builder.py
+  s_da6f3933cdb62d::t_ee17c9b994b41c 1-622
+cartridges/decoy/rounds/README.md
+  s_da6f3933cdb62d::t_7396312eb21132 1-36
+cartridges/decoy/rounds/decoy_ai.json
+  s_da6f3933cdb62d::t_d181f13559d127 1-48
+cartridges/decoy/rounds/decoy_crypto.json
+  s_da6f3933cdb62d::t_5c79d335c687aa 1-48
+cartridges/decoy/rounds/decoy_food.json
+  s_da6f3933cdb62d::t_09946dc4a4478e 1-48
+cartridges/decoy/rounds/decoy_movies.json
+  s_da6f3933cdb62d::t_06d58180ac55a4 1-48
+cartridges/decoy/rounds/decoy_music.json
+  s_da6f3933cdb62d::t_976af15a153098 1-48
+cartridges/decoy/rounds/decoy_sports.json
+  s_da6f3933cdb62d::t_2636e654a7ec59 1-48
+config.py
+  s_da6f3933cdb62d::t_bf9bee900537ab 1-20
+deploy/huggingface/Dockerfile
+  s_da6f3933cdb62d::t_4f847a3173dd9a 1-12
+deploy/huggingface/README.space.md
+  s_da6f3933cdb62d::t_6dbd1ed91b9453 1-18
+deploy/huggingface/stage.sh
+  s_da6f3933cdb62d::t_92a24a75ce3608 1-28
+fixtures/api/decoy_write/0dc69a5c5287f0f6dad87c822268c66e122f8cc054d3586d5827553dd6030fc0.json
+  s_da6f3933cdb62d::t_59ead2f570805e 1-81
+fixtures/api/decoy_write/472fa009406d8d2f35588eab42a931cd9aa900fe9047f5f1e6476b74c9790b30.json
+  s_da6f3933cdb62d::t_e5330d86fec4fd 1-81
+fixtures/api/decoy_write/52c0f83498d474e993c13cf00d60c73a8565d53169a5b514910e672421ce21cd.json
+  s_da6f3933cdb62d::t_65c450137405dd 1-81
+fixtures/api/decoy_write/8ed73ef8450ab2fe3e4e0dfd212cc12594b8dd1a69dcbb6aa621009a7088225c.json
+  s_da6f3933cdb62d::t_9cf22739388d35 1-81
+fixtures/api/decoy_write/dbc9d85fa91fa83d4c819dd58e034269d67334bbf59987e5d6ba0761e4dbdd33.json
+  s_da6f3933cdb62d::t_2975ffee053066 1-81
+fixtures/api/decoy_write/fbb0c8db6e5bca9ed7b5883324005f88c2c26eff2589beed615b4335bebe1bc7.json
+  s_da6f3933cdb62d::t_c60e17f0503a3c 1-81
+fixtures/api/image_gen/28912dd48842f8c226ce850f41d08350df235b2034a47d098dadf054e8b324d8.json
+  s_da6f3933cdb62d::t_fc3358dbb79de7 1-23
+fixtures/api/x_search_post/1ff1966580adf015fe959a65a8aa98b578f5a93e36345b8b9d7db3745ad9c2be.json
+  s_da6f3933cdb62d::t_277ab77257da45 1-498
+fixtures/api/x_search_post/4657a97a3a250930784db5896f3828f2799264fdd3da3f0deb2b3d901b7b1799.json
+  s_da6f3933cdb62d::t_690dc6014895a6 1-456
+fixtures/api/x_search_post/64deca11f56e5a3e576135498760910501c34ccbfa9b8b16bef9febd483f516b.json
+  s_da6f3933cdb62d::t_b68f6cb28b9e8a 1-596
+fixtures/api/x_search_post/81264f262b4bb4324e09dc32a45feb4568d048503e3d0e14bc51ac44b1c41dca.json
+  s_da6f3933cdb62d::t_84c339efbbbad7 1-501
+fixtures/api/x_search_post/8d820f7652882d5f5ad4c3336327dae0cfd69386f9632fa3840da8820756e1f1.json
+  s_da6f3933cdb62d::t_d53338a2f1803a 1-166
+fixtures/api/x_search_post/92051200858abfddd8d2f67290829d9718a722a776a0f8d48cd5e2eac2ab58bf.json
+  s_da6f3933cdb62d::t_ab24e92142438b 1-470
+fixtures/api/x_search_post/a1007b51c9b6c95fa178f6d4b277cd35db9e5e1571577bcccbfdd65ec4fd5d72.json
+  s_da6f3933cdb62d::t_7e91d02461bd3a 1-743
+fixtures/api/x_search_replies/20ce9ff189cebf93899680ae8d3f152a18913c94c836dd8d4c9cb525746b2873.json
+  s_da6f3933cdb62d::t_635b37f461f6c4 1-262
+fixtures/api/x_search_replies/4de1155fc60b8b9203336a63ce1e77f3a92aa45e41a9df0128ec9a0bfca67bb4.json
+  s_da6f3933cdb62d::t_579b6a9d46272e 1-262
+fixtures/api/x_search_replies/50f1e1f4f32edf2f8b2432125b3b2cc5b1578b8ee17db211280f4e2cdbef1f9a.json
+  s_da6f3933cdb62d::t_90f5ae8016117b 1-262
+fixtures/api/x_search_replies/65d372d552cd7831c113a366b457471569095e3f30310d53c9c92abcd702a3a5.json
+  s_da6f3933cdb62d::t_dc8a93e7842bf2 1-200
+fixtures/api/x_search_replies/6a2f601abd0c5bf8622cf6bce3123174b6b7b5f9667d72d6296dc4b109d5a150.json
+  s_da6f3933cdb62d::t_de9e228773f0e4 1-255
+fixtures/api/x_search_replies/7f7db988f826bbd9be6acfb157d5ef57a6ee9722f8e13a9f6e2daecbfd704ebd.json
+  s_da6f3933cdb62d::t_abd5decb906728 1-241
+fixtures/api/x_search_replies/a621eaf18cc3912ac85a21f3e08009966ee5286272a5d1907d985a8e53ae9480.json
+  s_da6f3933cdb62d::t_1f6ab193c848f5 1-168
+fixtures_core.py
+  s_da6f3933cdb62d::t_ebd0f86c534466 1-237
+integration_check.py
+  s_da6f3933cdb62d::t_3fcaeaa7bb157a 1-239
+paper/VISION.md
+  s_da6f3933cdb62d::t_b3cae9ff458c57 1-92
+plugins/ads/ADS.md
+  s_da6f3933cdb62d::t_7f441e62be4c7e 1-10
+plugins/ads/arenas.py
+  s_da6f3933cdb62d::t_5a98aaef4cac8b 1-43
+plugins/safety/SAFETY.md
+  s_da6f3933cdb62d::t_bee9d0112eb6e0 1-11
+plugins/safety/screen.py
+  s_da6f3933cdb62d::t_88397302285588 1-151
+requirements.txt
+  s_da6f3933cdb62d::t_33be2419fef09a 1-3
+run.sh
+  s_da6f3933cdb62d::t_346468f7bb7769 1-8
+server/app.py
+  s_da6f3933cdb62d::t_0cad78f5dd5fe3 1-471
+server/selfcheck.py
+  s_da6f3933cdb62d::t_64fa7ca67ca770 1-195
+services/REALTIME_NOTES.md
+  s_da6f3933cdb62d::t_d4a015111717a9 1-103
+services/card_forge.py
+  s_da6f3933cdb62d::t_d113fd8320b86f 1-132
+services/poster.py
+  s_da6f3933cdb62d::t_364742185e40de 1-43
+services/probe_surfaces.py
+  s_da6f3933cdb62d::t_63edebc65d4891 1-134
+services/voice_host.py
+  s_da6f3933cdb62d::t_6ba1add55ae36e 1-150
+slides/_deck_data.json
+  s_da6f3933cdb62d::t_65f33be161e9b3 1-215
+slides/build_deck.py
+  s_da6f3933cdb62d::t_d1dc4b840d7bd3 1-246
+slides/build_pdf.py
+  s_da6f3933cdb62d::t_2f068422ef56fb 1-26
+slides/build_pptx.py
+  s_da6f3933cdb62d::t_30f4d8e778e85c 1-39
+slides/index.html
+  s_da6f3933cdb62d::t_183e0e168d4625 1-164
+slides/make_portable.py
+  s_da6f3933cdb62d::t_e495f425c59370 1-77
+slides/render_all.sh
+  s_da6f3933cdb62d::t_c30059d196e335 1-25
+web/game.js
+  s_da6f3933cdb62d::t_2b5452303b054b 1-505
+web/index.html
+  s_da6f3933cdb62d::t_4371292985f91b 1-90
+web/style.css
+  s_da6f3933cdb62d::t_02c8f22359576f 1-436
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "33b10551c722eb80b7eacad321b88ee6a88d29c0",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Arun Sharma <sharm485@umn.edu>"
+    }
+  }
+}
