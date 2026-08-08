@@ -1,0 +1,97 @@
+{
+  "surface": "host_agent_chat",
+  "probed_at": "2026-08-08",
+  "agent_model": "grok-4-1-fast-non-reasoning",
+  "text_model": "grok-4.5",
+  "timeout_s": 2.5,
+  "client_abort_ms": 1800,
+  "note": "Five host mp3s remain the hard path; agent is async color only.",
+  "host_agent_runs": [
+    {
+      "case": "guessing",
+      "i": 0,
+      "wall_s": 0.477,
+      "latency_ms": 476,
+      "source": "agent",
+      "model": "grok-4-1-fast-non-reasoning",
+      "line": "NEON leads 0-0. Round one starts now.",
+      "detail": null
+    },
+    {
+      "case": "guessing",
+      "i": 1,
+      "wall_s": 0.508,
+      "latency_ms": 507,
+      "source": "agent",
+      "model": "grok-4-1-fast-non-reasoning",
+      "line": "Round one starts now, first tap wins.",
+      "detail": null
+    },
+    {
+      "case": "pick",
+      "i": 0,
+      "wall_s": 0.568,
+      "latency_ms": 567,
+      "source": "fallback_unsafe",
+      "model": null,
+      "line": "NEON locks reply 3.",
+      "detail": null
+    },
+    {
+      "case": "pick",
+      "i": 1,
+      "wall_s": 0.581,
+      "latency_ms": 580,
+      "source": "fallback_unsafe",
+      "model": null,
+      "line": "NEON locks reply 3.",
+      "detail": null
+    },
+    {
+      "case": "reveal",
+      "i": 0,
+      "wall_s": 0.777,
+      "latency_ms": 776,
+      "source": "agent",
+      "model": "grok-4-1-fast-non-reasoning",
+      "line": "NEON snags the point by dodging slot 2's painfully polite discourse dodge.",
+      "detail": null
+    },
+    {
+      "case": "reveal",
+      "i": 1,
+      "wall_s": 0.703,
+      "latency_ms": 702,
+      "source": "agent",
+      "model": "grok-4-1-fast-non-reasoning",
+      "line": "NEON dodged the corporate word salad in slot 2 for the win.",
+      "detail": null
+    }
+  ],
+  "host_agent_wall_s_mean": 0.616,
+  "host_agent_wall_s_max": 0.777,
+  "model_comparison_short_completion": [
+    {
+      "model": "grok-4.5",
+      "n": 3,
+      "mean_s": 8.524,
+      "min_s": 6.064,
+      "max_s": 12.505
+    },
+    {
+      "model": "grok-4-1-fast-non-reasoning",
+      "n": 3,
+      "mean_s": 0.676,
+      "min_s": 0.607,
+      "max_s": 0.749
+    },
+    {
+      "model": "grok-4-fast-non-reasoning",
+      "n": 3,
+      "mean_s": 0.723,
+      "min_s": 0.674,
+      "max_s": 0.77
+    }
+  ],
+  "recommendation": "Use grok-4-1-fast-non-reasoning for MODEL_AGENT; grok-4.5 is too slow (~5.5s) for live commentate under a 1.8s client cap."
+}

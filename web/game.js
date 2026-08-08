@@ -24,6 +24,7 @@ let muted = false;
 let audioUnlocked = false;
 let arcadeMode = "demo";
 let voiceModel = "grok-voice-think-fast-2.0";
+let ttsVoice = "eve"; // Grok speaker id — from /health or ARCADE_VOICE
 let firstRoundOfSession = true;
 
 // Scripted host lines — keep in sync with services/voice_host.py LINES.
@@ -37,6 +38,19 @@ const HOST_LINES = {
 };
 
 // ---------- audio (mp3 always available; live voice is best-effort) ----------
+// Absolute URLs so playback works no matter the page path.
+const HOST_MP3 = {
+  intro: "static-assets/host_intro.mp3",
+  round: "static-assets/host_round.mp3",
+  reveal: "static-assets/host_reveal.mp3",
+  win: "static-assets/host_win.mp3",
+  lose: "static-assets/host_lose.mp3",
+};
+function hostMp3Url(name) {
+  const rel = HOST_MP3[name];
+  if (!rel) return "";
+  try { return new URL(rel, location.href).href; } catch (e) { return rel; }
+}
 function makeSound(src) {
   const a = new Audio(src);
   a.preload = "auto";
@@ -45,40 +59,57 @@ function makeSound(src) {
   return a;
 }
 const sounds = {
-  intro: makeSound("static-assets/host_intro.mp3"),
-  round: makeSound("static-assets/host_round.mp3"),
-  reveal: makeSound("static-assets/host_reveal.mp3"),
-  win: makeSound("static-assets/host_win.mp3"),
-  lose: makeSound("static-assets/host_lose.mp3"),
+  intro: makeSound(HOST_MP3.intro),
+  round: makeSound(HOST_MP3.round),
+  reveal: makeSound(HOST_MP3.reveal),
+  win: makeSound(HOST_MP3.win),
+  lose: makeSound(HOST_MP3.lose),
 };
 
 function unlockAudio() {
-  if (audioUnlocked) return;
-  audioUnlocked = true;
-  for (const a of Object.values(sounds)) {
-    try {
-      a.muted = true;
-      const p = a.play();
-      if (p && p.then) p.then(() => { a.pause(); a.currentTime = 0; a.muted = false; })
-        .catch(() => { a.muted = false; });
-    } catch (e) { /* autoplay blocked, a later gesture retries */ }
+  // May be called on every major click — only the unlock work runs once,
+  // but we always try to resume contexts (browsers suspend aggressively).
+  if (!audioUnlocked) {
+    audioUnlocked = true;
+    for (const a of Object.values(sounds)) {
+      try {
+        a.muted = true;
+        const p = a.play();
+        if (p && p.then) {
+          p.then(() => { a.pause(); a.currentTime = 0; a.muted = false; })
+            .catch(() => { a.muted = false; });
+        } else {
+          a.muted = false;
+        }
+      } catch (e) { /* autoplay blocked */ }
+    }
   }
-  // Resume WebAudio if live voice already warmed a suspended context.
   if (pcmPlayer.ctx && pcmPlayer.ctx.state === "suspended") {
     pcmPlayer.ctx.resume().catch(() => {});
   }
-  // Warm the realtime host after a user gesture (required for autoplay + WS).
+  // Prime a silent Audio element so later voiceBus.playUrl is allowed.
+  try {
+    if (!voiceBus.el) voiceBus.el = new Audio();
+    const silent = voiceBus.el;
+    silent.muted = true;
+    const sp = silent.play();
+    if (sp && sp.then) {
+      sp.then(() => { silent.pause(); silent.muted = false; }).catch(() => { silent.muted = false; });
+    }
+  } catch (e) { /* ignore */ }
   if (arcadeMode === "live" && !MOCK) warmLiveVoice();
 }
+// Unlock on first gesture anywhere (and again on lobby buttons below).
 document.addEventListener("pointerdown", unlockAudio, { once: true });
 
 function playSound(name) {
-  const a = sounds[name];
-  if (!a || muted || a.dataset.ok === "no") return;
+  if (muted) return;
+  unlockAudio();
+  const url = hostMp3Url(name);
+  if (!url) return;
   try {
-    a.currentTime = 0;
-    const p = a.play();
-    if (p && p.catch) p.catch(() => {});
+    const a = new Audio(url);
+    a.play().catch(() => {});
   } catch (e) { /* never let audio break the game */ }
 }
 
@@ -255,9 +286,11 @@ function warmLiveVoice() {
       ws.send(JSON.stringify({
         type: "session.update",
         session: {
-          voice: "Eve",
+          voice: ttsVoice || "eve",
           instructions:
-            "You are the Decoy arcade host. Short lines, high energy, never reveal the decoy slot.",
+            "You are the Decoy arcade commentator. Short hype lines only. " +
+            "Never mention which reply is fake, decoy, robot, or the answer. " +
+            "You may talk about scores, leaders, locks, and winners after reveal.",
           // Scripted cues only — no mic VAD chatter during the duel.
           turn_detection: null,
           input_audio_format: "pcm16",
@@ -278,10 +311,16 @@ function warmLiveVoice() {
   return liveVoice.connecting;
 }
 
-function speakLive(lineKey) {
+/** Speak exact text over live realtime voice. */
+function speakLiveText(text) {
   return new Promise((resolve, reject) => {
     if (!liveVoice.ready || !liveVoice.ws || liveVoice.ws.readyState !== WebSocket.OPEN) {
       reject(new Error("voice not ready"));
+      return;
+    }
+    const line = String(text || "").trim();
+    if (!line) {
+      resolve();
       return;
     }
     if (liveVoice.pending) {
@@ -290,27 +329,23 @@ function speakLive(lineKey) {
       liveVoice.pending = null;
       prev.reject(new Error("superseded"));
     }
-    const text = HOST_LINES[lineKey];
-    if (!text) {
-      reject(new Error("unknown line"));
-      return;
-    }
+    // Escape quotes so the force-instruction stays one string.
+    const safe = line.replace(/\\/g, "/").replace(/"/g, "'");
     pcmPlayer.resetClock();
     const timer = setTimeout(() => {
       if (liveVoice.pending) {
         liveVoice.pending = null;
         reject(new Error("speak timeout"));
       }
-    }, 12000);
+    }, 14000);
     liveVoice.pending = { resolve, reject, timer };
     try {
-      // Cancel anything in flight so the cue is not queued behind a riff.
       liveVoice.ws.send(JSON.stringify({ type: "response.cancel" }));
       liveVoice.ws.send(JSON.stringify({
         type: "response.create",
         response: {
           modalities: ["audio", "text"],
-          instructions: 'Say exactly this, nothing more: "' + text + '"',
+          instructions: 'Say exactly this, nothing more: "' + safe + '"',
         },
       }));
     } catch (e) {
@@ -321,36 +356,274 @@ function speakLive(lineKey) {
   });
 }
 
-/** Play a host cue: live voice if available, else committed mp3. Never throws. */
+function speakLive(lineKey) {
+  const text = HOST_LINES[lineKey];
+  if (!text) return Promise.reject(new Error("unknown line"));
+  return speakLiveText(text);
+}
+
+/** Browser TTS last-resort fallback (not Grok). */
+function speakBrowser(text) {
+  return new Promise((resolve) => {
+    try {
+      if (!window.speechSynthesis) {
+        resolve();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(text || ""));
+      u.rate = 1.06;
+      u.pitch = 1.0;
+      u.onend = () => resolve();
+      u.onerror = () => resolve();
+      window.speechSynthesis.speak(u);
+    } catch (e) {
+      resolve();
+    }
+  });
+}
+
+/**
+ * One audio channel for the whole client. Stops any previous clip so Grok
+ * lines never stack on top of each other.
+ */
+const voiceBus = {
+  el: null,
+  url: null,
+  stop() {
+    try {
+      if (this.el) {
+        this.el.onended = null;
+        this.el.onerror = null;
+        this.el.pause();
+        this.el.removeAttribute("src");
+        this.el.load();
+      }
+    } catch (e) { /* ignore */ }
+    if (this.url) {
+      try { URL.revokeObjectURL(this.url); } catch (e) { /* ignore */ }
+      this.url = null;
+    }
+    if (window.speechSynthesis) {
+      try { window.speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+    }
+    // Cancel in-flight realtime utterance.
+    if (liveVoice.ws && liveVoice.ws.readyState === WebSocket.OPEN) {
+      try { liveVoice.ws.send(JSON.stringify({ type: "response.cancel" })); } catch (e) { /* ignore */ }
+    }
+    if (liveVoice.pending) {
+      clearTimeout(liveVoice.pending.timer);
+      const p = liveVoice.pending;
+      liveVoice.pending = null;
+      try { p.reject(new Error("cancelled")); } catch (e) { /* ignore */ }
+    }
+  },
+  playUrl(url) {
+    return new Promise((resolve, reject) => {
+      this.stop();
+      this.url = url;
+      if (!this.el) this.el = new Audio();
+      const a = this.el;
+      a.onended = () => resolve();
+      a.onerror = () => reject(new Error("audio element failed"));
+      a.src = url;
+      a.preload = "auto";
+      const p = a.play();
+      if (p && p.catch) p.catch(reject);
+    });
+  },
+};
+
+/**
+ * Serial voice queue with epoch cancel.
+ * When the game moves on (new round / phase), bump() hard-cuts audio and
+ * drops every pending job from the old moment so lines never lag behind.
+ */
+const voiceQueue = {
+  items: [],
+  running: false,
+  epoch: 0,
+  /** Hard cut: stop current clip and wipe backlog (call on phase/round change). */
+  bump() {
+    this.epoch += 1;
+    this.items = [];
+    voiceBus.stop();
+    this.running = false;
+  },
+  clear() {
+    this.bump();
+  },
+  /**
+   * @param {() => Promise<void>|void} job
+   * @param {{ phase?: string, roundId?: string|null, priority?: number }} [meta]
+   */
+  enqueue(job, meta) {
+    const m = Object.assign({ epoch: this.epoch, phase: null, roundId: null }, meta || {});
+    this.items.push({ run: job, meta: m });
+    // Keep the lane snappy — drop oldest non-playing jobs first.
+    while (this.items.length > 4) this.items.shift();
+    this.kick();
+  },
+  _stale(meta) {
+    if (!meta) return true;
+    if (meta.epoch !== this.epoch) return true;
+    if (meta.phase && state && state.phase && meta.phase !== state.phase) return true;
+    const liveId = state && state.round && state.round.round_id;
+    if (meta.roundId && liveId && meta.roundId !== liveId) return true;
+    return false;
+  },
+  kick() {
+    if (this.running) return;
+    // Drop anything that belongs to a past moment.
+    while (this.items.length && this._stale(this.items[0].meta)) {
+      this.items.shift();
+    }
+    if (!this.items.length) return;
+    this.running = true;
+    const item = this.items.shift();
+    const ep = item.meta.epoch;
+    Promise.resolve()
+      .then(() => {
+        if (ep !== this.epoch || this._stale(item.meta)) return;
+        return item.run();
+      })
+      .catch(() => {})
+      .then(() => {
+        this.running = false;
+        // If epoch moved mid-clip, don't chain old work.
+        if (ep !== this.epoch) {
+          this.items = this.items.filter((i) => i.meta.epoch === this.epoch);
+        }
+        this.kick();
+      });
+  },
+};
+
+function voiceMeta(extra) {
+  const roundId = state && state.round && state.round.round_id ? state.round.round_id : null;
+  const phase = state && state.phase ? state.phase : null;
+  return Object.assign({ phase: phase, roundId: roundId }, extra || {});
+}
+
+/**
+ * Grok Voice TTS via our server (POST /tts → Eve mp3).
+ * Works whenever ARCADE_MODE=live + XAI_API_KEY, no realtime socket required.
+ */
+function speakGrokTts(text) {
+  return (async () => {
+    const line = String(text || "").trim();
+    if (!line) return;
+    const r = await fetch("/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: line }),
+    });
+    if (!r.ok) {
+      const detail = await r.text().catch(() => "");
+      throw new Error("grok tts " + r.status + " " + detail.slice(0, 120));
+    }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    // voiceBus.playUrl takes ownership of stop/revoke on next play; revoke after.
+    try {
+      await voiceBus.playUrl(url);
+    } finally {
+      // playUrl already revoked on next stop; if ended cleanly, revoke now.
+      try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ }
+      if (voiceBus.url === url) voiceBus.url = null;
+    }
+  })();
+}
+
+/** Prefer Grok Voice TTS (stable) then realtime, then browser. Never overlaps. */
+async function speakWithGrok(text) {
+  const line = String(text || "").trim();
+  if (!line || muted) return;
+  // Prefer /tts — one clip at a time on voiceBus. Realtime is easy to stack.
+  if (arcadeMode === "live" && !MOCK) {
+    try {
+      await speakGrokTts(line);
+      return "tts";
+    } catch (e) { /* try realtime */ }
+    if (!liveVoice.disabled) {
+      try {
+        const ok = await warmLiveVoice();
+        if (ok) {
+          await speakLiveText(line);
+          return "realtime";
+        }
+      } catch (e2) { /* browser */ }
+    }
+  }
+  await speakBrowser(line);
+  return "browser";
+}
+
+function playMp3Cue(name) {
+  return new Promise((resolve) => {
+    if (muted) {
+      resolve();
+      return;
+    }
+    unlockAudio();
+    const url = hostMp3Url(name);
+    if (!url) {
+      resolve();
+      return;
+    }
+    // Fresh Audio(src) each time — cloneNode of <audio> often fails silently.
+    const clip = new Audio(url);
+    clip.preload = "auto";
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+    clip.onended = finish;
+    clip.onerror = finish;
+    // Safety: never hang the voice queue if ended event is missed.
+    const watchdog = setTimeout(finish, 12000);
+    const clearWd = () => clearTimeout(watchdog);
+    clip.addEventListener("ended", clearWd, { once: true });
+    clip.addEventListener("error", clearWd, { once: true });
+
+    voiceBus.stop();
+    voiceBus.el = clip;
+    const p = clip.play();
+    if (p && p.then) {
+      p.then(() => { /* playing */ }).catch(() => {
+        // Autoplay still blocked — resolve so queue continues; user can click again.
+        finish();
+      });
+    }
+  });
+}
+
+/**
+ * Hard host stinger: the five committed mp3s are the guaranteed path.
+ * Never waits on the agent or live TTS. Agent color is separate and async.
+ */
 function playHost(name, andThen) {
   if (muted) {
     if (andThen) andThen();
     return;
   }
-  const finish = () => { if (andThen) andThen(); };
-  const fallback = () => { playSound(name); finish(); };
-
-  if (arcadeMode !== "live" || liveVoice.disabled || MOCK) {
-    fallback();
-    return;
+  unlockAudio();
+  // Capture meta AFTER unlock; tag with current phase/round.
+  const meta = voiceMeta();
+  // Stamp epoch now so a concurrent bump doesn't false-stale us incorrectly
+  // if we already belong to the new epoch.
+  meta.epoch = voiceQueue.epoch;
+  voiceQueue.enqueue(async () => {
+    if (muted || voiceQueue._stale(meta)) return;
+    await playMp3Cue(name);
+  }, meta);
+  if (andThen) {
+    voiceQueue.enqueue(async () => {
+      if (!voiceQueue._stale(meta)) andThen();
+    }, meta);
   }
-
-  const run = async () => {
-    const ok = await warmLiveVoice();
-    if (!ok) {
-      fallback();
-      return;
-    }
-    try {
-      await speakLive(name);
-      finish();
-    } catch (e) {
-      // One soft failure → mp3 this cue. Repeated connect failures disable live.
-      playSound(name);
-      finish();
-    }
-  };
-  run();
 }
 
 function setMuted(v) {
@@ -358,10 +631,462 @@ function setMuted(v) {
   $("muteBtn").textContent = muted ? "SND OFF" : "SND ON";
   $("muteBtn").classList.toggle("off", muted);
   try { localStorage.setItem("arcade_muted", muted ? "1" : "0"); } catch (e) {}
-  if (muted && liveVoice.ws) {
-    try { liveVoice.ws.send(JSON.stringify({ type: "response.cancel" })); } catch (e) {}
+  if (muted) {
+    voiceQueue.clear();
+    if (typeof commentary !== "undefined" && commentary.clearQueue) commentary.clearQueue();
   }
 }
+
+// ---------- host AGENT + Grok Voice ----------
+// Observe safe state → POST /agent/commentate (Grok decides the line) → speak
+// with Grok Voice. Templates are fallback only. Never sends decoy secrets.
+const commentary = {
+  enabled: true,
+  hostOnly: true,
+  useAgent: true,
+  lastLeader: null,
+  lastGuessed: {},
+  lowClockSaid: false,
+  lastLobbyCount: 0,
+  inFlight: 0,
+  dropPending: false,
+  // Generation token — bumped when the game advances so late agent replies are dropped.
+  gen: 0,
+  activePhase: null,
+  activeRoundId: null,
+  // Last spoken lines — fed back to the agent so openers don't repeat.
+  recentLines: [],
+  rememberLine(line) {
+    const t = String(line || "").trim();
+    if (!t) return;
+    this.recentLines.push(t);
+    if (this.recentLines.length > 10) this.recentLines.shift();
+  },
+
+  setEnabled(v) {
+    this.enabled = !!v;
+    const btn = $("commBtn");
+    if (btn) {
+      btn.textContent = this.enabled ? "COMM ON" : "COMM OFF";
+      btn.title = this.enabled
+        ? "Host agent + Grok Voice (cuts when the round moves on)"
+        : "Commentator off";
+      btn.classList.toggle("off", !this.enabled);
+    }
+    try { localStorage.setItem("arcade_comm", this.enabled ? "1" : "0"); } catch (e) {}
+    if (!this.enabled) this.clearQueue();
+  },
+
+  clearQueue() {
+    this.dropPending = true;
+    this.gen += 1;
+  },
+
+  /** Game advanced — invalidate in-flight agent calls and old speech. */
+  onAdvance(phase, roundId) {
+    this.gen += 1;
+    this.dropPending = false;
+    this.activePhase = phase || null;
+    this.activeRoundId = roundId || null;
+    this.lowClockSaid = false;
+  },
+
+  canSpeak() {
+    if (muted || !this.enabled) return false;
+    // Solo practice always gets commentary on this machine.
+    if (typeof myRoom === "string" && isSoloFriendlyRoom(myRoom)) return true;
+    if (this.hostOnly && !iAmHost && !MOCK) return false;
+    return true;
+  },
+
+  stillCurrent(gen, phase, roundId) {
+    if (gen !== this.gen) return false;
+    if (this.dropPending) return false;
+    if (phase && state && state.phase && phase !== state.phase) return false;
+    const liveId = state && state.round && state.round.round_id;
+    if (roundId && liveId && roundId !== liveId) return false;
+    return true;
+  },
+
+  /**
+   * Phase-aware observation.
+   * Pre-reveal: spoiler-free. Reveal: decoy is public — include it for funny lines.
+   */
+  safeObservation(event, s, extra) {
+    const board = getStandings(s).map((p) => ({
+      rank: p.rank,
+      name: p.name,
+      score: p.score || 0,
+      streak: p.streak || 0,
+    }));
+    const phase = (s && s.phase) || "";
+    const topic = (s && s.round && s.round.source && s.round.source.topic) || null;
+    const obs = {
+      event: event,
+      phase: phase,
+      round: roundNo || null,
+      deadline_ms: typeof s.deadline_ms === "number" ? s.deadline_ms : null,
+      standings: board,
+      listener: myName || null,
+      recent_lines: this.recentLines.slice(-8),
+      topic: topic,
+    };
+    if (extra && typeof extra === "object") {
+      if (extra.just_locked) obs.just_locked = extra.just_locked;
+      if (extra.winner != null) obs.winner = extra.winner;
+      if (typeof extra.pick_reply === "number") obs.pick_reply = extra.pick_reply;
+      if (extra.picker) obs.picker = extra.picker;
+      if (extra.correct != null) obs.correct = !!extra.correct;
+    }
+    // Reveal only: host may see the answer (already on screen).
+    if (phase === "reveal" || event === "reveal") {
+      const rev = (s && s.reveal) || {};
+      if (typeof rev.decoy_slot === "number") obs.decoy_slot = rev.decoy_slot;
+      if (rev.rationale) obs.rationale = rev.rationale;
+      if (extra && typeof extra.decoy_slot === "number") obs.decoy_slot = extra.decoy_slot;
+      if (extra && extra.rationale) obs.rationale = extra.rationale;
+      const replies = s && s.round && s.round.replies;
+      if (Array.isArray(replies)) {
+        obs.replies = replies.map((r) => ({
+          slot: r.slot,
+          text: r.text || "",
+          author: r.author || "",
+          is_decoy: !!r.is_decoy,
+        }));
+      }
+    }
+    return obs;
+  },
+
+  // Client-side ceiling so a slow model never blocks the round path.
+  AGENT_TIMEOUT_MS: 1800,
+
+  async askAgent(event, s, extra) {
+    const obs = this.safeObservation(event, s, extra);
+    const localFallback = this.templateLine(event, s, extra);
+    if (!this.useAgent || MOCK) return { line: localFallback, source: "fallback_local" };
+    const ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    const timer = setTimeout(() => { try { ctrl && ctrl.abort(); } catch (e) { /* ignore */ } }, this.AGENT_TIMEOUT_MS);
+    try {
+      const r = await fetch("/agent/commentate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(obs),
+        signal: ctrl ? ctrl.signal : undefined,
+      });
+      if (!r.ok) return { line: localFallback, source: "fallback_http" };
+      const j = await r.json();
+      const line = (j && j.line) ? String(j.line).trim() : "";
+      if (!line) return { line: localFallback, source: "fallback_empty" };
+      return {
+        line: line,
+        source: j.source || "agent",
+        latency_ms: j.latency_ms,
+      };
+    } catch (e) {
+      return { line: localFallback, source: "fallback_timeout" };
+    } finally {
+      clearTimeout(timer);
+    }
+  },
+
+  _rotate(options, salt) {
+    const recent = this.recentLines.map((l) => l.toLowerCase());
+    const fresh = options.filter((o) => recent.indexOf(String(o).toLowerCase()) < 0);
+    const pool = fresh.length ? fresh : options;
+    if (!pool.length) return "New round. Stay sharp.";
+    const idx = Math.abs(salt || 0) % pool.length;
+    return pool[idx];
+  },
+
+  templateLine(event, s, extra) {
+    const board = getStandings(s);
+    const top = board[0];
+    extra = extra || {};
+    const rn = roundNo || 1;
+    const topic = (s && s.round && s.round.source && s.round.source.topic) || "this thread";
+    const leader = top ? top.name : "the field";
+    const score = top ? (top.score || 0) : 0;
+    if (event === "lobby_join") {
+      const n = (s.players || []).length;
+      if (n <= 1) {
+        return this._rotate([
+          "Lobby is live. Waiting on a challenger.",
+          "Cabinet's warm. Need one more body.",
+          "Open lobby. Who's stepping up?",
+        ], n);
+      }
+      const names = (s.players || []).map((p) => p.name).slice(0, 4).join(", ");
+      return this._rotate([
+        n + " players in the room. " + names + ".",
+        "Board's filling up: " + names + ".",
+        "Crowd check — " + names + " are in.",
+      ], n + names.length);
+    }
+    if (event === "round_start") {
+      return this._rotate([
+        score > 0
+          ? ("Round " + rn + ". " + leader + " sits on " + score + ".")
+          : ("Round " + rn + ". Fresh board, no leader yet."),
+        "Round " + rn + " on " + topic + ". Tap fast.",
+        "New deal, round " + rn + ". Don't blink.",
+        score > 0
+          ? ("Round " + rn + ". Pressure's on " + leader + ".")
+          : ("Round " + rn + ". First blood's open."),
+        "Clock's live for round " + rn + ". Hunt the fake.",
+        score > 0
+          ? ("Round " + rn + ". " + leader + " has the belt at " + score + ".")
+          : ("Round " + rn + ". Clean slate."),
+        "Shuffle up. Round " + rn + " on " + topic + ".",
+        "Round " + rn + ". Make it count.",
+      ], rn * 17 + score + leader.length);
+    }
+    if (event === "player_lock" || event === "player_pick") {
+      const who = extra.picker || (extra.just_locked && extra.just_locked[0]) || "Someone";
+      const n = extra.pick_reply;
+      const card = (typeof n === "number") ? (" reply " + n) : "";
+      const label = (who === myName || who === "you") ? "You" : who;
+      return this._rotate([
+        label + " locked" + card + ".",
+        label + " slams" + card + ".",
+        "Locked in — " + label + card + ".",
+        label + " commits" + card + ".",
+      ], (n || 0) + label.length + rn);
+    }
+    if (event === "clock_low") {
+      return this._rotate([
+        "Ten seconds!",
+        "Clock's screaming — ten left!",
+        "Final ten. Decide!",
+        "Ten on the clock!",
+      ], rn);
+    }
+    if (event === "reveal") {
+      const w = extra.winner;
+      const rev = (s && s.reveal) || {};
+      const decoy = (typeof rev.decoy_slot === "number") ? rev.decoy_slot + 1
+        : (typeof extra.decoy_slot === "number" ? extra.decoy_slot + 1 : null);
+      if (!w || w === "house") {
+        return this._rotate([
+          decoy ? ("House wins. Decoy was reply " + decoy + ".") : "House takes it.",
+          decoy ? ("Nobody had it. Fake hid in reply " + decoy + ".") : "House keeps the point.",
+          "Machine walks. House cashes.",
+        ], rn + (decoy || 0));
+      }
+      const who = w === myName ? "You" : w;
+      return this._rotate([
+        decoy ? (who + " called it — decoy was reply " + decoy + ".") : (who + " called it! Plus one."),
+        decoy ? (who + " sniffs out reply " + decoy + ". Plus one.") : (who + " takes the round."),
+        decoy ? ("Point to " + who + ". Fake lived in reply " + decoy + ".") : ("Board goes to " + who + "."),
+      ], rn + String(w).length + (decoy || 0));
+    }
+    if (event === "next_round") {
+      return this._rotate([
+        "Next round. Fresh board.",
+        "Reset. New thread.",
+        "Again — new five.",
+      ], rn);
+    }
+    return this._rotate([
+      "Eyes on the replies.",
+      "Stay sharp.",
+      "Don't sleep on this board.",
+    ], rn);
+  },
+
+  /**
+   * Fire agent async + time-capped. Never blocks mp3 stingers or the round.
+   * If the model is slow or the phase moved on, the result is dropped.
+   */
+  comment(event, s, extra, opts) {
+    opts = opts || {};
+    if (!this.canSpeak()) return;
+    if (this.inFlight > 2) return;
+    const gen = this.gen;
+    const phase = (s && s.phase) || (state && state.phase) || null;
+    const roundId = (s && s.round && s.round.round_id) || (state && state.round && state.round.round_id) || null;
+
+    const run = async () => {
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak()) return;
+      this.inFlight += 1;
+      let got = null;
+      try {
+        got = await this.askAgent(event, s, extra);
+      } finally {
+        this.inFlight -= 1;
+      }
+      if (!got || !got.line) return;
+      // Only speak if we are still on this moment.
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      const line = got.line;
+      // Skip near-duplicates of something we just said.
+      const low = line.toLowerCase();
+      if (this.recentLines.some((r) => r.toLowerCase() === low)) return;
+      voiceQueue.enqueue(async () => {
+        if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+        await speakWithGrok(line);
+        this.rememberLine(line);
+      }, voiceMeta({ phase: phase, roundId: roundId }));
+    };
+
+    // Always async — round path never awaits this.
+    const delay = opts.delayMs || 0;
+    if (delay > 0) {
+      setTimeout(() => {
+        if (this.stillCurrent(gen, phase, roundId)) run();
+      }, delay);
+    } else {
+      Promise.resolve().then(run);
+    }
+  },
+
+  /** Local player clicked a reply card — cut openers; mp3 path unchanged. */
+  onLocalPick(slot, s) {
+    if (!this.canSpeak()) return;
+    const replyNo = (typeof slot === "number") ? slot + 1 : null;
+    const snap = s || state;
+    // Cut leftover hype so the click feels instant; don't block on agent.
+    voiceQueue.bump();
+    this.gen = voiceQueue.epoch;
+    // Async agent color only — if reveal arrives first, stillCurrent drops it.
+    this.comment("player_pick", snap, {
+      picker: myName,
+      pick_reply: replyNo,
+      just_locked: [myName],
+    });
+  },
+
+  onState(s, was) {
+    if (!this.canSpeak()) return;
+    const board = getStandings(s);
+    const players = s.players || [];
+    const leader = board[0] && (board[0].score || 0) > 0 ? board[0].name : null;
+
+    if (s.phase === "lobby") {
+      const n = players.length;
+      if (n > this.lastLobbyCount && n >= 1 && joined) {
+        this.comment("lobby_join", s, null, { delayMs: 200 });
+      }
+      this.lastLobbyCount = n;
+      this.lastGuessed = {};
+      this.lowClockSaid = false;
+    }
+
+    if (s.phase === "guessing" && was !== "guessing") {
+      this.lowClockSaid = false;
+      this.lastGuessed = {};
+    }
+
+    if (s.phase === "guessing") {
+      for (const p of players) {
+        if (p.guessed && !this.lastGuessed[p.name]) {
+          this.lastGuessed[p.name] = true;
+          // Local pick already spoke via onLocalPick — only call out opponents.
+          if (p.name !== myName) {
+            this.comment("player_lock", s, { just_locked: [p.name], picker: p.name });
+          }
+        }
+      }
+      const left = typeof s.deadline_ms === "number" ? s.deadline_ms : null;
+      if (left !== null && left <= 10000 && left > 0 && !this.lowClockSaid) {
+        this.lowClockSaid = true;
+        this.comment("clock_low", s);
+      }
+    }
+
+    if (s.phase === "reveal" && was !== "reveal") {
+      const w = s.reveal && s.reveal.winner;
+      const mySlot = myGuessSlot;
+      const decoy = s.reveal && typeof s.reveal.decoy_slot === "number" ? s.reveal.decoy_slot : null;
+      const correct = (w && w === myName) || (decoy !== null && mySlot === decoy);
+      // One reveal line after outcome stinger (same queue, same epoch).
+      this.comment("reveal", s, {
+        winner: w || "house",
+        pick_reply: (typeof mySlot === "number") ? mySlot + 1 : null,
+        picker: myName,
+        correct: correct,
+      });
+      this.lastLeader = leader;
+    }
+
+    if (s.phase !== "lobby") this.lastLobbyCount = players.length;
+  },
+
+  afterHostStinger(s) {
+    if (!s || !this.canSpeak()) return;
+    if (state && state.phase !== "guessing") return;
+    this.comment("round_start", s);
+  },
+
+  /**
+   * Fresh opener every round: agent first (time-capped), else rotated template
+   * spoken via Grok Voice — never the same stock mp3 line on loop.
+   */
+  openRound(s) {
+    if (!this.canSpeak() || !s) return;
+    const gen = this.gen;
+    const phase = "guessing";
+    const roundId = s.round && s.round.round_id ? s.round.round_id : null;
+    const fallback = this.templateLine("round_start", s, {});
+
+    // Always have a unique fallback ready on the queue so audio isn't silent
+    // if the model is slow — but agent may replace flavor if it returns first.
+    let spoken = false;
+    const speakOnce = async (line, source) => {
+      if (spoken) return;
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      const text = String(line || "").trim();
+      if (!text) return;
+      const low = text.toLowerCase();
+      if (this.recentLines.some((r) => r.toLowerCase() === low)) return;
+      spoken = true;
+      await speakWithGrok(text);
+      this.rememberLine(text);
+    };
+
+    // Fast path: kick agent immediately (async).
+    this.inFlight += 1;
+    const agentPromise = this.askAgent("round_start", s, null).finally(() => {
+      this.inFlight -= 1;
+    });
+
+    voiceQueue.enqueue(async () => {
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      // Wait briefly for agent; if too slow, use rotated template.
+      const raced = await Promise.race([
+        agentPromise.then((got) => ({ t: "agent", got: got })),
+        new Promise((resolve) => setTimeout(() => resolve({ t: "timeout" }), 900)),
+      ]);
+      if (!this.stillCurrent(gen, phase, roundId) || muted) return;
+      if (raced.t === "agent" && raced.got && raced.got.line) {
+        const src = raced.got.source ? String(raced.got.source) : "";
+        // Prefer real agent lines; fallbacks are already rotated templates.
+        await speakOnce(raced.got.line, src || "agent");
+        return;
+      }
+      // Agent still running: use template now; ignore late agent (spoken gate).
+      await speakOnce(fallback, "fallback_rotate");
+      agentPromise.then((got) => {
+        // Late agent — only queue if still same round and line is fresh.
+        if (spoken) return;
+        if (!got || !got.line) return;
+        if (!this.stillCurrent(gen, phase, roundId)) return;
+        voiceQueue.enqueue(async () => {
+          await speakOnce(got.line, got.source || "agent_late");
+        }, voiceMeta({ phase: phase, roundId: roundId }));
+      }).catch(() => {});
+    }, voiceMeta({ phase: phase, roundId: roundId }));
+  },
+};
+
+try {
+  const saved = localStorage.getItem("arcade_comm");
+  commentary.setEnabled(saved === null ? true : saved === "1");
+} catch (e) {
+  commentary.setEnabled(true);
+}
+$("commBtn").addEventListener("click", () => commentary.setEnabled(!commentary.enabled));
+
 try { setMuted(localStorage.getItem("arcade_muted") === "1"); } catch (e) { setMuted(false); }
 $("muteBtn").addEventListener("click", () => setMuted(!muted));
 
@@ -374,6 +1099,7 @@ if (MOCK) {
     if (!j) return;
     if (j.mode) arcadeMode = j.mode;
     if (j.voice_model) voiceModel = j.voice_model;
+    if (j.tts_voice) ttsVoice = String(j.tts_voice).toLowerCase();
     if (j.mode === "demo" || j.demo === true) {
       $("demoBadge").hidden = false;
     } else if (j.mode === "live") {
@@ -431,8 +1157,19 @@ function setConn(text) {
 // ---------- state handling ----------
 function handleState(s) {
   const was = state ? state.phase : null;
+  const wasRoundId = state && state.round ? state.round.round_id : null;
   state = s;
   noteAutoDeadline(s);
+
+  const newRoundId = s.round && s.round.round_id ? s.round.round_id : null;
+  const phaseChanged = was !== null && was !== s.phase;
+  const roundChanged = !!(newRoundId && wasRoundId && newRoundId !== wasRoundId);
+
+  // Game moved on → cut leftover lines from the old moment, THEN queue new ones.
+  if (phaseChanged || roundChanged) {
+    voiceQueue.bump();
+    if (typeof commentary !== "undefined") commentary.onAdvance(s.phase, newRoundId);
+  }
 
   if (s.phase === "guessing" && s.round && s.round.round_id !== lastRoundId) {
     lastRoundId = s.round.round_id;
@@ -447,19 +1184,27 @@ function handleState(s) {
     stopTimer();
   }
   if (s.phase === "guessing" && was !== "guessing") {
-    // First duel of the session gets the full welcome; later rounds get the short cue.
+    unlockAudio();
+    // Session welcome once. After that, skip the same host_round.mp3 every time —
+    // each round gets a fresh spoken line (agent or rotated template) instead.
     if (firstRoundOfSession) {
       firstRoundOfSession = false;
-      playHost("intro", () => playHost("round"));
-    } else {
-      playHost("round");
+      if (!isSoloFriendlyRoom(myRoom)) playHost("intro");
     }
+    // Varied round opener (Grok TTS / agent) — not the identical mp3 loop.
+    try { commentary.openRound(s); } catch (e) { /* ignore */ }
   }
   if (s.phase === "reveal" && was !== "reveal") {
+    unlockAudio();
     const winner = s.reveal && s.reveal.winner;
     const outcome = (!winner || winner === "house") ? "lose" : "win";
-    playHost("reveal", () => playHost(outcome));
-    // Phone layout: replies push the banner below the fold — scroll it into view.
+    // Keep win/lose mp3 as hard sting; skip repeating reveal mp3 on solo.
+    // Varied roast comes from the agent after (async).
+    if (isSoloFriendlyRoom(myRoom)) {
+      playHost(outcome);
+    } else {
+      playHost(outcome);
+    }
     requestAnimationFrame(() => {
       const panel = $("revealPanel");
       if (panel && !panel.hidden && panel.scrollIntoView) {
@@ -468,6 +1213,7 @@ function handleState(s) {
       }
     });
   }
+  try { commentary.onState(s, was); } catch (e) { /* never break the game on voice */ }
   prevPhase = was;
   render(s);
 }
@@ -661,10 +1407,162 @@ function renderGame(s) {
   $("postText").textContent = src.post_text || "";
   $("timerWrap").style.visibility = s.phase === "guessing" ? "visible" : "hidden";
 
+  // Post text-only. Replies are GIF cards (humans + one Imagine loop).
+  hidePostRoundArt();
   renderLiveStandings(s);
   renderOpponents(s);
   renderReplies(s);
   renderReveal(s);
+}
+
+// Fingerprint of reply media set last used for recenter — avoid jitter.
+let lastCenteredReplyArtKey = "";
+
+/** Hide legacy post-level Imagine block. */
+function hidePostRoundArt() {
+  const wrap = $("roundArt");
+  if (wrap) wrap.hidden = true;
+  const img = $("roundArtImg");
+  if (img) {
+    img.hidden = true;
+    img.removeAttribute("src");
+  }
+  const pending = $("roundArtPending");
+  if (pending) pending.hidden = true;
+}
+
+/** Scroll the reply grid into view when GIF cards land. */
+function centerRepliesInView(smooth) {
+  const target = $("replies") || $("screen-game");
+  if (!target || target.hidden) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      try {
+        target.scrollIntoView({
+          behavior: smooth === false ? "auto" : "smooth",
+          block: "start",
+          inline: "nearest",
+        });
+      } catch (e) {
+        try { target.scrollIntoView(true); } catch (e2) { /* ignore */ }
+      }
+    });
+  });
+}
+
+/**
+ * Build looping media for a reply card.
+ * Humans → <img gif>. Decoy Imagine → muted autoplay loop <video> (gif-like).
+ * Never labels source during guessing (server strips media_source).
+ */
+function buildReplyMedia(reply, isRevealDecoy, onReady) {
+  const url = reply && reply.media_url ? String(reply.media_url) : "";
+  const status = reply && reply.media_status
+    ? String(reply.media_status)
+    : (url ? "ready" : "none");
+  const mtype = reply && reply.media_type ? String(reply.media_type) : "";
+
+  // Legacy art_url fallback (still images from older path).
+  const legacyUrl = !url && reply && reply.art_url ? String(reply.art_url) : "";
+  const effectiveUrl = url || legacyUrl;
+  if (status === "none" && !effectiveUrl) return null;
+
+  const frame = document.createElement("div");
+  frame.className = "reply-media";
+
+  const label = document.createElement("div");
+  label.className = "reply-media-label";
+  // Only name Imagine on the revealed decoy — otherwise neutral GIF chrome.
+  if (isRevealDecoy) {
+    label.textContent = "GROK IMAGINE";
+    label.classList.add("is-imagine");
+  } else {
+    label.textContent = "GIF";
+  }
+  frame.appendChild(label);
+
+  const box = document.createElement("div");
+  box.className = "reply-media-frame";
+
+  const markReady = (key) => {
+    if (typeof onReady === "function") onReady(key || effectiveUrl);
+  };
+
+  if (effectiveUrl) {
+    const isVideo = mtype === "video"
+      || /\.(mp4|webm|mov)(\?|$)/i.test(effectiveUrl);
+    if (isVideo) {
+      const vid = document.createElement("video");
+      vid.className = "reply-media-el reply-media-video";
+      vid.src = effectiveUrl;
+      vid.muted = true;
+      vid.defaultMuted = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      vid.setAttribute("webkit-playsinline", "");
+      vid.loop = true;
+      vid.autoplay = true;
+      vid.preload = "metadata";
+      vid.setAttribute("aria-label", "reply gif");
+      vid.onloadeddata = () => {
+        vid.classList.add("is-ready");
+        try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
+        markReady(effectiveUrl);
+      };
+      vid.onerror = () => {
+        vid.remove();
+        const fail = document.createElement("div");
+        fail.className = "reply-media-pending";
+        fail.textContent = "GIF UNAVAILABLE";
+        box.appendChild(fail);
+      };
+      box.appendChild(vid);
+      // Already buffered
+      if (vid.readyState >= 2) {
+        vid.classList.add("is-ready");
+        try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
+        markReady(effectiveUrl);
+      }
+    } else {
+      const img = document.createElement("img");
+      img.className = "reply-media-el reply-media-img";
+      img.alt = "reply gif";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.onload = () => {
+        img.classList.add("is-ready");
+        markReady(effectiveUrl);
+      };
+      img.onerror = () => {
+        img.remove();
+        const fail = document.createElement("div");
+        fail.className = "reply-media-pending";
+        fail.textContent = "GIF UNAVAILABLE";
+        box.appendChild(fail);
+      };
+      img.src = effectiveUrl;
+      box.appendChild(img);
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add("is-ready");
+        markReady(effectiveUrl);
+      }
+    }
+  } else if (status === "pending") {
+    const pending = document.createElement("div");
+    pending.className = "reply-media-pending";
+    pending.textContent = "LOADING GIF…";
+    box.appendChild(pending);
+  } else if (status === "failed") {
+    const fail = document.createElement("div");
+    fail.className = "reply-media-pending";
+    fail.textContent = "GIF UNAVAILABLE";
+    box.appendChild(fail);
+  } else {
+    return null;
+  }
+
+  frame.appendChild(box);
+  return frame;
 }
 
 function renderOpponents(s) {
@@ -689,10 +1587,28 @@ function renderReplies(s) {
   const r = s.round || {};
   const reveal = s.reveal;
   const canTap = s.phase === "guessing" && myGuessSlot === null && !myGuessConfirmed(s);
+  const replies = r.replies || [];
+  const isReveal = s.phase === "reveal" && !!reveal;
+  const isGifRound = r.format === "gif"
+    || replies.some((rep) => rep && (rep.media_url || rep.media_status));
 
-  for (const reply of r.replies || []) {
+  // Recenter once when the media set for this round is ready.
+  const mediaKey = replies
+    .map((rep) => (rep && rep.media_url) || (rep && rep.media_status) || "")
+    .join("|");
+  let didScheduleCenter = false;
+  const maybeCenter = (url) => {
+    if (didScheduleCenter) return;
+    if (!mediaKey || mediaKey === lastCenteredReplyArtKey) return;
+    if (!replies.some((rep) => rep && rep.media_url)) return;
+    didScheduleCenter = true;
+    lastCenteredReplyArtKey = mediaKey;
+    centerRepliesInView(true);
+  };
+
+  for (const reply of replies) {
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "card" + (isGifRound ? " has-media" : "");
     card.dataset.slot = reply.slot;
 
     const inner = document.createElement("div");
@@ -705,12 +1621,19 @@ function renderReplies(s) {
     tag.textContent = "REPLY " + (reply.slot + 1);
     front.appendChild(tag);
 
-    const isDecoy = reveal && reveal.decoy_slot === reply.slot;
+    const isDecoy = isReveal && reveal.decoy_slot === reply.slot;
     if (isDecoy) {
       const badge = document.createElement("span");
       badge.className = "robot-badge";
       badge.textContent = "ROBOT";
       front.appendChild(badge);
+    }
+
+    // All five cards show looping GIFs; decoy is Imagine video-as-gif.
+    const media = buildReplyMedia(reply, isDecoy, maybeCenter);
+    if (media) {
+      card.classList.add("has-media");
+      front.appendChild(media);
     }
 
     const text = document.createElement("p");
@@ -720,8 +1643,13 @@ function renderReplies(s) {
 
     const author = document.createElement("span");
     author.className = "reply-author";
-    author.textContent = s.phase === "reveal" && reply.author && !isDecoy ? reply.author : "@·····";
-    if (isDecoy) author.textContent = "grok wrote this one";
+    if (isDecoy) {
+      author.textContent = "grok imagine · this gif";
+    } else if (isReveal && reply.author) {
+      author.textContent = reply.author;
+    } else {
+      author.textContent = "@·····";
+    }
     front.appendChild(author);
 
     if (isDecoy && reveal.rationale) {
@@ -757,7 +1685,7 @@ function renderReplies(s) {
     inner.append(front, back);
     card.appendChild(inner);
 
-    if (s.phase === "reveal") {
+    if (isReveal) {
       card.classList.add(isDecoy ? "is-decoy" : "is-real");
       if (myGuessSlot === reply.slot) card.classList.add("my-pick");
     } else if (myGuessSlot === reply.slot) {
@@ -865,6 +1793,8 @@ function onGuess(slot, card) {
   const ms = Math.round(performance.now() - guessStartAt);
   card.classList.add("locked");
   send({ t: "guess", room: myRoom, slot, ms });
+  // Immediate click-aware voice; cuts any still-playing opener.
+  try { commentary.onLocalPick(slot, state); } catch (e) { /* ignore */ }
 }
 
 // A scanned QR lands here with ?room=CODE: skip the mode picker and open Join.
@@ -898,6 +1828,25 @@ function generatedRoomCode() {
     }
   }
   return code;
+}
+
+/** Solo practice codes: SOLO + 2 chars (server allows 1-player start). */
+function generatedSoloRoomCode() {
+  let tail = "";
+  if (window.crypto && crypto.getRandomValues) {
+    const buf = new Uint8Array(2);
+    crypto.getRandomValues(buf);
+    for (let i = 0; i < 2; i++) tail += ROOM_ALPHABET[buf[i] % ROOM_ALPHABET.length];
+  } else {
+    for (let i = 0; i < 2; i++) tail += ROOM_ALPHABET[Math.floor(Math.random() * ROOM_ALPHABET.length)];
+  }
+  return "SOLO" + tail;
+}
+
+/** Rooms that may start with a single player (matches server rules). */
+function isSoloFriendlyRoom(room) {
+  const r = String(room || "").toUpperCase();
+  return r === "GROK" || r.indexOf("SOLO") === 0 || MOCK;
 }
 
 function showModePick() {
@@ -971,6 +1920,8 @@ function doJoin(opts) {
   if ($("createEnterBtn")) $("createEnterBtn").disabled = true;
   if ($("modeCreateBtn")) $("modeCreateBtn").disabled = true;
   if ($("modeJoinBtn")) $("modeJoinBtn").disabled = true;
+  if ($("modeSoloBtn")) $("modeSoloBtn").disabled = true;
+  if ($("modeMockBtn")) $("modeMockBtn").disabled = true;
   if ($("backToModeBtn")) $("backToModeBtn").hidden = true;
 
   // arena:true asks the server to make this a host driven room, so it does
@@ -982,8 +1933,14 @@ function doJoin(opts) {
   loadPhoneJoinInfo(myRoom);
   if (iAmHost) {
     $("startBtn").hidden = false;
+    $("startBtn").disabled = false;
     $("waitLine").hidden = true;
-    setConn("ROOM " + myRoom + " · YOU ARE HOST. TAP START WHEN READY.");
+    if (isSoloFriendlyRoom(myRoom)) {
+      // Solo auto-starts on the server; START still works as a manual backup.
+      setConn("SOLO " + myRoom + " · ROUND SHOULD START — OR TAP START.");
+    } else {
+      setConn("ROOM " + myRoom + " · YOU ARE HOST. TAP START WHEN READY.");
+    }
   } else {
     $("startBtn").hidden = true;
     $("startBtn").disabled = true;
@@ -993,17 +1950,41 @@ function doJoin(opts) {
   }
 }
 
-// Mode picker
-$("modeCreateBtn").addEventListener("click", () => showLobbyForm("create"));
-$("modeJoinBtn").addEventListener("click", () => showLobbyForm("join"));
+// Mode picker — unlock audio on every lobby click (autoplay policy).
+function withAudioUnlock(fn) {
+  return (ev) => {
+    try { unlockAudio(); } catch (e) { /* ignore */ }
+    return fn(ev);
+  };
+}
+$("modeCreateBtn").addEventListener("click", withAudioUnlock(() => showLobbyForm("create")));
+$("modeJoinBtn").addEventListener("click", withAudioUnlock(() => showLobbyForm("join")));
+$("modeSoloBtn").addEventListener("click", withAudioUnlock(() => {
+  // Real server, one player: SOLO* room auto-starts on enter.
+  if (!$("nameInput").value.trim()) $("nameInput").value = generatedName();
+  showLobbyForm("create");
+  const code = generatedSoloRoomCode();
+  $("createdRoomDisplay").value = code;
+  $("roomInput").value = code;
+  $("createHint").textContent =
+    "Solo practice. Tap ENTER ROOM — the round starts automatically. Click once if sound is muted by the browser.";
+  setConn("SOLO ROOM " + code + " · ONE PLAYER OK");
+  loadPhoneJoinInfo(code);
+}));
+$("modeMockBtn").addEventListener("click", withAudioUnlock(() => {
+  const url = new URL(location.href);
+  url.searchParams.set("mock", "1");
+  url.searchParams.delete("room");
+  location.href = url.toString();
+}));
 $("backToModeBtn").addEventListener("click", () => {
   if (joined) return;
   showModePick();
   setConn("LINKED");
 });
-$("createEnterBtn").addEventListener("click", () => {
+$("createEnterBtn").addEventListener("click", withAudioUnlock(() => {
   if (!joined) doJoin({ asHost: true });
-});
+}));
 $("copyRoomBtn").addEventListener("click", () => {
   const code = ($("createdRoomDisplay").value || "").trim();
   if (!code) return;
@@ -1048,8 +2029,16 @@ $("lobbyForm").addEventListener("submit", (ev) => {
 
 // The contract has no separate start message. "next" from the lobby kicks
 // off the first round, the same way it advances rounds after a reveal.
-$("startBtn").addEventListener("click", () => send({ t: "next", room: myRoom }));
-$("nextBtn").addEventListener("click", () => send({ t: "next", room: myRoom }));
+function sendNext() {
+  try { unlockAudio(); } catch (e) { /* ignore */ }
+  // Player moved on — cut leftover reveal/hype immediately.
+  try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
+  send({ t: "next", room: myRoom });
+}
+$("startBtn").addEventListener("click", () => sendNext());
+$("nextBtn").addEventListener("click", () => sendNext());
+// Join form submit also counts as a user gesture for audio.
+$("lobbyForm").addEventListener("submit", () => { try { unlockAudio(); } catch (e) { /* ignore */ } }, true);
 
 /** Populate QR + copyable URL for phone players on the same Wi‑Fi. */
 function loadPhoneJoinInfo(room) {

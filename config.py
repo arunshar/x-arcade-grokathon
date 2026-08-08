@@ -3,11 +3,19 @@
 import os
 
 MODEL_TEXT = "grok-4.5"
+# Host commentator must be snappy. Probe 8 Aug 2026 (artifacts/probes/host_agent_chat.json):
+#   grok-4.5 host lines ~5.3–5.9s; grok-4-1-fast-non-reasoning ~0.6s.
+# Override with ARCADE_AGENT_MODEL if needed.
+MODEL_AGENT = os.environ.get("ARCADE_AGENT_MODEL", "grok-4-1-fast-non-reasoning").strip() or (
+    "grok-4-1-fast-non-reasoning"
+)
 MODEL_IMAGE = "grok-imagine-image"
 MODEL_VIDEO = "grok-imagine-video-1.5"
 # Pinned deliberately: the grok-voice-latest alias was repointed on 5 Aug 2026,
 # three days before the event. A pinned id cannot change under us on the day.
 MODEL_VOICE = "grok-voice-think-fast-2.0"
+# Grok TTS / realtime speaker id (eve, helix, sirius, leo, …). See GET /voices.
+TTS_VOICE = os.environ.get("ARCADE_VOICE", "eve").strip().lower() or "eve"
 
 API_BASE = "https://api.x.ai/v1"
 

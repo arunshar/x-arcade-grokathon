@@ -25,6 +25,7 @@
     <span class="chip chip-lead" id="leadChip" hidden title="current leader">LEAD —</span>
     <span class="chip chip-conn" id="connChip" title="connection">…</span>
     <span class="chip" id="roundCounter">RND 00</span>
+    <button class="chip chip-btn" id="commBtn" type="button" title="Commentator voice">COMM ON</button>
     <button class="chip chip-btn" id="muteBtn" type="button">SND ON</button>
   </div>
 </header>
@@ -38,9 +39,14 @@
     <!-- Step 1: pick create vs join (skipped when ?room= is in the URL) -->
     <div class="mode-pick" id="modePick">
       <p class="section-label mode-pick-label">HOW DO YOU WANT TO PLAY?</p>
-      <button class="big-btn mode-btn" id="modeCreateBtn" type="button">CREATE ROOM</button>
+      <button class="big-btn mode-btn" id="modeSoloBtn" type="button">SOLO PRACTICE</button>
+      <button class="big-btn mode-btn mode-btn-alt" id="modeCreateBtn" type="button">CREATE ROOM</button>
       <button class="big-btn mode-btn mode-btn-alt" id="modeJoinBtn" type="button">JOIN ROOM</button>
-      <p class="mode-hint">Create a private code for friends, or join with a code someone shared.</p>
+      <button class="linkish" id="modeMockBtn" type="button">OFFLINE MOCK (NO SERVER)</button>
+      <p class="mode-hint">
+        <b>Solo</b> = one player on this machine (real server + voice).
+        Create/Join = multiplayer. Mock = fake bot, no API.
+      </p>
     </div>
 
     <form class="lobby-form" id="lobbyForm" action="#" method="get" hidden>
@@ -106,6 +112,14 @@
           </div>
         </div>
         <p class="post-text" id="postText"></p>
+        <!-- Legacy post art kept hidden; Imagine art is on each reply card. -->
+        <div class="round-art" id="roundArt" hidden>
+          <div class="round-art-label">GROK IMAGINE</div>
+          <div class="round-art-frame">
+            <img id="roundArtImg" class="round-art-img" alt="" hidden>
+            <div class="round-art-pending" id="roundArtPending" hidden></div>
+          </div>
+        </div>
       </article>
       <div class="timer-wrap" id="timerWrap">
         <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true">

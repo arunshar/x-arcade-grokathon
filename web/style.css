@@ -434,6 +434,8 @@ main {
   border-radius: 14px;
   padding: 16px;
   box-shadow: 0 0 22px rgba(0, 229, 255, 0.06);
+  scroll-margin-top: 80px;
+  scroll-margin-bottom: 24px;
 }
 
 .post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -458,6 +460,17 @@ main {
 .post-topic { font-size: 11px; color: var(--mut); letter-spacing: 2px; text-transform: uppercase; }
 
 .post-text { font-size: 16px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Legacy post-level art block — always hidden; art is on reply cards. */
+.round-art { display: none !important; }
+.round-art-img[hidden],
+.round-art-pending[hidden] { display: none !important; }
+
+@keyframes artShimmer {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
 
 /* countdown ring */
 .timer-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto; flex: 0 0 auto; align-self: center; }
@@ -511,9 +524,12 @@ main {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   gap: 14px;
+  scroll-margin-top: 72px;
 }
 
 .card { perspective: 900px; min-height: 150px; }
+.card.has-media,
+.card.has-art { min-height: 280px; }
 
 .card-inner {
   position: relative;
@@ -523,6 +539,8 @@ main {
   transform-style: preserve-3d;
   transition: transform 0.45s;
 }
+.card.has-media .card-inner,
+.card.has-art .card-inner { min-height: 280px; }
 
 .card.locked .card-inner { transform: rotateY(180deg); }
 
@@ -541,6 +559,8 @@ main {
 /* the front sits in normal flow so the card grows with its content,
    the back is absolute and simply covers whatever height that is */
 .card-front { position: relative; min-height: 150px; cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s; }
+.card.has-media .card-front,
+.card.has-art .card-front { min-height: 280px; padding-top: 12px; }
 .card-back { position: absolute; inset: 0; }
 
 .card.tappable .card-front:hover,
@@ -564,7 +584,67 @@ main {
 
 .slot-tag { font-size: 10px; letter-spacing: 2px; color: var(--mut); }
 
+/* Reply GIF media — humans = real gifs; decoy = Imagine video looped as gif */
+.reply-media,
+.reply-art {
+  margin: 0 0 4px;
+  flex: 0 0 auto;
+}
+.reply-media-label,
+.reply-art-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--mut);
+  margin-bottom: 5px;
+}
+.reply-media-label.is-imagine {
+  color: var(--cyan);
+}
+.reply-media-frame,
+.reply-art-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--panel-2);
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.08);
+}
+.reply-media-el,
+.reply-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.reply-media-el.is-ready,
+.reply-art-img.is-ready { opacity: 1; }
+.reply-media-video {
+  background: #000;
+  pointer-events: none;
+}
+.reply-media-pending,
+.reply-art-pending {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--mut);
+  text-align: center;
+  padding: 8px;
+  background:
+    linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.06), transparent);
+  animation: artShimmer 1.4s ease-in-out infinite;
+}
+
 .reply-text { font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; flex: 1; }
+.card.has-media .reply-text,
+.card.has-art .reply-text { font-size: 13px; }
 
 .reply-author { font-size: 12px; color: var(--mut); letter-spacing: 1px; }
 

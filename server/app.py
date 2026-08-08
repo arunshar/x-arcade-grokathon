@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
+from fastapi import Body, FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 
@@ -126,6 +126,21 @@ app = FastAPI(title="X Arcade")
 # fields are kept only so older clients reading them do not break.
 ARENA_ROOMS = {"GROK"}
 
+# Solo practice: room codes starting with SOLO (e.g. SOLO7K) can start with one
+# player. After you guess, reveal fires immediately (all players have guessed).
+# Or set ARCADE_ALLOW_SOLO=1 to allow any room to start with one player.
+ALLOW_SOLO = os.environ.get("ARCADE_ALLOW_SOLO", "") == "1"
+
+
+def _allows_solo(room: dict[str, Any]) -> bool:
+    """True when a single player may start a round from the lobby."""
+    if room.get("arena"):
+        return True
+    if ALLOW_SOLO:
+        return True
+    rid = str(room.get("room_id") or "").upper()
+    return rid.startswith("SOLO")
+
 
 def _get_room(room_id: str) -> dict[str, Any]:
     room = ROOMS.get(room_id)
@@ -203,15 +218,40 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
     """The round as clients may see it in the current phase.
 
     During guessing this is the contract's critical strip: no decoy_slot, no
-    decoy_rationale, and replies reduced to slot and text only, which removes
-    both is_decoy and the real author values. Any other phase gets the full
-    round.
+    decoy_rationale, no media_source. Replies are slot + text + media only.
+
+    GIF rounds show looping media on every card (4 human GIFs + 1 Imagine
+    video-as-gif). media_source is stripped so clients cannot tell which is AI.
     """
     rnd = room["round"]
     if rnd is None or room["phase"] != "guessing":
         return rnd
-    safe = {k: v for k, v in rnd.items() if k not in ("decoy_slot", "decoy_rationale")}
-    safe["replies"] = [{"slot": r["slot"], "text": r["text"]} for r in rnd["replies"]]
+    strip_keys = (
+        "decoy_slot",
+        "decoy_rationale",
+        "reply_art_status",
+        "art_url",
+        "art_status",
+        "decoy_media_status",
+    )
+    safe = {k: v for k, v in rnd.items() if k not in strip_keys}
+    safe_replies = []
+    for r in rnd.get("replies") or []:
+        if not isinstance(r, dict) or "slot" not in r:
+            continue
+        item: dict[str, Any] = {"slot": r["slot"], "text": r.get("text") or ""}
+        # Motion media is safe during guessing — every slot has it.
+        if r.get("media_url"):
+            item["media_url"] = r["media_url"]
+        if r.get("media_type"):
+            item["media_type"] = r["media_type"]
+        if r.get("media_status"):
+            item["media_status"] = r["media_status"]
+        # Never send media_source / is_decoy / author during guessing.
+        safe_replies.append(item)
+    safe["replies"] = safe_replies
+    if rnd.get("format"):
+        safe["format"] = rnd["format"]
     return safe
 
 
@@ -330,7 +370,17 @@ async def _round_timer(room: dict[str, Any]) -> None:
 async def _start_round(room: dict[str, Any]) -> None:
     _cancel_timer(room)
     _cancel_auto(room)
-    room["round"] = await _next_round()
+    rnd = await _next_round()
+    # GIF rounds: 4 human reaction GIFs + 1 Grok Imagine looping video.
+    try:
+        from services.reply_gifs import attach_reply_media
+
+        attach_reply_media(rnd)
+    except Exception as exc:
+        print(f"attach_reply_media failed: {exc}", file=sys.stderr)
+        rnd.setdefault("format", "gif")
+        rnd.setdefault("decoy_media_status", "none")
+    room["round"] = rnd
     room["reveal"] = None
     room["phase"] = "guessing"
     room["guess_counter"] = 0
@@ -342,6 +392,9 @@ async def _start_round(room: dict[str, Any]) -> None:
     room["deadline_at"] = asyncio.get_running_loop().time() + config.ROUND_SECONDS
     room["timer"] = asyncio.create_task(_round_timer(room))
     await _broadcast(room)
+    # Live: if decoy Imagine gif missing, generate in background (may finish mid-round).
+    if config.MODE == "live" and rnd.get("decoy_media_status") != "ready":
+        asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
 
 
 async def _do_reveal(room: dict[str, Any]) -> None:
@@ -392,6 +445,8 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     await _broadcast(room)
     if config.MODE == "live":
         asyncio.create_task(_attach_live_card(room, rnd, winner))
+        if rnd.get("decoy_media_status") != "ready":
+            asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
 
 
 async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: str) -> None:
@@ -419,14 +474,91 @@ async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: s
         await _broadcast(room)
 
 
+async def _attach_decoy_imagine_gif(room: dict[str, Any], rnd: dict[str, Any]) -> None:
+    """Imagine agent: study human GIFs on this round → matching decoy video.
+
+    Uses vision style-brief + reference_images so the robot loop blends with
+    the four human reaction GIFs. Safe to broadcast during guessing once ready
+    (media_source stays stripped in _round_view).
+    """
+    if room.get("round") is not rnd:
+        return
+    try:
+        # Prefer the full agent; fall back to reply_gifs wrapper.
+        from services.imagine_agent import generate_matching_decoy as _gen
+    except ImportError:
+        try:
+            from services.reply_gifs import generate_decoy_media as _gen
+        except ImportError as exc:
+            print(f"imagine agent import failed: {exc}", file=sys.stderr)
+            return
+
+    try:
+        await asyncio.to_thread(_gen, rnd)
+    except Exception as exc:
+        rid = str(rnd.get("round_id") or "round")
+        print(f"decoy imagine gif {rid} failed: {exc}", file=sys.stderr)
+        rnd["decoy_media_status"] = "failed"
+        return
+
+    if room.get("round") is rnd and room["phase"] in ("guessing", "reveal"):
+        await _broadcast(room)
+
+
 @app.get("/health")
 async def health() -> dict[str, Any]:
     return {
         "mode": config.MODE,
         "rounds_available": _rounds_available(),
         "voice_model": config.MODEL_VOICE,
+        "tts_voice": getattr(config, "TTS_VOICE", "eve"),
         "image_model": config.MODEL_IMAGE,
+        "video_model": getattr(config, "MODEL_VIDEO", ""),
+        "round_format": "gif",
     }
+
+
+@app.get("/voices")
+async def list_voices() -> dict[str, Any]:
+    """List Grok TTS voices (live) or a short offline catalog (demo)."""
+    catalog = [
+        {"voice_id": "eve", "name": "Eve", "blurb": "Energetic default"},
+        {"voice_id": "helix", "name": "Helix", "blurb": "Bold commentary energy"},
+        {"voice_id": "sirius", "name": "Sirius", "blurb": "Playful and witty"},
+        {"voice_id": "leo", "name": "Leo", "blurb": "Authoritative host"},
+        {"voice_id": "rex", "name": "Rex", "blurb": "Clear PA announcer"},
+        {"voice_id": "ara", "name": "Ara", "blurb": "Warm and friendly"},
+        {"voice_id": "orion", "name": "Orion", "blurb": "Cinematic narrator"},
+        {"voice_id": "iris", "name": "Iris", "blurb": "Upbeat and charming"},
+    ]
+    current = getattr(config, "TTS_VOICE", "eve")
+    if config.MODE != "live":
+        return {"voices": catalog, "current": current, "source": "offline_catalog"}
+    try:
+        from services.xai_http import post_json  # noqa: F401 — ensure module loads
+        import json
+        import ssl
+        import urllib.request
+
+        import certifi
+
+        ctx = ssl.create_default_context(cafile=certifi.where())
+        key = os.environ.get("XAI_API_KEY", "")
+        req = urllib.request.Request(
+            config.API_BASE + "/tts/voices",
+            headers={"Authorization": f"Bearer {key}"},
+        )
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+            data = json.loads(resp.read())
+        voices = data.get("voices") or data
+        return {"voices": voices, "current": current, "source": "xai"}
+    except Exception as exc:
+        return {
+            "voices": catalog,
+            "current": current,
+            "source": "offline_catalog",
+            "detail": str(exc),
+        }
 
 
 def _lan_base_urls(port: int) -> list[str]:
@@ -583,6 +715,58 @@ async def token() -> Any:
     return out
 
 
+@app.post("/agent/commentate")
+async def agent_commentate(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Host agent: safe observation → one spoken line (Grok text).
+
+    The client then plays the line with Grok Voice (/tts or realtime).
+    Observation must not include decoy secrets; the agent also strips them.
+    """
+    if not isinstance(payload, dict):
+        raise HTTPException(status_code=400, detail="JSON object required")
+    try:
+        from services.host_agent import generate_line
+    except ImportError:
+        raise HTTPException(status_code=501, detail="host_agent is not available")
+    # Always run generate_line — it falls back cleanly in demo mode.
+    result = await asyncio.to_thread(generate_line, payload)
+    return result
+
+
+@app.post("/tts")
+async def tts_line(payload: dict[str, Any] = Body(...)) -> Response:
+    """Grok Voice TTS for dynamic commentator lines (Eve / en → mp3).
+
+    Live mode only — needs XAI_API_KEY. The browser posts short safe lines
+    (leads, locks, winners); never send secrets or decoy answers here.
+    """
+    if config.MODE != "live":
+        raise HTTPException(
+            status_code=503,
+            detail="Grok TTS needs ARCADE_MODE=live and XAI_API_KEY",
+        )
+    text = ""
+    if isinstance(payload, dict):
+        text = str(payload.get("text") or "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+    if len(text) > 400:
+        raise HTTPException(status_code=400, detail="text too long (max 400)")
+    try:
+        from services.voice_host import synthesize
+    except ImportError:
+        raise HTTPException(status_code=501, detail="voice_host is not available")
+    try:
+        audio = await asyncio.to_thread(synthesize, text)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Grok TTS failed: {exc}") from exc
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
 @app.websocket("/ws")
 async def ws_endpoint(ws: WebSocket) -> None:
     await ws.accept()
@@ -676,6 +860,6 @@ async def ws_endpoint(ws: WebSocket) -> None:
                         ROOMS.pop(joined[0], None)
 
 
-# Mounted last so /ws, /health, /token, /join-info, and /qr.png win the route
-# match. An empty directory serves 404s, which is fine for a standalone run.
+# Mounted last so /ws, /health, /token, /tts, /join-info, and /qr.png win the
+# route match. An empty directory serves 404s, which is fine standalone.
 app.mount("/", StaticFiles(directory=str(REPO_ROOT / "web"), html=True), name="web")

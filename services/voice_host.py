@@ -18,6 +18,7 @@ Token smoke test (prints the response shape, never the secret):
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -43,8 +44,10 @@ LINES: dict[str, str] = {
     "host_lose": "Wrong! [pause] The machine walks free. House wins.",
 }
 
-TTS_VOICE = "Eve"
-TTS_LANGUAGE = "en"
+# Prefer config so one env switch (ARCADE_VOICE) drives the whole app.
+TTS_VOICE = getattr(config, "TTS_VOICE", None) or os.environ.get("ARCADE_VOICE", "eve")
+TTS_VOICE = str(TTS_VOICE).strip() or "eve"
+TTS_LANGUAGE = os.environ.get("ARCADE_VOICE_LANG", "en").strip() or "en"
 
 
 def mint_token() -> dict[str, Any]:
@@ -56,6 +59,16 @@ def mint_token() -> dict[str, Any]:
     the value. See REALTIME_NOTES.md for the browser wiring.
     """
     return post_json("/realtime/client_secrets", {}, timeout=15)
+
+
+def synthesize(text: str) -> bytes:
+    """Public TTS entry: Grok Voice (Eve) → mp3 bytes for dynamic lines."""
+    cleaned = (text or "").strip()
+    if not cleaned:
+        raise ValueError("empty TTS text")
+    if len(cleaned) > 400:
+        cleaned = cleaned[:400].rsplit(" ", 1)[0] or cleaned[:400]
+    return _tts(cleaned)
 
 
 def _tts(text: str) -> bytes:

@@ -140,4 +140,77 @@ else:
 save("tts.json", rec)
 results["tts"] = status
 
+# 5. Host-agent chat latency (commentate path). Measure before trusting it live.
+print("\n== host_agent chat ==")
+from services import host_agent  # noqa: E402
+
+os.environ.setdefault("ARCADE_MODE", "live")
+# Force live generate even if process defaulted demo.
+import config as _cfg  # noqa: E402
+
+_cfg.MODE = "live"
+
+agent_cases = [
+    {
+        "name": "round_start_strict",
+        "obs": {
+            "event": "round_start",
+            "phase": "guessing",
+            "round": 2,
+            "standings": [
+                {"rank": 1, "name": "NEON", "score": 2, "streak": 2},
+                {"rank": 2, "name": "VOLT", "score": 1, "streak": 0},
+            ],
+        },
+    },
+    {
+        "name": "reveal_open",
+        "obs": {
+            "event": "reveal",
+            "phase": "reveal",
+            "round": 2,
+            "winner": "NEON",
+            "decoy_slot": 2,
+            "rationale": "Too balanced and corporate.",
+            "standings": [
+                {"rank": 1, "name": "NEON", "score": 2},
+                {"rank": 2, "name": "VOLT", "score": 1},
+            ],
+            "replies": [
+                {"slot": 0, "text": "real dunk", "author": "@a", "is_decoy": False},
+                {"slot": 2, "text": "This raises important questions.", "author": "decoy", "is_decoy": True},
+            ],
+        },
+    },
+]
+agent_runs = []
+for case in agent_cases:
+    t0 = time.time()
+    out = host_agent.generate_line(case["obs"])
+    wall = time.time() - t0
+    run = {
+        "case": case["name"],
+        "wall_s": round(wall, 3),
+        "latency_ms": out.get("latency_ms"),
+        "source": out.get("source"),
+        "line": out.get("line"),
+        "detail": out.get("detail"),
+    }
+    agent_runs.append(run)
+    print(
+        f"  {case['name']}: wall={wall:.3f}s reported_ms={out.get('latency_ms')} "
+        f"source={out.get('source')} line={out.get('line')!r}"
+    )
+
+agent_rec = {
+    "surface": "host_agent_chat",
+    "model": getattr(_cfg, "MODEL_TEXT", None),
+    "timeout_s": host_agent.CHAT_TIMEOUT_S,
+    "runs": agent_runs,
+    "wall_s_mean": round(sum(r["wall_s"] for r in agent_runs) / max(len(agent_runs), 1), 3),
+    "wall_s_max": round(max(r["wall_s"] for r in agent_runs), 3) if agent_runs else None,
+}
+save("host_agent_chat.json", agent_rec)
+results["host_agent_chat"] = "ok" if all(r.get("source") for r in agent_runs) else "fail"
+
 print("\nSUMMARY:", json.dumps(results))
