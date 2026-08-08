@@ -1,0 +1,234 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/Suzierizzo1/status/2086181164620931494 (post id 2086181164620931494, posted by @Suzierizzo1). A reliable way is searching with the query conversation_id:2086181164620931494 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "258f66e5cc6fbdb997c2be345c57539a61a849651b3e0f5a2683c521b2b22fc7",
+  "response": {
+    "background": false,
+    "completed_at": 1786220944,
+    "created_at": 1786220944,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "6efd305e-f225-942d-81bb-af6a721c242a",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_6efd305e-f225-942d-81bb-af6a721c242a",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/Suzierizzo1/status/2086181164620931494 (post id 2086181164620931494, posted by @Suzierizzo1).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-7031eb72-7b69-4a90-988c-6a1f6f1cebbe-0",
+        "id": "ctc_6efd305e-f225-942d-81bb-af6a721c242a_call-7031eb72-7b69-4a90-988c-6a1f6f1cebbe-0",
+        "input": "{\"query\":\"conversation_id:2086181164620931494 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6efd305e-f225-942d-81bb-af6a721c242a_call-7031eb72-7b69-4a90-988c-6a1f6f1cebbe-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186936146993165",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186936146993165"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185662164725906",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185662164725906"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184102886031470",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184102886031470"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185424699994577",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185424699994577"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184477467066393",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184477467066393"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187039620202764",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187039620202764"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@William02216755\",\n      \"text\": \"That business owner would have lost my business FOR LIFE.\\nWhy would ANY business owner treat their customers like that?!\\nWhen you lose 1 customer, it could be 10. Word of mouth is the best, or worst, advertising one can get.\"\n    },\n    {\n      \"author\": \"@smouse_lillee\",\n      \"text\": \"The customer.\"\n    },\n    {\n      \"author\": \"@saralynne65\",\n      \"text\": \"@JoeyTomatoes staff behavior was abhorrent, just outright assholes ruining a birthday party .\"\n    },\n    {\n      \"author\": \"@JimmyBenningho2\",\n      \"text\": \"The owner just \u201ckilled\u201d her own restaurant\"\n    },\n    {\n      \"author\": \"@kingofkings0247\",\n      \"text\": \"Most restaurants have a no outside food or drink policy but would allow for exceptions for something like a birthday cake with permission. They said they called ahead. That\u2019s just bad business.\"\n    },\n    {\n      \"author\": \"@idontgethowthis\",\n      \"text\": \"The staff should have volunteered to cut and serve the cake after the celebration. Joey Tomatoes needs to pound sand.\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_6efd305e-f225-942d-81bb-af6a721c242a",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3266,
+        "output_tokens": 708
+      },
+      "cost_in_usd_ticks": 157476000,
+      "input_tokens": 5150,
+      "input_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 945,
+      "output_tokens_details": {
+        "reasoning_tokens": 650
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6095
+    },
+    "user": null
+  },
+  "response_sha256": "72031e32859df3b5ad6a8af58601e65c0c40c0e87ca2f4547515f2023eef5b02",
+  "surface": "x_search_replies"
+}

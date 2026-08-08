@@ -1,0 +1,382 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Search X for one engaging post from the last 48 hours about movies, a new film, box office numbers, or actors, from a film focused account. Skip posts that are mainly political commentary with a healthy reply count, at least 5 replies. Pick a post whose replies are substantive full thoughts, not just emoji or tags. Return the numeric post id, the post text verbatim, the author handle, and the canonical x.com post url. Respond with only a JSON object with keys post_id, post_text, post_author, post_url. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "1e7cb8ab4ec2f39d615a01afbf54ade25daae15963d5620e1a0e28a5685ec5a6",
+  "response": {
+    "background": false,
+    "completed_at": 1786220761,
+    "created_at": 1786220761,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "bb5d46b6-072e-9c8f-a928-c5132e63de79",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_bb5d46b6-072e-9c8f-a928-c5132e63de79",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to search X for one engaging post from the last 48 hours about movies, a new film, box office numbers, or actors, from a film focused account. Skip posts that are mainly political co...",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-0",
+        "id": "ctc_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-0",
+        "input": "{\"query\":\"new movie film box office actors\",\"limit\":\"10\",\"from_date\":\"2025-03-08\"}",
+        "name": "x_semantic_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "xs_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-1",
+        "id": "ctc_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-1",
+        "input": "{\"query\":\"movie OR film OR \\\"box office\\\" OR actor OR actress filter:has_engagement min_replies:5 since:2025-03-08\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "id": "tco_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-1",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-2",
+        "id": "ctc_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-2",
+        "input": "{\"post_id\":\"2086186206438600744\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-2",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-3",
+        "id": "ctc_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-3",
+        "input": "{\"query\":\"(movie OR film OR \\\"box office\\\" OR cinema OR actor) (from:DiscussingFilm OR from:slashfilm OR from:IGN OR from:Variety OR from:HollywoodReporter OR from:EmpireMagazine OR from:rottentomatoes OR from:IMDb OR from:Letterboxd) min_replies:5 since:2026-08-06\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-4",
+        "id": "ctc_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-4",
+        "input": "{\"post_id\":\"2086143411984208230\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_bb5d46b6-072e-9c8f-a928-c5132e63de79_call-9eee89df-2c99-4f1a-82a3-f29369c145ab-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186206438600744",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186206438600744"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086139136025497951",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086139136025497951"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180267232796821",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180267232796821"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/1944592961737548017",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/1944592961737548017"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085287816582603049",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085287816582603049"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086154713850855678",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086154713850855678"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180921380688081",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180921380688081"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182392981487840",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182392981487840"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086167718164611464",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086167718164611464"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086128107665113426",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086128107665113426"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085673580977635362",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085673580977635362"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086143411984208230",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086143411984208230"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086154451476431232",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086154451476431232"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086183159998144936",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086183159998144936"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2043471984282001718",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2043471984282001718"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/1942324046265205206",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/1942324046265205206"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185201206440063",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185201206440063"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086128066678403541",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086128066678403541"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086165823270371647",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086165823270371647"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/1942328039188074615",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/1942328039188074615"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2084320584721215615",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2084320584721215615"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086136272490312066",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086136272490312066"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/1942412091350020419",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/1942412091350020419"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2084649513742975157",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2084649513742975157"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184003552301378",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184003552301378"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180648297931024",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180648297931024"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2083935443834589195",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2083935443834589195"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180494505369698",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180494505369698"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"post_id\": \"2086143411984208230\",\n  \"post_text\": \"Ryan Hurst has shared a photo of himself partially in makeup as Kratos for the live-action \u2018GOD OF WAR\u2019 series before he was recast.\",\n  \"post_author\": \"DiscussingFilm\",\n  \"post_url\": \"https://x.com/DiscussingFilm/status/2086143411984208230\"\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_bb5d46b6-072e-9c8f-a928-c5132e63de79",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 11389,
+        "output_tokens": 288
+      },
+      "cost_in_usd_ticks": 872832000,
+      "input_tokens": 38546,
+      "input_tokens_details": {
+        "cached_tokens": 12544
+      },
+      "num_server_side_tools_used": 5,
+      "num_sources_used": 0,
+      "output_tokens": 1086,
+      "output_tokens_details": {
+        "reasoning_tokens": 985
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 5
+      },
+      "total_tokens": 39632
+    },
+    "user": null
+  },
+  "response_sha256": "aa87e296be8599a6b632aefe2c80a01e93b749d08a0e47ae8aa0e93bcfe63fe0",
+  "surface": "x_search_post"
+}

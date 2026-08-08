@@ -46,11 +46,11 @@
   "request_sha256": "8d820f7652882d5f5ad4c3336327dae0cfd69386f9632fa3840da8820756e1f1",
   "response": {
     "background": false,
-    "completed_at": 1786127634,
-    "created_at": 1786127634,
+    "completed_at": 1786220931,
+    "created_at": 1786220931,
     "error": null,
     "frequency_penalty": 0.0,
-    "id": "839ce2d2-c420-9f0b-a578-180232b70203",
+    "id": "0040f4ab-f988-90d6-be82-9cdea6cfe0a1",
     "incomplete_details": null,
     "instructions": null,
     "max_output_tokens": null,
@@ -62,26 +62,538 @@
     "object": "response",
     "output": [
       {
-        "id": "rs_839ce2d2-c420-9f0b-a578-180232b70203",
+        "id": "rs_0040f4ab-f988-90d6-be82-9cdea6cfe0a1",
         "status": "completed",
         "summary": [
           {
-            "text": "The user wants me to search X for one engaging post from the last 48 hours about food, cooking, restaurants, or recipes. Criteria:\n",
+            "text": "The user wants me to search X for one engaging post from the last 48 hours about food, cooking, restaurants, or recipes. Criteria:\nI searched X using keyword operators for food, cooking, recipes, or restaurants with a min_replies:5 filter and within_time:2d for the last two days. I also added -filter:replies to focus on original posts and excluded sports-related terms.",
             "type": "summary_text"
           }
         ],
         "type": "reasoning"
       },
       {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-0",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-0",
+        "input": "{\"query\":\"(food OR cooking OR recipe OR recipes OR restaurant OR restaurants OR chef OR meal OR cuisine OR \\\"home cooking\\\" OR baking) min_replies:5 -sports -football -soccer -basketball -baseball -nfl -nba within_time:2d lang:en\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-1",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-1",
+        "input": "{\"post_id\":\"2086181653584715916\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-2",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-2",
+        "input": "{\"post_id\":\"2086182123333882172\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-1",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-2",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-3",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-3",
+        "input": "{\"post_id\":\"2086181167301365968\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-4",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-4",
+        "input": "{\"post_id\":\"2086181164620931494\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-5",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-5",
+        "input": "{\"post_id\":\"2086180898513588292\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-6",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-6",
+        "input": "{\"query\":\"(recipe OR recipes OR cooking OR \\\"home cooked\\\" OR baked OR grilling OR \\\"//restaurant\\\" OR chef) min_replies:10 within_time:2d lang:en -crypto -bitcoin -stock -nft\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-6",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-7",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-7",
+        "input": "{\"post_id\":\"2086174660878647448\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-7",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-8",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-8",
+        "input": "{\"post_id\":\"2086172987422646675\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-8",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-9",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-9",
+        "input": "{\"query\":\"(food OR cooking OR recipe OR restaurant) min_replies:5 within_time:48h lang:en filter:has_engagement -filter:replies\",\"limit\":\"10\",\"mode\":\"Top\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-9",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-10",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-10",
+        "input": "{\"query\":\"engaging posts about cooking recipes or restaurant experiences\",\"limit\":\"5\",\"from_date\":\"2026-08-06\"}",
+        "name": "x_semantic_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-10",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-11",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-11",
+        "input": "{\"query\":\"recipe OR \\\"how to cook\\\" OR \\\"my recipe\\\" OR \\\"dinner tonight\\\" OR \\\"cooked this\\\" min_replies:5 within_time:2d lang:en\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-11",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-12",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-12",
+        "input": "{\"post_id\":\"2086160535775838283\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-12",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-13",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-13",
+        "input": "{\"query\":\"from:turtledumplin\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-13",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-14",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-14",
+        "input": "{\"query\":\"conversation_id:2086160535775838283\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-14",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-b71092c2-f499-4278-9971-867486f6a0e1-15",
+        "id": "ctc_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-15",
+        "input": "{\"query\":\"conversation_id:2086181164620931494\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0040f4ab-f988-90d6-be82-9cdea6cfe0a1_call-b71092c2-f499-4278-9971-867486f6a0e1-15",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
         "content": [
           {
-            "annotations": [],
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086172127590313997",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086172127590313997"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187039620202764",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187039620202764"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185424699994577",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185424699994577"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086183808286777562",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086183808286777562"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086172987422646675",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086172987422646675"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181167301365968",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181167301365968"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086124029589716999",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086124029589716999"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086169514799251772",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086169514799251772"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086171186858225935",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086171186858225935"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086145306669056232",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086145306669056232"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185662164725906",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185662164725906"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086172346889523230",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086172346889523230"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086169364034658579",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086169364034658579"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182068631789635",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182068631789635"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086183402567245872",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086183402567245872"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086160927271887201",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086160927271887201"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184102886031470",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184102886031470"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086068759060451583",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086068759060451583"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086178767026737316",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086178767026737316"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181164620931494",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181164620931494"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184477467066393",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184477467066393"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086172996868170000",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086172996868170000"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186936146993165",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186936146993165"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180664634699795",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180664634699795"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2085405990246117801",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2085405990246117801"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086160535775838283",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086160535775838283"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180898513588292",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180898513588292"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181860259037476",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181860259037476"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086156541800165530",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086156541800165530"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086175203369910659",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086175203369910659"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086174660878647448",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086174660878647448"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086154163679891773",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086154163679891773"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086145233256149409",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086145233256149409"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181653584715916",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181653584715916"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184211765993836",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184211765993836"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086173115420455334",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086173115420455334"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086126735654035486",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086126735654035486"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086171902872359066",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086171902872359066"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086171169229779048",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086171169229779048"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182123333882172",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182123333882172"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181835298549803",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181835298549803"
+              }
+            ],
             "logprobs": [],
-            "text": "{\"post_id\": \"1995514046882472270\", \"post_text\": \"just made the most insane garlic butter steak bites and my kitchen smells like a 5-star restaurant. recipe is stupid simple:\\n\\n- sirloin, cubed\\n- drown in garlic butter + rosemary\\n- screamingly hot cast iron 2 min/side\\n- finish with flaky salt and parsley\\n\\nwho wants the full breakdown?\", \"post_author\": \"@KitchenConfessions\", \"post_url\": \"https://x.com/KitchenConfessions/status/1995514046882472270\"}",
+            "text": "{\n  \"post_id\": \"2086181164620931494\",\n  \"post_text\": \"Update: A family who was celebrating their 5y/o child\u2019s birthday at Joey Tomatoes pizzeria in Point Pleasant beach was berated by the owner for asking for a knife to cut a Birthday cake after they spent $250 for food & drinks. Allegedly they called before bringing it.Who\u2019s right?\",\n  \"post_author\": \"@Suzierizzo1\",\n  \"post_url\": \"https://x.com/Suzierizzo1/status/2086181164620931494\"\n}",
             "type": "output_text"
           }
         ],
-        "id": "msg_839ce2d2-c420-9f0b-a578-180232b70203",
+        "id": "msg_0040f4ab-f988-90d6-be82-9cdea6cfe0a1",
         "role": "assistant",
         "status": "completed",
         "type": "message"
@@ -143,24 +655,33 @@
     "truncation": "disabled",
     "usage": {
       "context_details": {
-        "input_tokens": 1864,
-        "output_tokens": 401
+        "input_tokens": 20443,
+        "output_tokens": 328
       },
-      "cost_in_usd_ticks": 32992000,
-      "input_tokens": 1864,
+      "cost_in_usd_ticks": 1885004000,
+      "input_tokens": 191677,
       "input_tokens_details": {
-        "cached_tokens": 1664
+        "cached_tokens": 170368
       },
-      "num_server_side_tools_used": 0,
+      "num_server_side_tools_used": 16,
       "num_sources_used": 0,
-      "output_tokens": 400,
+      "output_tokens": 2462,
       "output_tokens_details": {
-        "reasoning_tokens": 264
+        "reasoning_tokens": 2328
       },
-      "total_tokens": 2264
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 16
+      },
+      "total_tokens": 194139
     },
     "user": null
   },
-  "response_sha256": "77549e8be3b5db43250494631b9fa19d8a4c6f34b2daaff40a7d17e69af02eb2",
+  "response_sha256": "23846a9c97baa883d47ea97eedb4aa2fb58ed25c949c8e6926b60e3a7a3a5fd1",
   "surface": "x_search_post"
 }

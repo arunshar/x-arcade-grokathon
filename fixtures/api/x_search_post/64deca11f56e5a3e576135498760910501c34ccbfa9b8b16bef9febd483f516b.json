@@ -46,11 +46,11 @@
   "request_sha256": "64deca11f56e5a3e576135498760910501c34ccbfa9b8b16bef9febd483f516b",
   "response": {
     "background": false,
-    "completed_at": 1786127317,
-    "created_at": 1786127317,
+    "completed_at": 1786220483,
+    "created_at": 1786220483,
     "error": null,
     "frequency_penalty": 0.0,
-    "id": "7541ec33-37d1-9878-b842-e9697d9ee177",
+    "id": "693a9482-e610-9849-8548-3f1048f04730",
     "incomplete_details": null,
     "instructions": null,
     "max_output_tokens": null,
@@ -62,7 +62,7 @@
     "object": "response",
     "output": [
       {
-        "id": "rs_7541ec33-37d1-9878-b842-e9697d9ee177",
+        "id": "rs_693a9482-e610-9849-8548-3f1048f04730",
         "status": "completed",
         "summary": [
           {
@@ -73,155 +73,211 @@
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-0",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-0",
-        "input": "{\"query\":\"music min_replies:5 within_time:2d\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-0",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-0",
+        "input": "{\"query\":\"music min_replies:5 within_time:48h -filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
         "name": "x_keyword_search",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-0",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-0",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-1",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-1",
-        "input": "{\"post_id\":\"2085789310582685961\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-1",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-1",
+        "input": "{\"post_id\":\"2086180650244002054\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-1",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-1",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-2",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-2",
-        "input": "{\"post_id\":\"2085792907466781163\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-2",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-2",
+        "input": "{\"post_id\":\"2086183502513316265\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-2",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-2",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-3",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-3",
-        "input": "{\"post_id\":\"2085791278625661032\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-3",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-3",
+        "input": "{\"post_id\":\"2086182041755005302\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-3",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-3",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-4",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-4",
-        "input": "{\"query\":\"music (taste OR song OR album OR artist OR band) min_replies:10 within_time:2d\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-4",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-4",
+        "input": "{\"post_id\":\"2086180650244002054\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-5",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-5",
+        "input": "{\"post_id\":\"2086183327380152423\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-6",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-6",
+        "input": "{\"post_id\":\"2086174811995173172\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-6",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-7",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-7",
+        "input": "{\"post_id\":\"2086177468893831313\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-7",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-8",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-8",
+        "input": "{\"post_id\":\"2086179295496679593\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-8",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-9",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-9",
+        "input": "{\"query\":\"music (favorite OR best OR greatest OR love OR album OR song OR artist) min_replies:10 within_time:48h -filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
         "name": "x_keyword_search",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-4",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-9",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-5",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-5",
-        "input": "{\"post_id\":\"2085788060311073151\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-10",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-10",
+        "input": "{\"post_id\":\"2086165043964793286\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-5",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-10",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-6",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-6",
-        "input": "{\"query\":\"engaging discussion about music\",\"limit\":\"5\",\"from_date\":\"2026-08-05\"}",
-        "name": "x_semantic_search",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-6",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-7",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-7",
-        "input": "{\"query\":\"\\\"music\\\" min_replies:5 within_time:2d -filter:replies\",\"limit\":\"10\",\"mode\":\"Top\"}",
-        "name": "x_keyword_search",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-7",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-8",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-8",
-        "input": "{\"query\":\"music min_replies:5 within_time:48h\",\"limit\":\"10\",\"mode\":\"Top\"}",
-        "name": "x_keyword_search",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-8",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-9",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-9",
-        "input": "{\"post_id\":\"2085306680955334992\"}",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-11",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-11",
+        "input": "{\"post_id\":\"2086157998313914816\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-9",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-11",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-10",
-        "id": "ctc_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-10",
-        "input": "{\"query\":\"conversation_id:2085306680955334992\",\"limit\":\"10\",\"mode\":\"Latest\"}",
-        "name": "x_keyword_search",
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-12",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-12",
+        "input": "{\"post_id\":\"2086150447677710725\"}",
+        "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_7541ec33-37d1-9878-b842-e9697d9ee177_call-1e6d507d-16ac-4ebc-a60f-2e95c474609e-10",
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-12",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-13",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-13",
+        "input": "{\"post_id\":\"2086131573544378487\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-13",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-14",
+        "id": "ctc_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-14",
+        "input": "{\"post_id\":\"2086167082878763257\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_693a9482-e610-9849-8548-3f1048f04730_call-9fb15898-23d1-4c63-a04d-e121ae0d56be-14",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
@@ -233,276 +289,143 @@
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2084885714051690734",
+                "title": "https://x.com/i/status/2086131573544378487",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2084885714051690734"
+                "url": "https://x.com/i/status/2086131573544378487"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792907466781163",
+                "title": "https://x.com/i/status/2086183502513316265",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792907466781163"
+                "url": "https://x.com/i/status/2086183502513316265"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085789786212597787",
+                "title": "https://x.com/i/status/2086182678806536599",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085789786212597787"
+                "url": "https://x.com/i/status/2086182678806536599"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085789779489165701",
+                "title": "https://x.com/i/status/2086183327380152423",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085789779489165701"
+                "url": "https://x.com/i/status/2086183327380152423"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085774457634000908",
+                "title": "https://x.com/i/status/2086181187223978422",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085774457634000908"
+                "url": "https://x.com/i/status/2086181187223978422"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792922364957017",
+                "title": "https://x.com/i/status/2086145414642680006",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792922364957017"
+                "url": "https://x.com/i/status/2086145414642680006"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085784699767570783",
+                "title": "https://x.com/i/status/2086177468893831313",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085784699767570783"
+                "url": "https://x.com/i/status/2086177468893831313"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792280711958867",
+                "title": "https://x.com/i/status/2086157998313914816",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792280711958867"
+                "url": "https://x.com/i/status/2086157998313914816"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085781013922476049",
+                "title": "https://x.com/i/status/2086150453071315286",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085781013922476049"
+                "url": "https://x.com/i/status/2086150453071315286"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792261468758091",
+                "title": "https://x.com/i/status/2086180650244002054",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792261468758091"
+                "url": "https://x.com/i/status/2086180650244002054"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085778834465378646",
+                "title": "https://x.com/i/status/2086182041755005302",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085778834465378646"
+                "url": "https://x.com/i/status/2086182041755005302"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085790602701291883",
+                "title": "https://x.com/i/status/2086173858688839926",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085790602701291883"
+                "url": "https://x.com/i/status/2086173858688839926"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085306680955334992",
+                "title": "https://x.com/i/status/2086165043964793286",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085306680955334992"
+                "url": "https://x.com/i/status/2086165043964793286"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085779179795050793",
+                "title": "https://x.com/i/status/2086145440534368610",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085779179795050793"
+                "url": "https://x.com/i/status/2086145440534368610"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085348679091954142",
+                "title": "https://x.com/i/status/2086179295496679593",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085348679091954142"
+                "url": "https://x.com/i/status/2086179295496679593"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085784596235379122",
+                "title": "https://x.com/i/status/2086174811995173172",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085784596235379122"
+                "url": "https://x.com/i/status/2086174811995173172"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085783523768594811",
+                "title": "https://x.com/i/status/2086167082878763257",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085783523768594811"
+                "url": "https://x.com/i/status/2086167082878763257"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085791595186545083",
+                "title": "https://x.com/i/status/2086150447677710725",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085791595186545083"
+                "url": "https://x.com/i/status/2086150447677710725"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085789560043155847",
+                "title": "https://x.com/i/status/2086151675526488172",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085789560043155847"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085789310582685961",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085789310582685961"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085782339976679796",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085782339976679796"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085690167252156445",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085690167252156445"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085783678001750519",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085783678001750519"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085786769107378665",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085786769107378665"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085792077720301959",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085792077720301959"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085788659500867942",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085788659500867942"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085084335154098645",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085084335154098645"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085770086334226744",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085770086334226744"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085791278625661032",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085791278625661032"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085788060311073151",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085788060311073151"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085307787807019468",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085307787807019468"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085793940477780332",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085793940477780332"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085788945208787063",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085788945208787063"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085787090764140947",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085787090764140947"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085769047140900929",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085769047140900929"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085767918608851283",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085767918608851283"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085791946040107257",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085791946040107257"
-              },
-              {
-                "end_index": 0,
-                "start_index": 0,
-                "title": "https://x.com/i/status/2085792523629269138",
-                "type": "url_citation",
-                "url": "https://x.com/i/status/2085792523629269138"
+                "url": "https://x.com/i/status/2086151675526488172"
               }
             ],
             "logprobs": [],
-            "text": "{\n  \"post_id\": \"2085306680955334992\",\n  \"post_text\": \"tbh the music your parents played growing up stays with you for the rest of your life.\",\n  \"post_author\": \"@peegzy1\",\n  \"post_url\": \"https://x.com/peegzy1/status/2085306680955334992\"\n}",
+            "text": "{\n  \"post_id\": \"2086150447677710725\",\n  \"post_text\": \"Is \\\"Fortunate Son\\\" by Creedence Clearwater Revival a 10/10 song?\",\n  \"post_author\": \"@allrockmusic\",\n  \"post_url\": \"https://x.com/allrockmusic/status/2086150447677710725\"\n}",
             "type": "output_text"
           }
         ],
-        "id": "msg_7541ec33-37d1-9878-b842-e9697d9ee177",
+        "id": "msg_693a9482-e610-9849-8548-3f1048f04730",
         "role": "assistant",
         "status": "completed",
         "type": "message"
@@ -564,19 +487,19 @@
     "truncation": "disabled",
     "usage": {
       "context_details": {
-        "input_tokens": 15753,
-        "output_tokens": 258
+        "input_tokens": 16633,
+        "output_tokens": 200
       },
-      "cost_in_usd_ticks": 1217940000,
-      "input_tokens": 104604,
+      "cost_in_usd_ticks": 1597368000,
+      "input_tokens": 158632,
       "input_tokens_details": {
-        "cached_tokens": 89600
+        "cached_tokens": 142336
       },
-      "num_server_side_tools_used": 11,
+      "num_server_side_tools_used": 15,
       "num_sources_used": 0,
-      "output_tokens": 1651,
+      "output_tokens": 1574,
       "output_tokens_details": {
-        "reasoning_tokens": 1562
+        "reasoning_tokens": 1488
       },
       "server_side_tool_usage_details": {
         "code_interpreter_calls": 0,
@@ -585,12 +508,12 @@
         "image_generation_calls": 0,
         "mcp_calls": 0,
         "web_search_calls": 0,
-        "x_search_calls": 11
+        "x_search_calls": 15
       },
-      "total_tokens": 106255
+      "total_tokens": 160206
     },
     "user": null
   },
-  "response_sha256": "fae4986a3df6ef17f9aa90d2b1d6506dc9fe3af8f2e30766b5ff3bf4227e3064",
+  "response_sha256": "19a0fcbbb6f3c0a8d2db0b99db560804e4b008e388ff02df15bcec3756ece13a",
   "surface": "x_search_post"
 }

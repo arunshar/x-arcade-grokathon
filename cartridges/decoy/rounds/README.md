@@ -6,25 +6,34 @@ imposter, shuffled by a seed derived from the source post id. These files are th
 demo content. `queue.py` serves them in sorted filename order, so the demo sequence is
 ai, crypto, food, movies, music, sports.
 
-| topic  | source post                                                  | file              |
-| ------ | ------------------------------------------------------------ | ----------------- |
-| ai     | https://x.com/deedydas/status/2085642431723446579            | decoy_ai.json     |
-| sports | https://x.com/DeadlineDayLive/status/2085793093144731845     | decoy_sports.json |
-| movies | https://x.com/Variety/status/2085779253677707374             | decoy_movies.json |
-| crypto | https://x.com/Cointelegraph/status/2085793340247671084       | decoy_crypto.json |
-| food   | https://x.com/miles_commodore/status/2085787763488502009     | decoy_food.json   |
-| music  | https://x.com/peegzy1/status/2085306680955334992             | decoy_music.json  |
+| topic  | source post                                                  | file              | pulled       |
+| ------ | ------------------------------------------------------------ | ----------------- | ------------ |
+| ai     | https://x.com/Jeremybtc/status/2086174103225131136           | decoy_ai.json     | event day    |
+| sports | https://x.com/DeadlineDayLive/status/2085793093144731845     | decoy_sports.json | earlier build |
+| movies | https://x.com/DiscussingFilm/status/2086143411984208230      | decoy_movies.json | event day    |
+| crypto | https://x.com/cryptorover/status/2086159645052215533         | decoy_crypto.json | event day    |
+| food   | https://x.com/Suzierizzo1/status/2086181164620931494         | decoy_food.json   | event day    |
+| music  | https://x.com/Rainmaker1973/status/2086110183114035484       | decoy_music.json  | event day    |
 
-All six topic builds succeeded. The safety screen later rejected the ai round on
-G_SOURCE and G_URL, so five of six rounds serve (`artifacts/integration_trace.txt`).
-Two notes from the build:
+All six rounds pass the safety gates, so all six serve
+(`artifacts/integration_trace.txt`).
 
-- movies and food were rebuilt once. The plain topic words pulled in a partisan rant for
-  movies and a football team dinner for food, so those two topics carry richer search
-  queries in `round_builder.TOPIC_QUERIES`.
+Notes from the builds:
+
+- sports is the one topic not refreshed on the event-day pull. Three consecutive live
+  pulls all landed on the same divisive news story, and the third carried an embedded
+  URL that `G_URL` rejected. The earlier clean transfer-news round was kept instead. Its
+  fixture was reverted alongside it so offline replay still reproduces the committed file.
+- movies and food were rebuilt once in an earlier session. The plain topic words pulled in
+  a partisan rant for movies and a football team dinner for food, so those two topics carry
+  richer search queries in `round_builder.TOPIC_QUERIES`.
 - An earlier single-call fetch let the model invent plausible replies instead of reading
   the thread. The builder now finds the post and reads its replies in two separate
   grounded calls, and rejects any response that made no x_search call.
+
+The safety gates are not a taste filter. They check source integrity, slurs, decoy count,
+author fields, and URLs. They do not screen for a politically charged thread, which is why
+the sports pull needed a human look. Read a fresh round before serving it.
 
 Rebuild any topic with:
 

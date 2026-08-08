@@ -1,0 +1,200 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/Jeremybtc/status/2086174103225131136 (post id 2086174103225131136, posted by @Jeremybtc). A reliable way is searching with the query conversation_id:2086174103225131136 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array. Respond with only a JSON object with one key, replies, an array of {author, text}. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "5a90cfce1bc52938094128df3c8cba93a36394a11143487f030d1e8b783eb2f4",
+  "response": {
+    "background": false,
+    "completed_at": 1786220649,
+    "created_at": 1786220649,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "e1fa62e9-54cb-9176-a7bb-55e2be752d82",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_e1fa62e9-54cb-9176-a7bb-55e2be752d82",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/Jeremybtc/status/2086174103225131136 (post id 2086174103225131136, posted by @Jeremybtc).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-cb8df98a-26ec-4ba8-aa36-d11238ed4208-0",
+        "id": "ctc_e1fa62e9-54cb-9176-a7bb-55e2be752d82_call-cb8df98a-26ec-4ba8-aa36-d11238ed4208-0",
+        "input": "{\"query\":\"conversation_id:2086174103225131136 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_e1fa62e9-54cb-9176-a7bb-55e2be752d82_call-cb8df98a-26ec-4ba8-aa36-d11238ed4208-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185099385557473",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185099385557473"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181835445285299",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181835445285299"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180864912736558",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180864912736558"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182982478348470",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182982478348470"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185730913583112",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185730913583112"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180038307873214",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180038307873214"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184911786988018",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184911786988018"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182691125219415",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182691125219415"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181441314922760",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181441314922760"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180147435364655",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180147435364655"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@theyfwJuice\",\n      \"text\": \"gotta find some alternative\"\n    },\n    {\n      \"author\": \"@_luvauroraa\",\n      \"text\": \"Real\"\n    },\n    {\n      \"author\": \"@Mar_vel26\",\n      \"text\": \"Damn okay fam\"\n    },\n    {\n      \"author\": \"@DefiCrypto11\",\n      \"text\": \"It should get updated\"\n    },\n    {\n      \"author\": \"@youfadedwealth\",\n      \"text\": \"They really need to work on this before they lose all their customers\"\n    },\n    {\n      \"author\": \"@jamesrealezz\",\n      \"text\": \"Whatever happened to our beloved Claude? \ud83d\udc94\"\n    },\n    {\n      \"author\": \"@MelioHL\",\n      \"text\": \"saying claude is genuinely unusable is a strong line\\n\\nmost people just complain about vibes but you went straight to the product being broken\"\n    },\n    {\n      \"author\": \"@yasu0x1\",\n      \"text\": \"Codex quietly eating everyone\u2019s lunch while the big labs ship regressions\\n\\nSwitching mid project is the real pain though\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_e1fa62e9-54cb-9176-a7bb-55e2be752d82",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3724,
+        "output_tokens": 533
+      },
+      "cost_in_usd_ticks": 149704000,
+      "input_tokens": 5525,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 763,
+      "output_tokens_details": {
+        "reasoning_tokens": 483
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6288
+    },
+    "user": null
+  },
+  "response_sha256": "52cabb4686913619da7d1971301fbe9f673f886206348d8f2bdfed63b2106107",
+  "surface": "x_search_replies"
+}

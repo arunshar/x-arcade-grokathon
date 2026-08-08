@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"Thank God!\\n\\nThis victory belongs to every common sense voice out there who had the courage to call out the BS with the @WNBA.\\n\\nGirl dads and moms simply want a league we can support and a place where our daughters who play basketball can dream about competing one day.\\n\\nThat\u2019s it.\",\n  \"real_replies\": [\n    \"Omg I want to join the discrimination lawsuit too!\",\n    \"Finally, the only thing getting cut off is the nonsense, not the dreams. Go team!\",\n    \"A woman has a vagina and not a penis.... It really is that simple.... Why do they need a meeting about it?\",\n    \"The fact that they have to have a meeting to determine what qualifies as a woman is pretty sad.\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "34236ab45c370a63ea7742ecfabd4f91d4b48df3f2bd209f2b095019a061fb97",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\n  \"reply_text\": \"About time someone stood up for actual fairness in women's sports, our girls deserve better than this mess.\",\n  \"rationale\": \"The phrasing feels slightly too polished and evenly balanced without the raw, fragmented emphasis or casual fillers common in the surrounding replies.\"\n}",
+          "reasoning_content": "The user wants me to write one fake reply that hides among real replies to a real X post. I must match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habit...{\n  \"reply_text\": \"This is why we need to keep fighting for fairness in sports. No more special rules that mess everything up.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786220721,
+    "id": "a6932458-b77b-9673-a2e5-d940657590a8",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 62,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 391,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 36544000,
+      "num_sources_used": 0,
+      "prompt_tokens": 577,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 577
+      },
+      "total_tokens": 1030
+    }
+  },
+  "response_sha256": "88c7e7eda25f3e1f728e246ccf07d7f5a17ce695c0c706098c7519caef1978ab",
+  "surface": "decoy_write"
+}

@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-63ce6cb6a7de",
+  "round_id": "decoy-4da38a122dd5",
   "source": {
-    "post_text": "tbh the music your parents played growing up stays with you for the rest of your life.",
-    "post_author": "@peegzy1",
-    "post_url": "https://x.com/peegzy1/status/2085306680955334992",
+    "post_text": "Polish prodigy Marcin Patrzalek responds to those claiming his music is fake. \n\nWatch this tutorial breakdown: One guitar, zero fakes – mastering melody, bass, and percussion all at once.",
+    "post_author": "@Rainmaker1973",
+    "post_url": "https://x.com/Rainmaker1973/status/2086110183114035484",
     "topic": "music"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "I can't even lie, I no fit leave Ayefele songs.",
-      "author": "@OlajideJ7",
+      "text": "So overdubbed and phony.",
+      "author": "@Gorilla_Finger1",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "It get stored in your head forever",
-      "author": "@chizymusik",
+      "text": "That snare hit quite a few times without his hand tho",
+      "author": "@scottwilly86",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "Facts — hearing one old song and suddenly you’re back in the backseat of their car.",
-      "author": "@devops_prashant",
-      "is_decoy": false
-    },
-    {
-      "slot": 3,
-      "text": "Ebenezer Obey songs still dey my head",
+      "text": "bro still sounds layered af no shot one guitar does all that",
       "author": "decoy",
       "is_decoy": true
     },
     {
+      "slot": 3,
+      "text": "como se nota que nunca escuchaste rumba.",
+      "author": "@darkzideral",
+      "is_decoy": false
+    },
+    {
       "slot": 4,
-      "text": "Tope alabi songs",
-      "author": "@oluwasegun84872",
+      "text": "Marcin is awesome! I remember a couple of years ago I heard him and was hooked 👌🏼🙌🏼",
+      "author": "@pearpears0",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 3,
-  "decoy_rationale": "The mix of correct artist capitalization with dropped articles feels slightly over-crafted compared to the uneven casual typos in the real replies.",
+  "decoy_slot": 2,
+  "decoy_rationale": "The forced slang density and missing natural rhythm make the skepticism feel calculated rather than spontaneous like the real replies.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 6214443
+  "seed": 765686702
 }

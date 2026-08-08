@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-07f051a50258",
+  "round_id": "decoy-fdc7764b7ebb",
   "source": {
-    "post_text": "Sinatra once told the story of eating at a restaurant and Don Rickles asked if he could come by his table to impress his date and prove he knows him.\n\nA few minutes later Frank walks up and says hey Don how are you? \n\nRickles said hey Frank, do you mind we’re eating.",
-    "post_author": "@miles_commodore",
-    "post_url": "https://x.com/miles_commodore/status/2085787763488502009",
+    "post_text": "Update: A family who was celebrating their 5y/o child’s birthday at Joey Tomatoes pizzeria in Point Pleasant beach was berated by the owner for asking for a knife to cut a Birthday cake after they spent $250 for food & drinks. Allegedly they called before bringing it.Who’s right?",
+    "post_author": "@Suzierizzo1",
+    "post_url": "https://x.com/Suzierizzo1/status/2086181164620931494",
     "topic": "food"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "I love that story.",
-      "author": "@lorikramer58",
+      "text": "Most restaurants have a no outside food or drink policy but would allow for exceptions for something like a birthday cake with permission. They said they called ahead. That’s just bad business.",
+      "author": "@kingofkings0247",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "Such a good joke.",
-      "author": "@kwrob24",
+      "text": "@JoeyTomatoes staff behavior was abhorrent, just outright assholes ruining a birthday party .",
+      "author": "@saralynne65",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "I've heard that story. Sinatra really cracked up when this happened.",
-      "author": "@rickdanna4719",
-      "is_decoy": false
-    },
-    {
-      "slot": 3,
-      "text": "Rickles always had the perfect zinger ready.",
+      "text": "Unbelievable that theyd treat a family like that on their kids birthday after dropping $250. That place just lost a ton of potential customers.",
       "author": "decoy",
       "is_decoy": true
     },
     {
+      "slot": 3,
+      "text": "The owner just “killed” her own restaurant",
+      "author": "@JimmyBenningho2",
+      "is_decoy": false
+    },
+    {
       "slot": 4,
-      "text": "Don Rickles was hilarious!  I miss him.",
-      "author": "@JeffGil27225591",
+      "text": "That business owner would have lost my business FOR LIFE.\nWhy would ANY business owner treat their customers like that?!\nWhen you lose 1 customer, it could be 10. Word of mouth is the best, or worst, advertising one can get.",
+      "author": "@William02216755",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 3,
-  "decoy_rationale": "The slightly polished phrasing and word choice 'zinger' stand out as more writerly than the plain, direct praise in the real replies.",
+  "decoy_slot": 2,
+  "decoy_rationale": "The missing apostrophes in 'theyd' and 'kids' combined with otherwise polished outrage make the casualness feel calculated rather than natural.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 696310936
+  "seed": 725101952
 }

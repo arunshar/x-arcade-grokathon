@@ -1,0 +1,193 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/allrockmusic/status/2086150447677710725 (post id 2086150447677710725, posted by @allrockmusic). A reliable way is searching with the query conversation_id:2086150447677710725 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array. Respond with only a JSON object with one key, replies, an array of {author, text}. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "6dd2c36127fc45e72d75743cbebd8ef93e3e957fd41b13df57ec6c8c04ee7174",
+  "response": {
+    "background": false,
+    "completed_at": 1786220501,
+    "created_at": 1786220501,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "df59a29f-53b7-961f-9d6c-3cb193e4e62b",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_df59a29f-53b7-961f-9d6c-3cb193e4e62b",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/allrockmusic/status/2086150447677710725 (post id 2086150447677710725, posted by @allrockmusic).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-0c834acb-68ea-4fca-942d-4d045c585a73-0",
+        "id": "ctc_df59a29f-53b7-961f-9d6c-3cb193e4e62b_call-0c834acb-68ea-4fca-942d-4d045c585a73-0",
+        "input": "{\"query\":\"conversation_id:2086150447677710725 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_df59a29f-53b7-961f-9d6c-3cb193e4e62b_call-0c834acb-68ea-4fca-942d-4d045c585a73-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086175710767464556",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086175710767464556"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086166594720293186",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086166594720293186"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086168468609462603",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086168468609462603"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086165374878585100",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086165374878585100"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086168043793625486",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086168043793625486"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086178407587414056",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086178407587414056"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086166677675241978",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086166677675241978"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086177705632903209",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086177705632903209"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086179917398507884",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086179917398507884"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@Terry1679957\",\n      \"text\": \"Absolutely \ud83d\udcaf\"\n    },\n    {\n      \"author\": \"@TwoWave2\",\n      \"text\": \"Absolutely. I think it\u2019s also their best song amid strong competition in their catalog.\"\n    },\n    {\n      \"author\": \"@pearson_de29369\",\n      \"text\": \"Yes, great music and lyrics.\"\n    },\n    {\n      \"author\": \"@RHoltzel\",\n      \"text\": \"Yes.\"\n    },\n    {\n      \"author\": \"@doryclar\",\n      \"text\": \"No\"\n    },\n    {\n      \"author\": \"@BroiledScallops\",\n      \"text\": \"It is!\"\n    },\n    {\n      \"author\": \"@MoonBeef1\",\n      \"text\": \"Yes!\"\n    },\n    {\n      \"author\": \"@StevenLFair\",\n      \"text\": \"7.5\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_df59a29f-53b7-961f-9d6c-3cb193e4e62b",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3586,
+        "output_tokens": 360
+      },
+      "cost_in_usd_ticks": 141136000,
+      "input_tokens": 5389,
+      "input_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 593,
+      "output_tokens_details": {
+        "reasoning_tokens": 369
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 5982
+    },
+    "user": null
+  },
+  "response_sha256": "bd1b8ce472b31d0a24c3f575cb09ed1a2152951be21dc9d1b1eb4d20da5f7ad9",
+  "surface": "x_search_replies"
+}

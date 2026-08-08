@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"\ud83e\udd2f Bitcoin implied volatility hits yearly LOWS.\\n\\nYou know what this means, right...\",\n  \"real_replies\": [\n    \"We already feared it's coming.\",\n    \"the honest answer is that low volatility usually precedes a significant move up or down. market sentiment hasn't changed, but the lack of price discovery might indicate a shift in investor behavior.\",\n    \"cheap insurance before the next blowup\\n\\neveryone too comfortable rn\",\n    \"Low volatility usually does not last forever. The question is not whether BTC moves, but which direction gets confirmed.\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "6cb8cc973f696413780fb34981c2d7f211c8d560a186b7c5f36a8c5bee261a19",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\"reply_text\":\"these vol levels never hold, something always breaks soon after\",\"rationale\":\"The phrasing stays cleanly parallel and risk-neutral without any of the slight emotional shading or shorthand fragments that mark the real replies.\"}",
+          "reasoning_content": "The user wants me to write one fake reply that hides among real replies to a real X post. I need to match the register exactly: typical reply length, tone, capitalization, punctuation habits, typo lev...{\n  \"reply_text\": \"vol crush like this is the calm before the storm, but who knows if it's up or down this time\",\n  \"rationale\": \"The subtle tell is the slightly more formal phrasing 'calm before the storm' mixed with casual slang, which doesn't quite match the raw, meme 2.0 energy of the other replies.\"\n}turn\n\n{\n  \"reply_text\": \"vol crush like this is the calm before the storm, but who knows if it's up or down this time\",\n  \"rationale\": \"The subtle tell is the slightly more formal phrasing 'calm before the storm' mixed with casual slang, which doesn't quite match the raw, meme 2.0 energy of the other replies.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786220849,
+    "id": "c22489e7-9411-9828-81c3-09cc8b7b2c92",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 50,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 1028,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 73184000,
+      "num_sources_used": 0,
+      "prompt_tokens": 534,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 534
+      },
+      "total_tokens": 1612
+    }
+  },
+  "response_sha256": "2a2605dad81ebec91cecbbbf8f3211408937d3a93d402da7087dd6ab059dfcd1",
+  "surface": "decoy_write"
+}

@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-ebc5b68f8a7e",
+  "round_id": "decoy-5913ef31dd6d",
   "source": {
-    "post_text": "🇺🇸  INSIGHT: Senator Elizabeth Warren says the U.S. needs crypto legislation, but not legislation \"written by the crypto industry to protect and advance the crypto industry.\"",
-    "post_author": "@Cointelegraph",
-    "post_url": "https://x.com/Cointelegraph/status/2085793340247671084",
+    "post_text": "🤯 Bitcoin implied volatility hits yearly LOWS.\n\nYou know what this means, right...",
+    "post_author": "@cryptorover",
+    "post_url": "https://x.com/cryptorover/status/2086159645052215533",
     "topic": "crypto"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "Nobody in congress understands crypto enough to write good laws anyway",
-      "author": "decoy",
-      "is_decoy": true
+      "text": "the honest answer is that low volatility usually precedes a significant move up or down. market sentiment hasn't changed, but the lack of price discovery might indicate a shift in investor behavior.",
+      "author": "@adelbucetta",
+      "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "Elizabeth Dear should go to honeymoon and chill.",
-      "author": "@Nae5000",
+      "text": "cheap insurance before the next blowup\n\neveryone too comfortable rn",
+      "author": "@brita_lisa",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "It’s the hypocrisy for me. VOTE THEM OUT",
-      "author": "@CryptoJee_",
-      "is_decoy": false
+      "text": "these vol levels never hold, something always breaks soon after",
+      "author": "decoy",
+      "is_decoy": true
     },
     {
       "slot": 3,
-      "text": "When both sides agree legislation is needed, the debate has already moved forward",
-      "author": "@secondorderdesk",
+      "text": "Low volatility usually does not last forever. The question is not whether BTC moves, but which direction gets confirmed.",
+      "author": "@TokenTrailHQ",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "Good regulation should protect people, not just protect crypto companies",
-      "author": "@tedtradingclub",
+      "text": "We already feared it's coming.",
+      "author": "@gainzalgo",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 0,
-  "decoy_rationale": "The subtle tell is the absolute 'nobody' generalization paired with perfect grammar that feels polished compared to the rawer real replies.",
+  "decoy_slot": 2,
+  "decoy_rationale": "The phrasing stays cleanly parallel and risk-neutral without any of the slight emotional shading or shorthand fragments that mark the real replies.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 194138987
+  "seed": 882748265
 }

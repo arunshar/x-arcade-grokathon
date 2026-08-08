@@ -1,0 +1,241 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/patrickbetdavid/status/2086183417297649934 (post id 2086183417297649934, posted by @patrickbetdavid). A reliable way is searching with the query conversation_id:2086183417297649934 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "d11b648a476634c2d4ab65e1d6a50298dcd526f67eb8f1ac4e5a49d01b6e749d",
+  "response": {
+    "background": false,
+    "completed_at": 1786220721,
+    "created_at": 1786220721,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "4d4fed70-0dbd-9ed1-b2bd-fe4ab2429543",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_4d4fed70-0dbd-9ed1-b2bd-fe4ab2429543",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/patrickbetdavid/status/2086183417297649934 (post id 2086183417297649934, posted by @patrickbetdavid).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-a145d356-2e5f-4533-ac89-67cbdfc5d5f4-0",
+        "id": "ctc_4d4fed70-0dbd-9ed1-b2bd-fe4ab2429543_call-a145d356-2e5f-4533-ac89-67cbdfc5d5f4-0",
+        "input": "{\"query\":\"conversation_id:2086183417297649934 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_4d4fed70-0dbd-9ed1-b2bd-fe4ab2429543_call-a145d356-2e5f-4533-ac89-67cbdfc5d5f4-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186148481597597",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186148481597597"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185898832539801",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185898832539801"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186180568121618",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186180568121618"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185339849232612",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185339849232612"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185109024039289",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185109024039289"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185042871804321",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185042871804321"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184874453422306",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184874453422306"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@johnny_fame\",\n      \"text\": \"Omg I want to join the discrimination lawsuit too!\"\n    },\n    {\n      \"author\": \"@smyallh57618239\",\n      \"text\": \"Finally, the only thing getting cut off is the nonsense, not the dreams. Go team!\"\n    },\n    {\n      \"author\": \"@KingDanTheGr8\",\n      \"text\": \"A woman has a vagina and not a penis.... It really is that simple.... Why do they need a meeting about it?\"\n    },\n    {\n      \"author\": \"@CharlesHuntNews\",\n      \"text\": \"The fact that they have to have a meeting to determine what qualifies as a woman is pretty sad.\"\n    },\n    {\n      \"author\": \"@CEJacksonLaw\",\n      \"text\": \"Don\u2019t declare victory yet; WNBA could try to dodge defining \u201cwomen\u201d by, eg, saying that playing in the NBA makes you ineligible for the WNBA.\"\n    },\n    {\n      \"author\": \"@FoundersX76\",\n      \"text\": \"They can't define a woman though lol\"\n    },\n    {\n      \"author\": \"@valuetainment\",\n      \"text\": \"You are right.  \\n\\nWe will see.\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_4d4fed70-0dbd-9ed1-b2bd-fe4ab2429543",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3380,
+        "output_tokens": 646
+      },
+      "cost_in_usd_ticks": 151524000,
+      "input_tokens": 5262,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 881,
+      "output_tokens_details": {
+        "reasoning_tokens": 585
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6143
+    },
+    "user": null
+  },
+  "response_sha256": "77e36b4c85f6d6c02cb875c825758d767e3c30a53e75a86a8e960d1ef81b95ed",
+  "surface": "x_search_replies"
+}

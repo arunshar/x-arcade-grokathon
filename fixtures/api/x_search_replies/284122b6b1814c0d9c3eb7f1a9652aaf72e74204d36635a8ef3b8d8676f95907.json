@@ -1,0 +1,186 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/FOS/status/2086172811496706141 (post id 2086172811496706141, posted by @FOS). A reliable way is searching with the query conversation_id:2086172811496706141 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array. Respond with only a JSON object with one key, replies, an array of {author, text}. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "284122b6b1814c0d9c3eb7f1a9652aaf72e74204d36635a8ef3b8d8676f95907",
+  "response": {
+    "background": false,
+    "completed_at": 1786221171,
+    "created_at": 1786221171,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "a2f17e72-7a90-9401-b87a-8480da3e8e13",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_a2f17e72-7a90-9401-b87a-8480da3e8e13",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/FOS/status/2086172811496706141 (post id 2086172811496706141, posted by @FOS).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4496e76b-9b91-4e5e-8a2d-7bb9aa4f8ac5-0",
+        "id": "ctc_a2f17e72-7a90-9401-b87a-8480da3e8e13_call-4496e76b-9b91-4e5e-8a2d-7bb9aa4f8ac5-0",
+        "input": "{\"query\":\"conversation_id:2086172811496706141 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_a2f17e72-7a90-9401-b87a-8480da3e8e13_call-4496e76b-9b91-4e5e-8a2d-7bb9aa4f8ac5-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186320951435596",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186320951435596"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188796379333022",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188796379333022"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186601332273434",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186601332273434"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187676680827336",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187676680827336"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187123737047120",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187123737047120"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188144437969252",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188144437969252"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187909871235333",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187909871235333"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186108979921356",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186108979921356"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@JLThunder545\",\n      \"text\": \"Needing a \u201ctask force\u201d to figure out what a real woman is \ud83d\ude02\"\n    },\n    {\n      \"author\": \"@Jawsstinn\",\n      \"text\": \"They\u2019re so fucked. The WNBA may not survive their decision\"\n    },\n    {\n      \"author\": \"@justmarvg\",\n      \"text\": \"How is Royce White going to fly with team?\"\n    },\n    {\n      \"author\": \"@GrandeDiesel\",\n      \"text\": \"Video evidence for the meetings\\nhttps://www.youtube.com/watch?v=T3wcxHiorJ4&feature=youtu.be\"\n    },\n    {\n      \"author\": \"@Stickstostocks\",\n      \"text\": \"It\u2019s disgusting that we can\u2019t protect REAL BIOLOGICAL women. Perverse people that change who God made them to be are lost souls that we don\u2019t need to cater to. Pray for them? Help them see through the BS and find truth? Yes. But this is all absolutely disgraceful nonsense.\"\n    },\n    {\n      \"author\": \"@nowellstradamus\",\n      \"text\": \"A task force ? \\n\\nBetter be filled with biologists\"\n    },\n    {\n      \"author\": \"@LawsonPowell4\",\n      \"text\": \"Let\u2019s get she/her for our team.  \\n\\nhttps://www.youtube.com/shorts/JLGYzUzvhDc?is=TLDYoo7Vofv9dcFQ\"\n    },\n    {\n      \"author\": \"@susiemcdonnell\",\n      \"text\": \"so the stunt forced the wnba commissioner to admit she doesn't have a policy.\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_a2f17e72-7a90-9401-b87a-8480da3e8e13",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3479,
+        "output_tokens": 761
+      },
+      "cost_in_usd_ticks": 158364000,
+      "input_tokens": 5280,
+      "input_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 989,
+      "output_tokens_details": {
+        "reasoning_tokens": 599
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6269
+    },
+    "user": null
+  },
+  "response_sha256": "8a419f745920df1b559c8c5723f4f93e560fb058e0e2c84cb944ca4593dceb90",
+  "surface": "x_search_replies"
+}

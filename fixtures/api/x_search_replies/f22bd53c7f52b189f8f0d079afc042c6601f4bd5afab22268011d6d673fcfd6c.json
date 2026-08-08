@@ -1,0 +1,262 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/YahooSports/status/2086187248677007520 (post id 2086187248677007520, posted by @YahooSports). A reliable way is searching with the query conversation_id:2086187248677007520 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "f22bd53c7f52b189f8f0d079afc042c6601f4bd5afab22268011d6d673fcfd6c",
+  "response": {
+    "background": false,
+    "completed_at": 1786221076,
+    "created_at": 1786221076,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "569ed09f-48ca-9d7e-b1c2-8921772988bb",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_569ed09f-48ca-9d7e-b1c2-8921772988bb",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/YahooSports/status/2086187248677007520 (post id 2086187248677007520, posted by @YahooSports).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-ee5b052a-81e2-4bf8-80d9-af89755a8ac6-0",
+        "id": "ctc_569ed09f-48ca-9d7e-b1c2-8921772988bb_call-ee5b052a-81e2-4bf8-80d9-af89755a8ac6-0",
+        "input": "{\"query\":\"conversation_id:2086187248677007520 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_569ed09f-48ca-9d7e-b1c2-8921772988bb_call-ee5b052a-81e2-4bf8-80d9-af89755a8ac6-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187613698793755",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187613698793755"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188086875287573",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188086875287573"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188041958482073",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188041958482073"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188258229182804",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188258229182804"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188362767978701",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188362767978701"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188362399178956",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188362399178956"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188209470341459",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188209470341459"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188161034490329",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188161034490329"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086188461166415952",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086188461166415952"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086187671953547360",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086187671953547360"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@OK_AM86\",\n      \"text\": \"Dijonnaise?  More like horseradish!\"\n    },\n    {\n      \"author\": \"@MRFEDEX07\",\n      \"text\": \"Should be fined for that comment but the league will release an apology on her behalf.\"\n    },\n    {\n      \"author\": \"@ClaymoreKwaram1\",\n      \"text\": \"When did it become a race issue when she's the one who perpetrated.  The video is there to see. \ud83e\udd23\ud83e\udd23\ud83e\udd23\u2753\ufe0f\u2753\ufe0f\\n\\nWas Sophie supposed to get up and hug and thank her for that cheap shot \u2753\ufe0f\"\n    },\n    {\n      \"author\": \"@mattniftiest\",\n      \"text\": \"WNBA gets somewhat popular and now it\u2019s going down hill already. That was quick and now their paychecks go back to where they were and or less than before.\"\n    },\n    {\n      \"author\": \"@ItsDaQB\",\n      \"text\": \"Yahoo has picked it up. It\u2019s a wrap\u2026\"\n    },\n    {\n      \"author\": \"@daveoyt\",\n      \"text\": \"Is she sure wanna do this.. \ud83d\ude2d\ud83d\udcaf Those MAGA cult bigots will harass and attack her for the rest of her existence \ud83e\udd26\u200d\u2642\ufe0f\"\n    },\n    {\n      \"author\": \"@LoveFLbeaches\",\n      \"text\": \"she sounds racist! and mean! and just no!\"\n    },\n    {\n      \"author\": \"@ZanKrajnic\",\n      \"text\": \"Admitting your flagrant foul was racially motivated is going to have to be severely punished by the WNBA\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_569ed09f-48ca-9d7e-b1c2-8921772988bb",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3850,
+        "output_tokens": 496
+      },
+      "cost_in_usd_ticks": 160528000,
+      "input_tokens": 5730,
+      "input_tokens_details": {
+        "cached_tokens": 2816
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 730,
+      "output_tokens_details": {
+        "reasoning_tokens": 353
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6460
+    },
+    "user": null
+  },
+  "response_sha256": "76a95cef9c902b68dc606bba36977e53b8382cb2314acb9e38f06c48323c72f4",
+  "surface": "x_search_replies"
+}

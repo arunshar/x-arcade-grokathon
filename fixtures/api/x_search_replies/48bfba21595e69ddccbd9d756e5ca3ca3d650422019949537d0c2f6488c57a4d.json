@@ -1,0 +1,193 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/Rainmaker1973/status/2086110183114035484 (post id 2086110183114035484, posted by @Rainmaker1973). A reliable way is searching with the query conversation_id:2086110183114035484 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array. Respond with only a JSON object with one key, replies, an array of {author, text}. No prose.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "48bfba21595e69ddccbd9d756e5ca3ca3d650422019949537d0c2f6488c57a4d",
+  "response": {
+    "background": false,
+    "completed_at": 1786220548,
+    "created_at": 1786220548,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "770c57a3-ba22-9d54-81f0-5a2549ebf452",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_770c57a3-ba22-9d54-81f0-5a2549ebf452",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/Rainmaker1973/status/2086110183114035484 (post id 2086110183114035484, posted by @Rainmaker1973).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-67201897-5f1a-4bb5-962a-295d7a58fc94-0",
+        "id": "ctc_770c57a3-ba22-9d54-81f0-5a2549ebf452_call-67201897-5f1a-4bb5-962a-295d7a58fc94-0",
+        "input": "{\"query\":\"conversation_id:2086110183114035484 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_770c57a3-ba22-9d54-81f0-5a2549ebf452_call-67201897-5f1a-4bb5-962a-295d7a58fc94-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086183636496257253",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086183636496257253"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185327400775934",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185327400775934"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180768238158030",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180768238158030"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185605466091606",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185605466091606"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180187805196780",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180187805196780"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182092627492889",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182092627492889"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184665577353455",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184665577353455"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180974044291574",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180974044291574"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086178741743652922",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086178741743652922"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@darkzideral\",\n      \"text\": \"como se nota que nunca escuchaste rumba.\"\n    },\n    {\n      \"author\": \"@Gorilla_Finger1\",\n      \"text\": \"So overdubbed and phony.\"\n    },\n    {\n      \"author\": \"@pearpears0\",\n      \"text\": \"Marcin is awesome! I remember a couple of years ago I heard him and was hooked \ud83d\udc4c\ud83c\udffc\ud83d\ude4c\ud83c\udffc\"\n    },\n    {\n      \"author\": \"@ZEBULON972mada\",\n      \"text\": \"gj wp\"\n    },\n    {\n      \"author\": \"@scottwilly86\",\n      \"text\": \"That snare hit quite a few times without his hand tho\"\n    },\n    {\n      \"author\": \"@tda0626\",\n      \"text\": \"Yawn\"\n    },\n    {\n      \"author\": \"@GuitarChristie\",\n      \"text\": \"it doesn't prove anything! There is kick drum and snare hit added. And it's all pre recorded.\"\n    },\n    {\n      \"author\": \"@IAskew3\",\n      \"text\": \"Wow you have talent!\ud83d\udc4f\ud83e\udd29\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_770c57a3-ba22-9d54-81f0-5a2549ebf452",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "type": "text"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3540,
+        "output_tokens": 538
+      },
+      "cost_in_usd_ticks": 150876000,
+      "input_tokens": 5345,
+      "input_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 770,
+      "output_tokens_details": {
+        "reasoning_tokens": 497
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6115
+    },
+    "user": null
+  },
+  "response_sha256": "5cf6c672dacf186fdb5c56bfdf16e73e0977ec8619cdae4c089a04d7056c294d",
+  "surface": "x_search_replies"
+}

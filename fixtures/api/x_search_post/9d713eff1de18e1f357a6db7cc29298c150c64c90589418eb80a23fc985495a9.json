@@ -1,0 +1,407 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Search X for any popular post from the last 7 days related to music with a healthy reply count, at least 5 replies. Pick one whose replies are full sentences, not just emoji. Return the numeric post id, the post text verbatim, the author handle, and the canonical x.com post url.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_post",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "post_author": {
+              "description": "Handle like @name",
+              "type": "string"
+            },
+            "post_id": {
+              "description": "Numeric status id of the post",
+              "type": "string"
+            },
+            "post_text": {
+              "type": "string"
+            },
+            "post_url": {
+              "description": "Canonical https://x.com/.../status/... url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_id",
+            "post_text",
+            "post_author",
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "9d713eff1de18e1f357a6db7cc29298c150c64c90589418eb80a23fc985495a9",
+  "response": {
+    "background": false,
+    "completed_at": 1786220533,
+    "created_at": 1786220533,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "6e8305ea-de77-95b8-9e63-a981aa645056",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_6e8305ea-de77-95b8-9e63-a981aa645056",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to search X for a popular post from the last 7 days related to music with a healthy reply count, at least 5 replies. Pick one whose replies are full sentences, not just emoji. Return...",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-0",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-0",
+        "input": "{\"query\":\"music min_replies:5 since:2024-10-01\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-1",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-1",
+        "input": "{\"post_id\":\"2086179295496679593\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-1",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-2",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-2",
+        "input": "{\"post_id\":\"2086180650244002054\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-2",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-3",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-3",
+        "input": "{\"post_id\":\"2086183327380152423\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-4",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-4",
+        "input": "{\"post_id\":\"2086183502513316265\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-5",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-5",
+        "input": "{\"post_id\":\"2086177468893831313\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-6",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-6",
+        "input": "{\"post_id\":\"2086182041755005302\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-6",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-7",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-7",
+        "input": "{\"query\":\"music min_replies:10 since:2026-08-01\",\"limit\":\"5\",\"mode\":\"Top\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-7",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4363ce21-7a69-487b-a663-583aa5190b99-8",
+        "id": "ctc_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-8",
+        "input": "{\"post_id\":\"2086110183114035484\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6e8305ea-de77-95b8-9e63-a981aa645056_call-4363ce21-7a69-487b-a663-583aa5190b99-8",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180650244002054",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180650244002054"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086174811995173172",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086174811995173172"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2083754085061177728",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2083754085061177728"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086122175581524307",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086122175581524307"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2083528044476801224",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2083528044476801224"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086179295496679593",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086179295496679593"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182041755005302",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182041755005302"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086182678806536599",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086182678806536599"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086140289106743419",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086140289106743419"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086181187223978422",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086181187223978422"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086173858688839926",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086173858688839926"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086110183114035484",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086110183114035484"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086177468893831313",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086177468893831313"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086183327380152423",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086183327380152423"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086183502513316265",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086183502513316265"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"post_id\": \"2086110183114035484\",\n  \"post_text\": \"Polish prodigy Marcin Patrzalek responds to those claiming his music is fake. \\n\\nWatch this tutorial breakdown: One guitar, zero fakes \u2013 mastering melody, bass, and percussion all at once.\",\n  \"post_author\": \"@Rainmaker1973\",\n  \"post_url\": \"https://x.com/Rainmaker1973/status/2086110183114035484\"\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_6e8305ea-de77-95b8-9e63-a981aa645056",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "post_author": {
+              "description": "Handle like @name",
+              "type": "string"
+            },
+            "post_id": {
+              "description": "Numeric status id of the post",
+              "type": "string"
+            },
+            "post_text": {
+              "type": "string"
+            },
+            "post_url": {
+              "description": "Canonical https://x.com/.../status/... url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_id",
+            "post_text",
+            "post_author",
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 11372,
+        "output_tokens": 327
+      },
+      "cost_in_usd_ticks": 953692000,
+      "input_tokens": 70761,
+      "input_tokens_details": {
+        "cached_tokens": 58624
+      },
+      "num_server_side_tools_used": 9,
+      "num_sources_used": 0,
+      "output_tokens": 1418,
+      "output_tokens_details": {
+        "reasoning_tokens": 1303
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 9
+      },
+      "total_tokens": 72179
+    },
+    "user": null
+  },
+  "response_sha256": "f4cc5bd1457e0474a34888723de0316be5c32c0ede1f3ac145ae521626fe8faf",
+  "surface": "x_search_post"
+}

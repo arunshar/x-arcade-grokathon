@@ -1,0 +1,81 @@
+{
+  "format_version": 1,
+  "request": {
+    "messages": [
+      {
+        "content": "You write one fake reply that must hide among real replies to a real X post. Match the register of the thread exactly: typical reply length, tone, capitalization, punctuation habits, typo level, and slang. Stay on topic and plausible on its own. Do not copy phrases from the real replies. Never hint that you are an AI. Also write a one sentence rationale naming the subtle tell that makes your reply artificial. Players see the rationale only after the reveal.",
+        "role": "system"
+      },
+      {
+        "content": "Here is the post and its 4 real replies:\n{\n  \"post_text\": \"Polish prodigy Marcin Patrzalek responds to those claiming his music is fake. \\n\\nWatch this tutorial breakdown: One guitar, zero fakes \u2013 mastering melody, bass, and percussion all at once.\",\n  \"real_replies\": [\n    \"como se nota que nunca escuchaste rumba.\",\n    \"So overdubbed and phony.\",\n    \"Marcin is awesome! I remember a couple of years ago I heard him and was hooked \ud83d\udc4c\ud83c\udffc\ud83d\ude4c\ud83c\udffc\",\n    \"That snare hit quite a few times without his hand tho\"\n  ]\n}\nWrite the one imposter reply and the rationale.",
+        "role": "user"
+      }
+    ],
+    "model": "grok-4.5",
+    "response_format": {
+      "json_schema": {
+        "name": "decoy_reply",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "rationale": {
+              "description": "One sentence naming the subtle artificial tell",
+              "type": "string"
+            },
+            "reply_text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reply_text",
+            "rationale"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "json_schema"
+    }
+  },
+  "request_sha256": "f9c08a6dd0a0f33f81399feba854c2517850beb9dd37b0d579e5e7172d138a2e",
+  "response": {
+    "choices": [
+      {
+        "finish_reason": "stop",
+        "index": 0,
+        "message": {
+          "content": "{\n  \"reply_text\": \"bro still sounds layered af no shot one guitar does all that\",\n  \"rationale\": \"The forced slang density and missing natural rhythm make the skepticism feel calculated rather than spontaneous like the real replies.\"\n}",
+          "reasoning_content": "The user wants me to write one fake reply that hides among real replies to a real X post. I need to match the register: typical reply length, tone, capitalization, punctuation habits, typo level, and ...{\n  \"reply_text\": \"dude how does he pull off that bass line with just one guitar? insane\",\n  \"rationale\": \"The reply uses casual slang and a question that implies technical doubt, but the phrasing 'pull off that bass line' subtly echoes common online guitar-talk tropes without matching any real reply's exact vibe or emoji style.",
+          "refusal": null,
+          "role": "assistant"
+        }
+      }
+    ],
+    "created": 1786220549,
+    "id": "3d8fd764-cff6-938c-bb2d-a555b1b333dc",
+    "model": "grok-4.5",
+    "object": "chat.completion",
+    "service_tier": "default",
+    "system_fingerprint": "fp_a39489019fa99b6e",
+    "usage": {
+      "completion_tokens": 51,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 827,
+        "rejected_prediction_tokens": 0
+      },
+      "cost_in_usd_ticks": 61124000,
+      "num_sources_used": 0,
+      "prompt_tokens": 531,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 128,
+        "image_tokens": 0,
+        "text_tokens": 531
+      },
+      "total_tokens": 1409
+    }
+  },
+  "response_sha256": "d8f248613ab1c9cb09c426aa58c2bee3290aa0e2c57391623ea16ebbe9a9cbc1",
+  "surface": "decoy_write"
+}

@@ -1,0 +1,255 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/DiscussingFilm/status/2086143411984208230 (post id 2086143411984208230, posted by @DiscussingFilm). A reliable way is searching with the query conversation_id:2086143411984208230 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "3998bceef1e02cbb2f78f5fa99cd0c4641c63837512411d2ad6702f13e4d6991",
+  "response": {
+    "background": false,
+    "completed_at": 1786220774,
+    "created_at": 1786220774,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "5fca1542-2fb8-9071-b06d-d72d09c41cb4",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_5fca1542-2fb8-9071-b06d-d72d09c41cb4",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/DiscussingFilm/status/2086143411984208230 (post id 2086143411984208230, posted by @DiscussingFilm).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-fe2cee98-e7bc-4a9e-a7f4-a3b6a9582c48-0",
+        "id": "ctc_5fca1542-2fb8-9071-b06d-d72d09c41cb4_call-fe2cee98-e7bc-4a9e-a7f4-a3b6a9582c48-0",
+        "input": "{\"query\":\"conversation_id:2086143411984208230 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_5fca1542-2fb8-9071-b06d-d72d09c41cb4_call-fe2cee98-e7bc-4a9e-a7f4-a3b6a9582c48-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186619992776736",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186619992776736"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186348965146641",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186348965146641"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186021415190874",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186021415190874"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185810177724615",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185810177724615"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186919919034542",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186919919034542"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186707058061464",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186707058061464"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186668697014758",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186668697014758"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186619611095458",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186619611095458"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086186066374271127",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086186066374271127"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@DonDrawsStuff\",\n      \"text\": \"I'm not Grok but apparently he effed his shoulder up in a scene. But he's also a newly remade Muslim or some shit, and I think that might have something to do with it. Cheers, Drinker! Keep up the good work, Legend!\"\n    },\n    {\n      \"author\": \"@Adventuremaker7\",\n      \"text\": \"I still think this show should have done ALL of Kratos\u2019s story, and not just part skip to the Norse trilogy \\n\\nLike there\u2019s 7 games and a canonical crossover bossfight that should be covered before this\"\n    },\n    {\n      \"author\": \"@hyakkimaruu__\",\n      \"text\": \"\u00c7a le faisait tellement j\u2019ai trop le seum\"\n    },\n    {\n      \"author\": \"@Silverstar_ot\",\n      \"text\": \"why was he recast tho\"\n    },\n    {\n      \"author\": \"@PhilipLigon\",\n      \"text\": \"wtf they absolutely fucked up recasting him\"\n    },\n    {\n      \"author\": \"@ajnelson__\",\n      \"text\": \"They had to recast him cos he tore his biceps\"\n    },\n    {\n      \"author\": \"@lrislzc\",\n      \"text\": \"Bro was born to play this role\"\n    },\n    {\n      \"author\": \"@MrHAlvelo\",\n      \"text\": \"Stfu\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_5fca1542-2fb8-9071-b06d-d72d09c41cb4",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3641,
+        "output_tokens": 670
+      },
+      "cost_in_usd_ticks": 160360000,
+      "input_tokens": 5523,
+      "input_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 905,
+      "output_tokens_details": {
+        "reasoning_tokens": 574
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6428
+    },
+    "user": null
+  },
+  "response_sha256": "9f1c87f1141d02875602215504a9fd64512c7d2e40635ab6b4f85cb3fa357aa6",
+  "surface": "x_search_replies"
+}

@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-8bb84cfc46e8",
+  "round_id": "decoy-e9ae15e902d5",
   "source": {
-    "post_text": "“The Odyssey” has officially crossed $1 billion in global ticket sales after just three weeks of release:\n\n• This is the first Christopher Nolan movie to hit the milestone since 2012’s “The Dark Knight Rises”\n\n• In a matter of days, “The Odyssey” will become Nolan’s highest-grossing release of all time, eclipsing the long-held records of “The Dark Knight Rises” ($1.08B) and “The Dark Knight” ($1.008B)",
-    "post_author": "@Variety",
-    "post_url": "https://x.com/Variety/status/2085779253677707374",
+    "post_text": "Ryan Hurst has shared a photo of himself partially in makeup as Kratos for the live-action ‘GOD OF WAR’ series before he was recast.",
+    "post_author": "@DiscussingFilm",
+    "post_url": "https://x.com/DiscussingFilm/status/2086143411984208230",
     "topic": "movies"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "hit a billion without china and still climbing nolan just different fr",
-      "author": "decoy",
-      "is_decoy": true
+      "text": "I'm not Grok but apparently he effed his shoulder up in a scene. But he's also a newly remade Muslim or some shit, and I think that might have something to do with it. Cheers, Drinker! Keep up the good work, Legend!",
+      "author": "@DonDrawsStuff",
+      "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "the dark knight rises did 1.08 billion without china rereleases or premium screens in half its markets",
-      "author": "@eren81416622",
+      "text": "why was he recast tho",
+      "author": "@Silverstar_ot",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "still funny that nolan’s first billion-dollar movie in 14 years is a 3,000-year-old poem about a guy who just wants to go home",
-      "author": "@_HECTORARRIOLA_",
-      "is_decoy": false
+      "text": "dude nailed the kratos look already wild they bounced him",
+      "author": "decoy",
+      "is_decoy": true
     },
     {
       "slot": 3,
-      "text": "The Odyssey have not released in china either. Its inflation most people dont remember to take into account",
-      "author": "@Hedgehog_SWE",
+      "text": "Ça le faisait tellement j’ai trop le seum",
+      "author": "@hyakkimaruu__",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "So how many tickets ? \n\n100 milllions went decades ago, now it’s 10s of millions at $30-50",
-      "author": "@SeanNicol",
+      "text": "I still think this show should have done ALL of Kratos’s story, and not just part skip to the Norse trilogy \n\nLike there’s 7 games and a canonical crossover bossfight that should be covered before this",
+      "author": "@Adventuremaker7",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 0,
-  "decoy_rationale": "The subtle tell is the slightly forced slang closer 'fr' that feels tacked on rather than organic to the thread's natural mix of typos and incomplete thoughts.",
+  "decoy_slot": 2,
+  "decoy_rationale": "The verb 'bounced' feels slightly off-register and forced as slang for recasting compared to the thread's more natural casual phrasing.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 897422272
+  "seed": 210886257
 }

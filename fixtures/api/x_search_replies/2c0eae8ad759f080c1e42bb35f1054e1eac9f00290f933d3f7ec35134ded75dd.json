@@ -1,0 +1,255 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/allrockmusic/status/2086150447677710725 (post id 2086150447677710725, posted by @allrockmusic). A reliable way is searching with the query conversation_id:2086150447677710725 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "2c0eae8ad759f080c1e42bb35f1054e1eac9f00290f933d3f7ec35134ded75dd",
+  "response": {
+    "background": false,
+    "completed_at": 1786220492,
+    "created_at": 1786220492,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "6d8bdf87-e3bf-9288-96d1-41be0f9cc00b",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_6d8bdf87-e3bf-9288-96d1-41be0f9cc00b",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/allrockmusic/status/2086150447677710725 (post id 2086150447677710725, posted by @allrockmusic). They suggest searching with ...",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-1bb12e51-83e6-4b50-af75-4ae873a03ba4-0",
+        "id": "ctc_6d8bdf87-e3bf-9288-96d1-41be0f9cc00b_call-1bb12e51-83e6-4b50-af75-4ae873a03ba4-0",
+        "input": "{\"query\":\"conversation_id:2086150447677710725 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_6d8bdf87-e3bf-9288-96d1-41be0f9cc00b_call-1bb12e51-83e6-4b50-af75-4ae873a03ba4-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086168043793625486",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086168043793625486"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086175710767464556",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086175710767464556"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086166594720293186",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086166594720293186"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086165374878585100",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086165374878585100"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086166677675241978",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086166677675241978"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086179917398507884",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086179917398507884"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086178407587414056",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086178407587414056"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086168468609462603",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086168468609462603"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086177705632903209",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086177705632903209"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@Terry1679957\",\n      \"text\": \"Absolutely \ud83d\udcaf\"\n    },\n    {\n      \"author\": \"@TwoWave2\",\n      \"text\": \"Absolutely. I think it\u2019s also their best song amid strong competition in their catalog.\"\n    },\n    {\n      \"author\": \"@pearson_de29369\",\n      \"text\": \"Yes, great music and lyrics.\"\n    },\n    {\n      \"author\": \"@RHoltzel\",\n      \"text\": \"Yes.\"\n    },\n    {\n      \"author\": \"@doryclar\",\n      \"text\": \"No\"\n    },\n    {\n      \"author\": \"@BroiledScallops\",\n      \"text\": \"It is!\"\n    },\n    {\n      \"author\": \"@MoonBeef1\",\n      \"text\": \"Yes!\"\n    },\n    {\n      \"author\": \"@StevenLFair\",\n      \"text\": \"7.5\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_6d8bdf87-e3bf-9288-96d1-41be0f9cc00b",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3657,
+        "output_tokens": 457
+      },
+      "cost_in_usd_ticks": 147300000,
+      "input_tokens": 5539,
+      "input_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 682,
+      "output_tokens_details": {
+        "reasoning_tokens": 458
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6221
+    },
+    "user": null
+  },
+  "response_sha256": "b8c24f788940fb4ef0b1915edf4a2cfd9c2cea565f87973a52a3b6b2fd6c5ea5",
+  "surface": "x_search_replies"
+}

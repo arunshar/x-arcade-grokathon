@@ -1,0 +1,234 @@
+{
+  "format_version": 1,
+  "request": {
+    "input": "Open this X thread and read its replies: https://x.com/cryptorover/status/2086159645052215533 (post id 2086159645052215533, posted by @cryptorover). A reliable way is searching with the query conversation_id:2086159645052215533 filter:replies . List up to 8 replies that you actually read from the thread, each with the real author handle and the reply text verbatim. Only include replies you read in the search results. Never invent, merge, or paraphrase a reply. Skip replies from the original poster. If you cannot read the thread, return an empty replies array.",
+    "max_tool_calls": 8,
+    "model": "grok-4.5",
+    "text": {
+      "format": {
+        "name": "decoy_replies",
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ]
+  },
+  "request_sha256": "f6a39ac6a5bda77e0f76404744294cc2a5bacbef4128993181d18bb83d6859ec",
+  "response": {
+    "background": false,
+    "completed_at": 1786220848,
+    "created_at": 1786220848,
+    "error": null,
+    "frequency_penalty": 0.0,
+    "id": "931426d0-1818-9763-9e09-6398e5628474",
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "max_tool_calls": null,
+    "metadata": {
+      "system_fingerprint": "fp_a39489019fa99b6e"
+    },
+    "model": "grok-4.5",
+    "object": "response",
+    "output": [
+      {
+        "id": "rs_931426d0-1818-9763-9e09-6398e5628474",
+        "status": "completed",
+        "summary": [
+          {
+            "text": "The user wants me to open this X thread and read its replies: https://x.com/cryptorover/status/2086159645052215533 (post id 2086159645052215533, posted by @cryptorover).\n",
+            "type": "summary_text"
+          }
+        ],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-4e995370-6c84-4a7b-8ac5-7dd3681748bc-0",
+        "id": "ctc_931426d0-1818-9763-9e09-6398e5628474_call-4e995370-6c84-4a7b-8ac5-7dd3681748bc-0",
+        "input": "{\"query\":\"conversation_id:2086159645052215533 filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_931426d0-1818-9763-9e09-6398e5628474_call-4e995370-6c84-4a7b-8ac5-7dd3681748bc-0",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "content": [
+          {
+            "annotations": [
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086177240312660032",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086177240312660032"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086180779114299722",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086180779114299722"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086176116025303172",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086176116025303172"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086174552342589855",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086174552342589855"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086185537849958567",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086185537849958567"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086177614440669606",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086177614440669606"
+              }
+            ],
+            "logprobs": [],
+            "text": "{\n  \"replies\": [\n    {\n      \"author\": \"@gainzalgo\",\n      \"text\": \"We already feared it's coming.\"\n    },\n    {\n      \"author\": \"@adelbucetta\",\n      \"text\": \"the honest answer is that low volatility usually precedes a significant move up or down. market sentiment hasn't changed, but the lack of price discovery might indicate a shift in investor behavior.\"\n    },\n    {\n      \"author\": \"@Jmaxcapital\",\n      \"text\": \"Tell us..\"\n    },\n    {\n      \"author\": \"@brita_lisa\",\n      \"text\": \"cheap insurance before the next blowup\\n\\neveryone too comfortable rn\"\n    },\n    {\n      \"author\": \"@TokenTrailHQ\",\n      \"text\": \"Low volatility usually does not last forever. The question is not whether BTC moves, but which direction gets confirmed.\"\n    },\n    {\n      \"author\": \"@AssetsNorris\",\n      \"text\": \"this is now a possibility. TICK TOK. pick a direction BTC\"\n    }\n  ]\n}",
+            "type": "output_text"
+          }
+        ],
+        "id": "msg_931426d0-1818-9763-9e09-6398e5628474",
+        "role": "assistant",
+        "status": "completed",
+        "type": "message"
+      }
+    ],
+    "parallel_tool_calls": true,
+    "presence_penalty": 0.0,
+    "previous_response_id": null,
+    "prompt_cache_key": null,
+    "reasoning": {
+      "effort": "high",
+      "summary": "detailed"
+    },
+    "safety_identifier": null,
+    "service_tier": "default",
+    "status": "completed",
+    "store": true,
+    "temperature": 0.7,
+    "text": {
+      "format": {
+        "schema": {
+          "additionalProperties": false,
+          "properties": {
+            "replies": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "author",
+                  "text"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "replies"
+          ],
+          "type": "object"
+        },
+        "type": "json_schema"
+      }
+    },
+    "tool_choice": "auto",
+    "tools": [
+      {
+        "type": "x_search"
+      }
+    ],
+    "top_logprobs": 0,
+    "top_p": 0.95,
+    "truncation": "disabled",
+    "usage": {
+      "context_details": {
+        "input_tokens": 3523,
+        "output_tokens": 597
+      },
+      "cost_in_usd_ticks": 153380000,
+      "input_tokens": 5405,
+      "input_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "num_server_side_tools_used": 1,
+      "num_sources_used": 0,
+      "output_tokens": 828,
+      "output_tokens_details": {
+        "reasoning_tokens": 592
+      },
+      "server_side_tool_usage_details": {
+        "code_interpreter_calls": 0,
+        "document_search_calls": 0,
+        "file_search_calls": 0,
+        "image_generation_calls": 0,
+        "mcp_calls": 0,
+        "web_search_calls": 0,
+        "x_search_calls": 1
+      },
+      "total_tokens": 6233
+    },
+    "user": null
+  },
+  "response_sha256": "30686df1071b0f9829c41f9ebd5783a9b59a95dc98f8808041d72db728c8bb29",
+  "surface": "x_search_replies"
+}

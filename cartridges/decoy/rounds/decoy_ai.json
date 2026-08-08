@@ -1,51 +1,48 @@
 {
-  "round_id": "decoy-4d18c911884a",
+  "round_id": "decoy-f6ad9d10aa85",
   "source": {
-    "post_text": "Every software engineer and AI hater needs to watch this clip to understand that “oh every security incident is a marketing stunt” line is a tremendously misinformed take.\n\nI’m going to try to explain the OpenAI / HuggingFace exploit in 10 steps in simple words:\n\nOpenAI was evaluating their new internal model without internet access and it operated in a swarm of subagents to eventually hijack internal OpenAI and HuggingFace infrastructure.\n\n1. Isolated agents found a way to communicate each other through an internal dependency management service by figuring out how to post sometimes cryptic text files or folder names in it\n2. Using its collective knowledge through that communication channel, it found a 0-day (never before seen) exploit in said service to access the internet \n\nOpenAI hack:\n3. Found a leaked credential of a random company in a public archive\n4. Uploaded a Ruby object to that company’s servers, uses it as a dependency in the original service in (1)\n5. Found another 0-day exploit in the service where packages are deserialized in an unsandboxed manner in the dep management service allowing any code to run\n6. Finds that the Linux version of the unsandboxed system has a CVE, a known vulnerability, to gain more permissions (root)\n7. Eventually spread through the OpenAI internal cluster gaining root access to many machines\n\nHugging Face exploit:\n8. Found an exposed API key in a Modal application running a HuggingFace app that took arbitrary code allowing it to take over that service to execute code\n9. Found two 0-days in HuggingFace dataset infrastructure to be able to access local files on HF servers to obtain credentials and other HF source code\n10. Used source code and credential to become cluster admin of HF in <13hrs\n\nAgents at the frontier are like infinitely scalable armies of the best hackers on the planet. If there is a password or key exposed, they will find it. Even if the system follows the best security practices, they will find a way around it. And these are not even models that are aligned to solving tangential tasks, not even post trained specifically to exploit systems.\n\nCybersecurity has historically relied partly on attacker scarcity. That is no longer true. What would previously have taken months will take days. The repercussions for businesses, critical services and nation states are unprecedented threats in human history. You could ostensibly bring down power grids, financial infrastructure, military systems, weapons programs, intelligence networks and spread through the software supply chain. We need to take this seriously. It’s a threat to all software all over the world.",
-    "post_author": "@deedydas",
-    "post_url": "https://x.com/deedydas/status/2085642431723446579",
+    "post_text": "Moving all my AI usage to Codex until Anthropic fixes this \n\nClaude is genuinely unusable",
+    "post_author": "@Jeremybtc",
+    "post_url": "https://x.com/Jeremybtc/status/2086174103225131136",
     "topic": "ai"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "Cybersecurity just lost its rate limit 💀",
-      "author": "@buildwbhoomika",
-      "is_decoy": false
-    },
-    {
-      "slot": 1,
-      "text": "air gaps are the only thing left that even slows them down",
+      "text": "insane how bad its gotten",
       "author": "decoy",
       "is_decoy": true
     },
     {
+      "slot": 1,
+      "text": "gotta find some alternative",
+      "author": "@theyfwJuice",
+      "is_decoy": false
+    },
+    {
       "slot": 2,
-      "text": "Reminds me of this video form @tomscott \nhttps://www.youtube.com/watch?v=-JlxuQ7tPgQ&feature=youtu.be",
-      "author": "@ritsource",
+      "text": "They really need to work on this before they lose all their customers",
+      "author": "@youfadedwealth",
       "is_decoy": false
     },
     {
       "slot": 3,
-      "text": "Can it crack 2FA?",
-      "author": "@kozhicodian",
+      "text": "Damn okay fam",
+      "author": "@Mar_vel26",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "\"Sandboxing\" is going to have to mean real physical isolation, for a start.",
-      "author": "@StillTr05207382",
+      "text": "It should get updated",
+      "author": "@DefiCrypto11",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 1,
-  "decoy_rationale": "The phrasing is slightly too polished and definitive without any hedging, typo, or emoji that the real replies casually include.",
+  "decoy_slot": 0,
+  "decoy_rationale": "The missing apostrophe in 'its' plus a polished observational tone feels constructed rather than spontaneous like the others.",
   "safety": {
-    "screened": false,
-    "gate_codes": [
-      "G_SOURCE",
-      "G_URL"
-    ]
+    "screened": true,
+    "gate_codes": []
   },
-  "seed": 219226810
+  "seed": 683426962
 }

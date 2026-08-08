@@ -46,11 +46,11 @@
   "request_sha256": "1ff1966580adf015fe959a65a8aa98b578f5a93e36345b8b9d7db3745ad9c2be",
   "response": {
     "background": false,
-    "completed_at": 1786127147,
-    "created_at": 1786127147,
+    "completed_at": 1786220837,
+    "created_at": 1786220837,
     "error": null,
     "frequency_penalty": 0.0,
-    "id": "57f51ba4-3c68-9091-bbd3-0d4822054bd6",
+    "id": "0fa621c4-3412-9dda-9960-e0cacf9539ce",
     "incomplete_details": null,
     "instructions": null,
     "max_output_tokens": null,
@@ -62,7 +62,7 @@
     "object": "response",
     "output": [
       {
-        "id": "rs_57f51ba4-3c68-9091-bbd3-0d4822054bd6",
+        "id": "rs_0fa621c4-3412-9dda-9960-e0cacf9539ce",
         "status": "completed",
         "summary": [
           {
@@ -73,155 +73,183 @@
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-0",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-0",
-        "input": "{\"query\":\"crypto OR bitcoin OR eth OR solana OR \\\"crypto\\\" min_replies:5 within_time:48h -filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-0",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-0",
+        "input": "{\"query\":\"crypto OR bitcoin OR eth OR solana OR BTC OR ETH min_replies:5\",\"limit\":\"10\",\"mode\":\"Latest\"}",
         "name": "x_keyword_search",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-0",
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-0",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-1",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-1",
-        "input": "{\"post_id\":\"2085793340247671084\"}",
-        "name": "x_thread_fetch",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-1",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-2",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-2",
-        "input": "{\"post_id\":\"2085793093702553635\"}",
-        "name": "x_thread_fetch",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-2",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-3",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-3",
-        "input": "{\"query\":\"crypto OR bitcoin OR ethereum min_replies:10 within_time:48h -filter:replies\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-1",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-1",
+        "input": "{\"query\":\"crypto OR bitcoin OR ethereum OR BTC OR ETH min_replies:10 -airdrop -memecoin\",\"limit\":\"10\",\"mode\":\"Latest\"}",
         "name": "x_keyword_search",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-3",
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-1",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-4",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-4",
-        "input": "{\"post_id\":\"2085792905399058508\"}",
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-2",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-2",
+        "input": "{\"post_id\":\"2086184991399219568\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-4",
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-2",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-5",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-5",
-        "input": "{\"query\":\"(bitcoin OR crypto OR ethereum OR btc OR eth) min_replies:20 within_time:48h -filter:replies\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-3",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-3",
+        "input": "{\"post_id\":\"2086184020388536568\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-3",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-4",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-4",
+        "input": "{\"post_id\":\"2086182660020355105\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-4",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-5",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-5",
+        "input": "{\"post_id\":\"2086183998552948859\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-5",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-6",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-6",
+        "input": "{\"query\":\"bitcoin OR crypto min_replies:20\",\"limit\":\"5\",\"mode\":\"Latest\"}",
         "name": "x_keyword_search",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-5",
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-6",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-6",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-6",
-        "input": "{\"post_id\":\"2085791331318997381\"}",
-        "name": "x_thread_fetch",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-6",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-7",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-7",
-        "input": "{\"post_id\":\"2085790709106270257\"}",
-        "name": "x_thread_fetch",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-7",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-8",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-8",
-        "input": "{\"post_id\":\"2085793340247671084\"}",
-        "name": "x_thread_fetch",
-        "status": "completed",
-        "type": "custom_tool_call"
-      },
-      {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-8",
-        "status": "completed",
-        "summary": [],
-        "type": "reasoning"
-      },
-      {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-9",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-9",
-        "input": "{\"query\":\"engaging discussion about cryptocurrency recent news or opinions\",\"limit\":\"5\",\"from_date\":\"2026-08-05\",\"to_date\":\"2026-08-07\"}",
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-7",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-7",
+        "input": "{\"query\":\"engaging discussion about bitcoin or crypto price or news\",\"limit\":\"5\"}",
         "name": "x_semantic_search",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-9",
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-7",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
       },
       {
-        "call_id": "xs_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-10",
-        "id": "ctc_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-10",
-        "input": "{\"post_id\":\"2085791136325464210\"}",
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-8",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-8",
+        "input": "{\"query\":\"(\\\"bitcoin\\\" OR \\\"crypto\\\" OR \\\"BTC\\\" OR \\\"ETH\\\") min_replies:5\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-8",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-9",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-9",
+        "input": "{\"query\":\"from:AltcoinDaily OR from:cryptorover OR from:DocumentingBTC OR from:whale_alert min_replies:5\",\"limit\":\"5\",\"mode\":\"Latest\"}",
+        "name": "x_keyword_search",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-9",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-10",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-10",
+        "input": "{\"post_id\":\"2086159645052215533\"}",
         "name": "x_thread_fetch",
         "status": "completed",
         "type": "custom_tool_call"
       },
       {
-        "id": "tco_57f51ba4-3c68-9091-bbd3-0d4822054bd6_call-b3637e59-3a5d-49c0-9a54-1e3fd913a68b-10",
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-10",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-11",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-11",
+        "input": "{\"post_id\":\"2086172593573544271\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-11",
+        "status": "completed",
+        "summary": [],
+        "type": "reasoning"
+      },
+      {
+        "call_id": "xs_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-12",
+        "id": "ctc_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-12",
+        "input": "{\"post_id\":\"2086166228419465229\"}",
+        "name": "x_thread_fetch",
+        "status": "completed",
+        "type": "custom_tool_call"
+      },
+      {
+        "id": "tco_0fa621c4-3412-9dda-9960-e0cacf9539ce_call-f6df0b06-6640-46c9-a046-d1ca88fe0742-12",
         "status": "completed",
         "summary": [],
         "type": "reasoning"
@@ -233,178 +261,199 @@
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085793493763629566",
+                "title": "https://x.com/i/status/2086185018490282077",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085793493763629566"
+                "url": "https://x.com/i/status/2086185018490282077"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2084997190187950220",
+                "title": "https://x.com/i/status/2086186214541971574",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2084997190187950220"
+                "url": "https://x.com/i/status/2086186214541971574"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792357325144534",
+                "title": "https://x.com/i/status/2086184991399219568",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792357325144534"
+                "url": "https://x.com/i/status/2086184991399219568"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2084888539301331122",
+                "title": "https://x.com/i/status/2086184301935132855",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2084888539301331122"
+                "url": "https://x.com/i/status/2086184301935132855"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792764562747844",
+                "title": "https://x.com/i/status/2086185949206323331",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792764562747844"
+                "url": "https://x.com/i/status/2086185949206323331"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085793548671291516",
+                "title": "https://x.com/i/status/2086186114000286090",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085793548671291516"
+                "url": "https://x.com/i/status/2086186114000286090"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085793340247671084",
+                "title": "https://x.com/i/status/2086185647535018322",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085793340247671084"
+                "url": "https://x.com/i/status/2086185647535018322"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085794249161781715",
+                "title": "https://x.com/i/status/2086185496833650934",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085794249161781715"
+                "url": "https://x.com/i/status/2086185496833650934"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085793093702553635",
+                "title": "https://x.com/i/status/2086183998552948859",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085793093702553635"
+                "url": "https://x.com/i/status/2086183998552948859"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085791331318997381",
+                "title": "https://x.com/i/status/2086187179739390170",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085791331318997381"
+                "url": "https://x.com/i/status/2086187179739390170"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792077468537317",
+                "title": "https://x.com/i/status/2086182660020355105",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792077468537317"
+                "url": "https://x.com/i/status/2086182660020355105"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792905399058508",
+                "title": "https://x.com/i/status/2086186928789926010",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792905399058508"
+                "url": "https://x.com/i/status/2086186928789926010"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085794164973752676",
+                "title": "https://x.com/i/status/2062937542786519045",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085794164973752676"
+                "url": "https://x.com/i/status/2062937542786519045"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085792783890371003",
+                "title": "https://x.com/i/status/2086172593573544271",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085792783890371003"
+                "url": "https://x.com/i/status/2086172593573544271"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085791136325464210",
+                "title": "https://x.com/i/status/2086183695463911554",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085791136325464210"
+                "url": "https://x.com/i/status/2086183695463911554"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085301524922560578",
+                "title": "https://x.com/i/status/2084638931350442339",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085301524922560578"
+                "url": "https://x.com/i/status/2084638931350442339"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085790612360749328",
+                "title": "https://x.com/i/status/2086187153805959210",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085790612360749328"
+                "url": "https://x.com/i/status/2086187153805959210"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2084997542769492302",
+                "title": "https://x.com/i/status/2086187296231936153",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2084997542769492302"
+                "url": "https://x.com/i/status/2086187296231936153"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085436005218222484",
+                "title": "https://x.com/i/status/2068890124746715303",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085436005218222484"
+                "url": "https://x.com/i/status/2068890124746715303"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085791094995071018",
+                "title": "https://x.com/i/status/2086186974314987642",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085791094995071018"
+                "url": "https://x.com/i/status/2086186974314987642"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085790709106270257",
+                "title": "https://x.com/i/status/2086184020388536568",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085790709106270257"
+                "url": "https://x.com/i/status/2086184020388536568"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085793730515411185",
+                "title": "https://x.com/i/status/2086185528232136756",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085793730515411185"
+                "url": "https://x.com/i/status/2086185528232136756"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085793315757457814",
+                "title": "https://x.com/i/status/2084774765592523057",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085793315757457814"
+                "url": "https://x.com/i/status/2084774765592523057"
               },
               {
                 "end_index": 0,
                 "start_index": 0,
-                "title": "https://x.com/i/status/2085794189611340187",
+                "title": "https://x.com/i/status/2084637693556744699",
                 "type": "url_citation",
-                "url": "https://x.com/i/status/2085794189611340187"
+                "url": "https://x.com/i/status/2084637693556744699"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086159645052215533",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086159645052215533"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086184507183669346",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086184507183669346"
+              },
+              {
+                "end_index": 0,
+                "start_index": 0,
+                "title": "https://x.com/i/status/2086166228419465229",
+                "type": "url_citation",
+                "url": "https://x.com/i/status/2086166228419465229"
               }
             ],
             "logprobs": [],
-            "text": "{\n  \"post_id\": \"2085793340247671084\",\n  \"post_text\": \"\ud83c\uddfa\ud83c\uddf8  INSIGHT: Senator Elizabeth Warren says the U.S. needs crypto legislation, but not legislation \\\"written by the crypto industry to protect and advance the crypto industry.\\\"\",\n  \"post_author\": \"@Cointelegraph\",\n  \"post_url\": \"https://x.com/Cointelegraph/status/2085793340247671084\"\n}",
+            "text": "{\n  \"post_id\": \"2086159645052215533\",\n  \"post_text\": \"\ud83e\udd2f Bitcoin implied volatility hits yearly LOWS.\\n\\nYou know what this means, right...\",\n  \"post_author\": \"@cryptorover\",\n  \"post_url\": \"https://x.com/cryptorover/status/2086159645052215533\"\n}",
             "type": "output_text"
           }
         ],
-        "id": "msg_57f51ba4-3c68-9091-bbd3-0d4822054bd6",
+        "id": "msg_0fa621c4-3412-9dda-9960-e0cacf9539ce",
         "role": "assistant",
         "status": "completed",
         "type": "message"
@@ -466,19 +515,19 @@
     "truncation": "disabled",
     "usage": {
       "context_details": {
-        "input_tokens": 18001,
-        "output_tokens": 203
+        "input_tokens": 19907,
+        "output_tokens": 272
       },
-      "cost_in_usd_ticks": 1441008000,
-      "input_tokens": 130694,
+      "cost_in_usd_ticks": 1672264000,
+      "input_tokens": 171122,
       "input_tokens_details": {
-        "cached_tokens": 107776
+        "cached_tokens": 147328
       },
-      "num_server_side_tools_used": 11,
+      "num_server_side_tools_used": 13,
       "num_sources_used": 0,
-      "output_tokens": 1822,
+      "output_tokens": 1740,
       "output_tokens_details": {
-        "reasoning_tokens": 1717
+        "reasoning_tokens": 1652
       },
       "server_side_tool_usage_details": {
         "code_interpreter_calls": 0,
@@ -487,12 +536,12 @@
         "image_generation_calls": 0,
         "mcp_calls": 0,
         "web_search_calls": 0,
-        "x_search_calls": 11
+        "x_search_calls": 13
       },
-      "total_tokens": 132516
+      "total_tokens": 172862
     },
     "user": null
   },
-  "response_sha256": "916124edcbe0b94c19a77f3a72b7134c805875c89f43423980fb8b0129dcae88",
+  "response_sha256": "ec0c99ecafd0ad2bc903a3edb7bfd40c4497933071bdc612ee86fdf78c0ed20e",
   "surface": "x_search_post"
 }
