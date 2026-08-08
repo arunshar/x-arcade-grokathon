@@ -22,8 +22,21 @@ let timerEndAt = 0;
 let timerRaf = 0;
 let muted = false;
 let audioUnlocked = false;
+let arcadeMode = "demo";
+let voiceModel = "grok-voice-think-fast-2.0";
+let firstRoundOfSession = true;
 
-// ---------- audio ----------
+// Scripted host lines — keep in sync with services/voice_host.py LINES.
+// Live realtime forces these exact strings; mp3s were rendered from the same text.
+const HOST_LINES = {
+  intro: "Welcome to the arcade. Tonight, one of the players at this cabinet is not a player at all.",
+  round: "Four humans. One machine. Thirty seconds.",
+  reveal: "Hands off the buttons. The decoy was...",
+  win: "Got it! The machine never stood a chance.",
+  lose: "Wrong! The machine walks free. House wins.",
+};
+
+// ---------- audio (mp3 always available; live voice is best-effort) ----------
 function makeSound(src) {
   const a = new Audio(src);
   a.preload = "auto";
@@ -33,7 +46,10 @@ function makeSound(src) {
 }
 const sounds = {
   intro: makeSound("static-assets/host_intro.mp3"),
+  round: makeSound("static-assets/host_round.mp3"),
   reveal: makeSound("static-assets/host_reveal.mp3"),
+  win: makeSound("static-assets/host_win.mp3"),
+  lose: makeSound("static-assets/host_lose.mp3"),
 };
 
 function unlockAudio() {
@@ -47,6 +63,12 @@ function unlockAudio() {
         .catch(() => { a.muted = false; });
     } catch (e) { /* autoplay blocked, a later gesture retries */ }
   }
+  // Resume WebAudio if live voice already warmed a suspended context.
+  if (pcmPlayer.ctx && pcmPlayer.ctx.state === "suspended") {
+    pcmPlayer.ctx.resume().catch(() => {});
+  }
+  // Warm the realtime host after a user gesture (required for autoplay + WS).
+  if (arcadeMode === "live" && !MOCK) warmLiveVoice();
 }
 document.addEventListener("pointerdown", unlockAudio, { once: true });
 
@@ -60,22 +82,304 @@ function playSound(name) {
   } catch (e) { /* never let audio break the game */ }
 }
 
+// Live Grok voice: mint ephemeral token from our server, open realtime WS,
+// force scripted lines. Any failure silently drops to the mp3 rung.
+const pcmPlayer = {
+  ctx: null,
+  nextTime: 0,
+  sampleRate: 24000,
+  ensure() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      this.ctx = new AC({ sampleRate: this.sampleRate });
+      this.nextTime = this.ctx.currentTime;
+    }
+    if (this.ctx.state === "suspended") this.ctx.resume().catch(() => {});
+    return true;
+  },
+  resetClock() {
+    if (this.ctx) this.nextTime = this.ctx.currentTime;
+  },
+  pushBase64Pcm16(b64) {
+    if (!b64 || !this.ensure()) return;
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const samples = new Int16Array(bytes.buffer, bytes.byteOffset, bytes.byteLength >> 1);
+    const f32 = new Float32Array(samples.length);
+    for (let i = 0; i < samples.length; i++) f32[i] = samples[i] / 32768;
+    const buf = this.ctx.createBuffer(1, f32.length, this.sampleRate);
+    buf.copyToChannel(f32, 0);
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(this.ctx.destination);
+    const start = Math.max(this.ctx.currentTime + 0.02, this.nextTime);
+    src.start(start);
+    this.nextTime = start + buf.duration;
+  },
+};
+
+const liveVoice = {
+  ws: null,
+  ready: false,
+  disabled: false, // sticky: after hard failure, stay on mp3s
+  connecting: null,
+  pending: null, // { resolve, reject, timer }
+};
+
+function disableLiveVoice(reason) {
+  liveVoice.disabled = true;
+  liveVoice.ready = false;
+  if (liveVoice.ws) {
+    try { liveVoice.ws.close(); } catch (e) { /* ignore */ }
+    liveVoice.ws = null;
+  }
+  if (liveVoice.pending) {
+    clearTimeout(liveVoice.pending.timer);
+    const p = liveVoice.pending;
+    liveVoice.pending = null;
+    p.reject(new Error(reason || "live voice disabled"));
+  }
+}
+
+async function mintVoiceToken() {
+  const r = await fetch("/token");
+  if (!r.ok) throw new Error("token http " + r.status);
+  const j = await r.json();
+  if (j.demo || !j.value) throw new Error(j.detail || "no token");
+  if (j.model) voiceModel = j.model;
+  return j.value;
+}
+
+function attachLiveVoiceHandlers(ws) {
+  ws.addEventListener("message", (ev) => {
+    let msg = null;
+    try {
+      if (typeof ev.data === "string") msg = JSON.parse(ev.data);
+      else return; // binary frames unused; we expect base64 deltas in JSON
+    } catch (e) { return; }
+    if (!msg || !msg.type) return;
+
+    if (msg.type === "error" || msg.type === "response.failed") {
+      if (liveVoice.pending) {
+        clearTimeout(liveVoice.pending.timer);
+        const p = liveVoice.pending;
+        liveVoice.pending = null;
+        p.reject(new Error(msg.error?.message || msg.type));
+      }
+      return;
+    }
+
+    // Audio deltas — tolerate a few event name variants across API revisions.
+    const delta =
+      msg.delta ||
+      msg.audio ||
+      (msg.type && msg.type.indexOf("audio.delta") !== -1 ? msg.delta : null);
+    if (
+      msg.type === "response.output_audio.delta" ||
+      msg.type === "response.audio.delta" ||
+      msg.type === "response.output_audio_transcript.delta"
+    ) {
+      // Only play raw pcm audio deltas, not transcript text.
+      if (msg.type.indexOf("transcript") === -1 && (msg.delta || msg.audio)) {
+        pcmPlayer.pushBase64Pcm16(msg.delta || msg.audio);
+      }
+      return;
+    }
+    if (delta && msg.type && msg.type.indexOf("audio") !== -1 && msg.type.indexOf("transcript") === -1) {
+      pcmPlayer.pushBase64Pcm16(delta);
+      return;
+    }
+
+    if (
+      msg.type === "response.done" ||
+      msg.type === "response.output_audio.done" ||
+      msg.type === "response.audio.done"
+    ) {
+      if (liveVoice.pending && msg.type === "response.done") {
+        clearTimeout(liveVoice.pending.timer);
+        const p = liveVoice.pending;
+        liveVoice.pending = null;
+        // Let the last PCM buffer finish playing before resolving.
+        const waitMs = pcmPlayer.ctx
+          ? Math.max(0, (pcmPlayer.nextTime - pcmPlayer.ctx.currentTime) * 1000) + 80
+          : 80;
+        setTimeout(() => p.resolve(), waitMs);
+      }
+    }
+  });
+
+  ws.addEventListener("close", () => {
+    liveVoice.ready = false;
+    liveVoice.ws = null;
+    if (liveVoice.pending) {
+      clearTimeout(liveVoice.pending.timer);
+      const p = liveVoice.pending;
+      liveVoice.pending = null;
+      p.reject(new Error("voice socket closed"));
+    }
+  });
+
+  ws.addEventListener("error", () => {
+    // close handler cleans pending; mark not ready so next cue falls back.
+    liveVoice.ready = false;
+  });
+}
+
+function warmLiveVoice() {
+  if (MOCK || liveVoice.disabled || arcadeMode !== "live") return liveVoice.connecting || Promise.resolve(false);
+  if (liveVoice.ready && liveVoice.ws && liveVoice.ws.readyState === WebSocket.OPEN) {
+    return Promise.resolve(true);
+  }
+  if (liveVoice.connecting) return liveVoice.connecting;
+
+  liveVoice.connecting = (async () => {
+    try {
+      const value = await mintVoiceToken();
+      const model = encodeURIComponent(voiceModel);
+      const ws = new WebSocket(
+        `wss://api.x.ai/v1/realtime?model=${model}`,
+        [
+          "realtime",
+          "openai-insecure-api-key." + value,
+          "openai-beta.realtime-v1",
+        ]
+      );
+      await new Promise((resolve, reject) => {
+        const t = setTimeout(() => reject(new Error("voice connect timeout")), 8000);
+        ws.addEventListener("open", () => { clearTimeout(t); resolve(); });
+        ws.addEventListener("error", () => { clearTimeout(t); reject(new Error("voice connect error")); });
+      });
+      attachLiveVoiceHandlers(ws);
+      ws.send(JSON.stringify({
+        type: "session.update",
+        session: {
+          voice: "Eve",
+          instructions:
+            "You are the Decoy arcade host. Short lines, high energy, never reveal the decoy slot.",
+          // Scripted cues only — no mic VAD chatter during the duel.
+          turn_detection: null,
+          input_audio_format: "pcm16",
+          output_audio_format: "pcm16",
+        },
+      }));
+      liveVoice.ws = ws;
+      liveVoice.ready = true;
+      pcmPlayer.ensure();
+      return true;
+    } catch (e) {
+      disableLiveVoice(String(e && e.message ? e.message : e));
+      return false;
+    } finally {
+      liveVoice.connecting = null;
+    }
+  })();
+  return liveVoice.connecting;
+}
+
+function speakLive(lineKey) {
+  return new Promise((resolve, reject) => {
+    if (!liveVoice.ready || !liveVoice.ws || liveVoice.ws.readyState !== WebSocket.OPEN) {
+      reject(new Error("voice not ready"));
+      return;
+    }
+    if (liveVoice.pending) {
+      clearTimeout(liveVoice.pending.timer);
+      const prev = liveVoice.pending;
+      liveVoice.pending = null;
+      prev.reject(new Error("superseded"));
+    }
+    const text = HOST_LINES[lineKey];
+    if (!text) {
+      reject(new Error("unknown line"));
+      return;
+    }
+    pcmPlayer.resetClock();
+    const timer = setTimeout(() => {
+      if (liveVoice.pending) {
+        liveVoice.pending = null;
+        reject(new Error("speak timeout"));
+      }
+    }, 12000);
+    liveVoice.pending = { resolve, reject, timer };
+    try {
+      // Cancel anything in flight so the cue is not queued behind a riff.
+      liveVoice.ws.send(JSON.stringify({ type: "response.cancel" }));
+      liveVoice.ws.send(JSON.stringify({
+        type: "response.create",
+        response: {
+          modalities: ["audio", "text"],
+          instructions: 'Say exactly this, nothing more: "' + text + '"',
+        },
+      }));
+    } catch (e) {
+      clearTimeout(timer);
+      liveVoice.pending = null;
+      reject(e);
+    }
+  });
+}
+
+/** Play a host cue: live voice if available, else committed mp3. Never throws. */
+function playHost(name, andThen) {
+  if (muted) {
+    if (andThen) andThen();
+    return;
+  }
+  const finish = () => { if (andThen) andThen(); };
+  const fallback = () => { playSound(name); finish(); };
+
+  if (arcadeMode !== "live" || liveVoice.disabled || MOCK) {
+    fallback();
+    return;
+  }
+
+  const run = async () => {
+    const ok = await warmLiveVoice();
+    if (!ok) {
+      fallback();
+      return;
+    }
+    try {
+      await speakLive(name);
+      finish();
+    } catch (e) {
+      // One soft failure → mp3 this cue. Repeated connect failures disable live.
+      playSound(name);
+      finish();
+    }
+  };
+  run();
+}
+
 function setMuted(v) {
   muted = v;
   $("muteBtn").textContent = muted ? "SND OFF" : "SND ON";
   $("muteBtn").classList.toggle("off", muted);
   try { localStorage.setItem("arcade_muted", muted ? "1" : "0"); } catch (e) {}
+  if (muted && liveVoice.ws) {
+    try { liveVoice.ws.send(JSON.stringify({ type: "response.cancel" })); } catch (e) {}
+  }
 }
 try { setMuted(localStorage.getItem("arcade_muted") === "1"); } catch (e) { setMuted(false); }
 $("muteBtn").addEventListener("click", () => setMuted(!muted));
 
-// ---------- health badge ----------
+// ---------- health badge + mode detection ----------
 if (MOCK) {
   $("demoBadge").textContent = "MOCK";
   $("demoBadge").hidden = false;
 } else {
   fetch("/health").then((r) => r.json()).then((j) => {
-    if (j && (j.mode === "demo" || j.demo === true)) $("demoBadge").hidden = false;
+    if (!j) return;
+    if (j.mode) arcadeMode = j.mode;
+    if (j.voice_model) voiceModel = j.voice_model;
+    if (j.mode === "demo" || j.demo === true) {
+      $("demoBadge").hidden = false;
+    } else if (j.mode === "live") {
+      $("demoBadge").textContent = "LIVE";
+      $("demoBadge").hidden = false;
+    }
   }).catch(() => {});
 }
 
@@ -123,8 +427,20 @@ function handleState(s) {
   } else {
     stopTimer();
   }
-  if (s.phase === "guessing" && was !== "guessing") playSound("intro");
-  if (s.phase === "reveal" && was !== "reveal") playSound("reveal");
+  if (s.phase === "guessing" && was !== "guessing") {
+    // First duel of the session gets the full welcome; later rounds get the short cue.
+    if (firstRoundOfSession) {
+      firstRoundOfSession = false;
+      playHost("intro", () => playHost("round"));
+    } else {
+      playHost("round");
+    }
+  }
+  if (s.phase === "reveal" && was !== "reveal") {
+    const winner = s.reveal && s.reveal.winner;
+    const outcome = (!winner || winner === "house") ? "lose" : "win";
+    playHost("reveal", () => playHost(outcome));
+  }
   prevPhase = was;
   render(s);
 }

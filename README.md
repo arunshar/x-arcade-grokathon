@@ -31,6 +31,22 @@ match going.
 - `ARCADE_MODE=live`: real xAI API calls. Needs `XAI_API_KEY` in the
   environment. `ARCADE_RECORD=1` refreshes fixtures while live.
 
+### Live Imagine + Voice
+
+With a key from [console.x.ai](https://console.x.ai):
+
+```sh
+export XAI_API_KEY=xai-...
+ARCADE_MODE=live ./run.sh
+```
+
+| Feature | What happens in live |
+|---------|----------------------|
+| **Imagine** | After reveal, `card_forge` calls `POST /v1/images/generations` and the share card URL is re-broadcast (~6.5s). Demo still serves the committed card instantly. |
+| **Voice** | Browser `GET /token` mints an ephemeral realtime secret, opens Grok voice, and speaks host cues. Any failure falls back to the committed `host_*.mp3` files. |
+
+Optional: `ARCADE_RECORD=1` writes fixtures while calling the API (useful for refreshing demo assets). Live without record hits the API directly and persists nothing.
+
 ## Deploying your own
 
 Two placeholders are left in the docs on purpose. `github.com/arunshar/x-arcade-grokathon`
