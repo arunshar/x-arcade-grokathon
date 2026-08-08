@@ -127,6 +127,27 @@ body {
 .chip-conn.warn { color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); }
 .chip-conn.bad { color: var(--red); border-color: rgba(255, 45, 85, 0.45); }
 
+.chip-points {
+  color: var(--bg);
+  background: var(--cyan);
+  border-color: var(--cyan);
+  font-weight: 700;
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+.chip-points.leading {
+  background: #fbbf24;
+  border-color: #fbbf24;
+  color: var(--bg);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45);
+}
+.chip-lead {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.45);
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ---------- layout ---------- */
 main {
   max-width: 980px;
@@ -165,6 +186,33 @@ main {
   font-size: 13px;
 }
 
+.mode-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(420px, 100%);
+  margin: 18px auto 0;
+}
+.mode-pick-label { text-align: center; margin-bottom: 4px; }
+.mode-btn { width: 100%; }
+.mode-btn-alt {
+  color: var(--text);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.mode-btn-alt:hover:not(:disabled) {
+  background: var(--panel-2);
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+.mode-hint {
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: var(--mut);
+  line-height: 1.4;
+}
+
 .lobby-form {
   display: flex;
   flex-direction: column;
@@ -172,6 +220,39 @@ main {
   width: min(420px, 100%);
   margin: 12px auto 0;
 }
+
+.room-code-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.room-code-row input {
+  flex: 1;
+  text-align: center;
+  font-size: 22px !important;
+  letter-spacing: 6px !important;
+  color: var(--cyan) !important;
+  border-color: var(--cyan) !important;
+}
+.copy-btn {
+  flex: 0 0 auto;
+  min-width: 64px;
+  align-self: stretch;
+  height: auto;
+  min-height: 54px;
+}
+.linkish {
+  background: none;
+  border: none;
+  color: var(--mut);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  padding: 8px;
+  text-align: center;
+}
+.linkish:hover { color: var(--cyan); }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field span { font-size: 11px; letter-spacing: 2.5px; color: var(--mut); }
@@ -225,9 +306,87 @@ main {
   letter-spacing: 2px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .player-list .empty { border-left-color: var(--line); color: var(--mut); }
+
+.standings-list li.is-leader {
+  border-left-color: #fbbf24;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.15);
+}
+.standings-list li.is-me {
+  outline: 1px solid rgba(0, 229, 255, 0.45);
+}
+.standings-list .rank {
+  color: var(--mut);
+  min-width: 2.2em;
+  font-size: 12px;
+}
+.standings-list li.is-leader .rank { color: #fbbf24; }
+.standings-list .who { flex: 1; text-align: left; }
+.standings-list .pts {
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.standings-list .streak {
+  color: var(--mut);
+  font-size: 11px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* Compact ranked strip during guessing / always under the post */
+.live-standings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 0;
+}
+.live-standings:empty { display: none; }
+.live-standings .ls-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--mut);
+  margin-right: 2px;
+}
+.live-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  max-width: 100%;
+}
+.live-pill .ls-rank { color: var(--mut); }
+.live-pill .ls-pts { color: var(--cyan); font-weight: 700; }
+.live-pill.is-leader {
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+}
+.live-pill.is-leader .ls-rank { color: #fbbf24; }
+.live-pill.is-me { outline: 1px solid rgba(0, 229, 255, 0.5); }
+
+.points-flash {
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #fbbf24;
+  text-align: center;
+  text-transform: uppercase;
+}
+.reveal-standings-label {
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
 
 .conn-line { text-align: center; font-size: 11px; letter-spacing: 2px; color: var(--mut); }
 
@@ -470,9 +629,24 @@ main {
   padding: 8px 14px;
   letter-spacing: 2px;
   font-size: 13px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.score b { color: var(--cyan); margin-left: 8px; }
+.score b { color: var(--cyan); margin-left: 0; }
+.score .score-streak {
+  color: var(--mut);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.score.is-me { outline: 1px solid rgba(0, 229, 255, 0.45); }
+.score.leader {
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.18);
+}
 
 /* Reserve card space so NEXT does not jump when the image lands */
 .share-card-frame {

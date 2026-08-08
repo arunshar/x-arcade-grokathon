@@ -471,11 +471,100 @@ function handleState(s) {
   render(s);
 }
 
+// ---------- standings / points ----------
+/** Ranked rows from server standings, or derive from players for older payloads. */
+function getStandings(s) {
+  if (s.standings && s.standings.length) return s.standings.slice();
+  if (s.reveal && s.reveal.leaderboard && s.reveal.leaderboard.length) {
+    return s.reveal.leaderboard.map((p, i) => ({
+      rank: p.rank || i + 1,
+      name: p.name,
+      score: p.score || 0,
+      streak: p.streak || 0,
+    }));
+  }
+  const rows = (s.players || []).map((p) => ({
+    name: p.name,
+    score: p.score || 0,
+    streak: p.streak || 0,
+  }));
+  rows.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+  return rows.map((p, i) => ({ rank: i + 1, name: p.name, score: p.score, streak: p.streak }));
+}
+
+function renderTopPoints(s) {
+  const board = getStandings(s);
+  const meChip = $("myPoints");
+  const leadChip = $("leadChip");
+  if (!joined || !myName) {
+    if (meChip) meChip.hidden = true;
+    if (leadChip) leadChip.hidden = true;
+    return;
+  }
+  const me = board.find((p) => p.name === myName)
+    || (s.players || []).find((p) => p.name === myName);
+  const myScore = me ? (me.score || 0) : 0;
+  const leader = board[0] || null;
+  const iLead = !!(leader && leader.name === myName && board.length > 0);
+
+  if (meChip) {
+    meChip.hidden = false;
+    meChip.textContent = iLead && board.length > 1
+      ? ("YOU " + myScore + " · LEAD")
+      : ("YOU " + myScore + " PTS");
+    meChip.classList.toggle("leading", iLead && (leader.score || 0) > 0);
+    meChip.title = "Your points (first correct guess each round = +1)";
+  }
+  if (leadChip) {
+    if (leader && board.length > 0) {
+      leadChip.hidden = false;
+      leadChip.textContent = iLead
+        ? ("#1 YOU · " + (leader.score || 0))
+        : ("#1 " + leader.name + " · " + (leader.score || 0));
+      leadChip.title = "Current leader by points";
+    } else {
+      leadChip.hidden = true;
+    }
+  }
+}
+
+function renderLiveStandings(s) {
+  const box = $("liveStandings");
+  if (!box) return;
+  box.innerHTML = "";
+  if (s.phase === "lobby") return;
+  const board = getStandings(s);
+  if (!board.length) return;
+
+  const label = document.createElement("span");
+  label.className = "ls-label";
+  label.textContent = "PTS";
+  box.appendChild(label);
+
+  board.forEach((p) => {
+    const el = document.createElement("span");
+    el.className = "live-pill"
+      + (p.rank === 1 && (p.score || 0) > 0 ? " is-leader" : "")
+      + (p.name === myName ? " is-me" : "");
+    const rank = document.createElement("span");
+    rank.className = "ls-rank";
+    rank.textContent = "#" + (p.rank || "?");
+    const name = document.createElement("span");
+    name.textContent = p.name === myName ? "YOU" : p.name;
+    const pts = document.createElement("span");
+    pts.className = "ls-pts";
+    pts.textContent = String(p.score || 0);
+    el.append(rank, name, pts);
+    box.appendChild(el);
+  });
+}
+
 // ---------- rendering ----------
 function render(s) {
   $("roundCounter").textContent = "RND " + String(roundNo).padStart(2, "0");
   const screened = !!(s.round && s.round.safety && s.round.safety.screened);
   $("safetyChip").hidden = !screened;
+  renderTopPoints(s);
 
   const inLobby = s.phase === "lobby";
   $("screen-lobby").hidden = !inLobby;
@@ -486,39 +575,60 @@ function render(s) {
 function renderLobby(s) {
   const ul = $("lobbyPlayers");
   ul.innerHTML = "";
+  const board = getStandings(s);
   const players = s.players || [];
-  if (players.length === 0) {
+  if (board.length === 0) {
     const li = document.createElement("li");
     li.className = "empty";
     li.textContent = "NO PLAYERS YET";
     ul.appendChild(li);
   }
-  for (const p of players) {
+  for (const p of board) {
     const li = document.createElement("li");
+    if (p.rank === 1 && (p.score || 0) > 0) li.classList.add("is-leader");
+    if (p.name === myName) li.classList.add("is-me");
+
+    const rank = document.createElement("span");
+    rank.className = "rank";
+    rank.textContent = "#" + (p.rank || "—");
+
     const who = document.createElement("span");
+    who.className = "who";
     who.textContent = p.name + (p.name === myName ? " (YOU)" : "");
-    const sc = document.createElement("span");
-    sc.textContent = "SCORE " + (p.score || 0);
-    li.append(who, sc);
+
+    const pts = document.createElement("span");
+    pts.className = "pts";
+    pts.textContent = (p.score || 0) + " PTS";
+
+    li.append(rank, who, pts);
+    if ((p.streak || 0) > 1) {
+      const st = document.createElement("span");
+      st.className = "streak";
+      st.textContent = p.streak + "×";
+      li.appendChild(st);
+    }
     ul.appendChild(li);
   }
-  // Phones that scanned ?room=GROK are guests: hide START (host-only on arena).
-  // Host laptop (no prefill) keeps the button.
+  // Host (created the room) can START; joiners wait. Deep-link guests are never host.
   const start = $("startBtn");
   const wait = $("waitLine");
-  if (PREFILL_ROOM) {
+  if (!joined) {
+    start.hidden = true;
+    start.disabled = true;
+    if (wait) wait.hidden = true;
+  } else if (iAmHost) {
+    start.hidden = false;
+    // Duel needs 2 players; arena (e.g. GROK) can open with 1 — server enforces too.
+    const needTwo = myRoom !== "GROK";
+    start.disabled = needTwo ? players.length < 2 : players.length < 1;
+    if (wait) wait.hidden = true;
+  } else {
     start.hidden = true;
     start.disabled = true;
     if (wait) {
-      wait.hidden = !joined;
-      wait.textContent = joined
-        ? ("IN " + PREFILL_ROOM + " · WAITING FOR HOST TO START…")
-        : "WAITING FOR HOST TO START…";
+      wait.hidden = false;
+      wait.textContent = "IN " + (myRoom || "ROOM") + " · WAITING FOR HOST TO START…";
     }
-  } else {
-    start.hidden = false;
-    start.disabled = !(joined && players.length >= 1);
-    if (wait) wait.hidden = true;
   }
 }
 
@@ -531,6 +641,7 @@ function renderGame(s) {
   $("postText").textContent = src.post_text || "";
   $("timerWrap").style.visibility = s.phase === "guessing" ? "visible" : "hidden";
 
+  renderLiveStandings(s);
   renderOpponents(s);
   renderReplies(s);
   renderReveal(s);
@@ -544,7 +655,10 @@ function renderOpponents(s) {
     if (p.name === myName) continue;
     const el = document.createElement("span");
     el.className = "opp" + (p.guessed ? " locked" : "");
-    el.textContent = p.name + (p.guessed ? " LOCKED IN" : " PICKING...");
+    const pts = typeof p.score === "number" ? p.score : 0;
+    el.textContent = p.name
+      + " · " + pts + "p"
+      + (p.guessed ? " · LOCKED" : " · PICKING");
     strip.appendChild(el);
   }
 }
@@ -646,20 +760,47 @@ function renderReveal(s) {
     banner.classList.remove("house");
   }
 
+  // Flash who scored this round (+1 for first correct).
+  const flash = $("pointsFlash");
+  if (flash) {
+    const awarded = s.reveal.points_awarded || [];
+    if (!w || w === "house") {
+      flash.hidden = false;
+      flash.textContent = "NO POINTS THIS ROUND";
+    } else if (awarded.length) {
+      const a = awarded[0];
+      flash.hidden = false;
+      flash.textContent = (a.name === myName ? "YOU" : a.name)
+        + " +" + (a.delta || 1) + " POINT"
+        + ((a.delta || 1) === 1 ? "" : "S");
+    } else {
+      flash.hidden = false;
+      flash.textContent = (w === myName ? "YOU" : w) + " +1 POINT";
+    }
+  }
+
   const strip = $("scoreStrip");
   strip.innerHTML = "";
-  // Prefer the server-computed leaderboard (top 5, arena-ready). Fall back to
-  // the raw player list for older state shapes.
-  const board = (s.reveal.leaderboard && s.reveal.leaderboard.length)
-    ? s.reveal.leaderboard
-    : (s.players || []);
-  board.forEach((p, i) => {
+  // Full ranked standings (prefer server standings, then reveal.leaderboard).
+  const board = getStandings(s);
+  board.forEach((p) => {
     const el = document.createElement("span");
-    el.className = "score" + (i === 0 ? " leader" : "");
-    el.textContent = (board.length > 2 ? (i + 1) + ". " : "") + p.name;
+    const isLead = p.rank === 1 && (p.score || 0) > 0;
+    el.className = "score"
+      + (isLead ? " leader" : "")
+      + (p.name === myName ? " is-me" : "");
+    const label = document.createElement("span");
+    label.textContent = "#" + (p.rank || "?") + " "
+      + (p.name === myName ? "YOU" : p.name);
     const b = document.createElement("b");
-    b.textContent = String(p.score || 0);
-    el.appendChild(b);
+    b.textContent = (p.score || 0) + " PTS";
+    el.append(label, b);
+    if ((p.streak || 0) > 1) {
+      const st = document.createElement("span");
+      st.className = "score-streak";
+      st.textContent = p.streak + " streak";
+      el.appendChild(st);
+    }
     strip.appendChild(el);
   });
 
@@ -696,25 +837,93 @@ function onGuess(slot, card) {
   send({ t: "guess", room: myRoom, slot, ms });
 }
 
-// A scanned QR lands here with ?room=GROK: prefill the room so a phone joins
-// with one tap, and show the QR block on the big screen (no ?room param) so
-// the audience can scan it off the projector.
+// A scanned QR lands here with ?room=CODE: skip the mode picker and open Join.
 const PREFILL_ROOM = (new URLSearchParams(location.search).get("room") || "").toUpperCase();
 
-// A scanned phone gets a generated name too, otherwise "one tap" is a lie: the
-// grey placeholder reads as a filled field, the player taps JOIN, and the only
-// feedback is a validation line they have to decode. In a crowd that is the
-// difference between playing and giving up.
+// Lobby path: null | "create" | "join". Prefill forces "join".
+let lobbyMode = null;
+// True when this client created the room (or is treated as host for START UI).
+let iAmHost = false;
+
+// A scanned phone gets a generated name too, otherwise "one tap" is a lie.
 const HANDLES = ["NEON", "VOLT", "PIXEL", "GHOST", "RELAY", "QUARK", "ORBIT", "FLUX",
                  "VAPOR", "CIPHER", "NOVA", "RIFT", "ECHO", "DRIFT", "PRISM", "ONYX"];
+const ROOM_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
+
 function generatedName() {
   const word = HANDLES[Math.floor(Math.random() * HANDLES.length)];
   return word + Math.floor(Math.random() * 90 + 10);
 }
 
-function doJoin() {
+/** Short private room codes friends can type (4 chars). */
+function generatedRoomCode() {
+  let code = "";
+  if (window.crypto && crypto.getRandomValues) {
+    const buf = new Uint8Array(4);
+    crypto.getRandomValues(buf);
+    for (let i = 0; i < 4; i++) code += ROOM_ALPHABET[buf[i] % ROOM_ALPHABET.length];
+  } else {
+    for (let i = 0; i < 4; i++) {
+      code += ROOM_ALPHABET[Math.floor(Math.random() * ROOM_ALPHABET.length)];
+    }
+  }
+  return code;
+}
+
+function showModePick() {
+  lobbyMode = null;
+  $("modePick").hidden = false;
+  $("lobbyForm").hidden = true;
+  $("createFields").hidden = true;
+  $("joinFields").hidden = true;
+  $("lobbyQr").hidden = true;
+  $("startBtn").hidden = true;
+  $("waitLine").hidden = true;
+}
+
+function showLobbyForm(mode) {
+  lobbyMode = mode;
+  $("modePick").hidden = true;
+  $("lobbyForm").hidden = false;
+  $("createFields").hidden = mode !== "create";
+  $("joinFields").hidden = mode !== "join";
+  $("backToModeBtn").hidden = !!PREFILL_ROOM;
+  if (!$("nameInput").value.trim()) $("nameInput").value = generatedName();
+
+  if (mode === "create") {
+    const code = generatedRoomCode();
+    $("createdRoomDisplay").value = code;
+    $("roomInput").value = code;
+    iAmHost = true;
+    setConn("ROOM " + code + " READY. ENTER WHEN YOU ARE.");
+    // Preview QR before entering so host can share immediately.
+    $("lobbyQr").hidden = false;
+    loadPhoneJoinInfo(code);
+  } else {
+    iAmHost = false;
+    $("lobbyQr").hidden = true;
+    if (PREFILL_ROOM) {
+      $("roomInput").value = PREFILL_ROOM;
+      setConn("JOINING ROOM " + PREFILL_ROOM);
+    } else {
+      $("roomInput").value = "";
+      setConn("ENTER A ROOM CODE TO JOIN");
+    }
+    try { $("roomInput").focus(); } catch (e) { /* ignore */ }
+  }
+}
+
+function doJoin(opts) {
+  opts = opts || {};
+  const asHost = !!opts.asHost;
   let name = $("nameInput").value.trim().toUpperCase();
-  const room = $("roomInput").value.trim().toUpperCase();
+  let room = "";
+  if (lobbyMode === "create" || asHost) {
+    room = ($("createdRoomDisplay") && $("createdRoomDisplay").value || $("roomInput").value || "")
+      .trim().toUpperCase();
+  } else {
+    room = $("roomInput").value.trim().toUpperCase();
+  }
   if (!room) { setConn("ENTER A ROOM CODE"); return; }
   // Never block a player on an empty name. Fill it and let them in.
   if (!name) {
@@ -724,37 +933,85 @@ function doJoin() {
   myName = name;
   myRoom = room;
   joined = true;
+  iAmHost = asHost || lobbyMode === "create" || iAmHost;
   $("nameInput").disabled = true;
   $("roomInput").disabled = true;
-  $("joinBtn").disabled = true;
+  if ($("createdRoomDisplay")) $("createdRoomDisplay").disabled = true;
+  if ($("joinBtn")) $("joinBtn").disabled = true;
+  if ($("createEnterBtn")) $("createEnterBtn").disabled = true;
+  if ($("modeCreateBtn")) $("modeCreateBtn").disabled = true;
+  if ($("modeJoinBtn")) $("modeJoinBtn").disabled = true;
+  if ($("backToModeBtn")) $("backToModeBtn").hidden = true;
+
   send({ t: "join", room: myRoom, name: myName });
-  // Clear any stale validation text, otherwise the lobby keeps showing the
-  // error from a failed attempt after the join has already succeeded.
-  if (PREFILL_ROOM) {
-    setConn("JOINED " + myRoom + ". WAIT FOR HOST.");
+
+  // Hosts see QR + START; guests wait.
+  $("lobbyQr").hidden = false;
+  loadPhoneJoinInfo(myRoom);
+  if (iAmHost) {
+    $("startBtn").hidden = false;
+    $("waitLine").hidden = true;
+    setConn("ROOM " + myRoom + " · YOU ARE HOST. TAP START WHEN READY.");
   } else {
-    setConn("JOINED " + myRoom + ". TAP START WHEN READY.");
+    $("startBtn").hidden = true;
+    $("startBtn").disabled = true;
+    $("waitLine").hidden = false;
+    $("waitLine").textContent = "IN " + myRoom + " · WAITING FOR HOST TO START…";
+    setConn("JOINED " + myRoom + ". WAIT FOR HOST.");
   }
 }
 
+// Mode picker
+$("modeCreateBtn").addEventListener("click", () => showLobbyForm("create"));
+$("modeJoinBtn").addEventListener("click", () => showLobbyForm("join"));
+$("backToModeBtn").addEventListener("click", () => {
+  if (joined) return;
+  showModePick();
+  setConn("LINKED");
+});
+$("createEnterBtn").addEventListener("click", () => {
+  if (!joined) doJoin({ asHost: true });
+});
+$("copyRoomBtn").addEventListener("click", () => {
+  const code = ($("createdRoomDisplay").value || "").trim();
+  if (!code) return;
+  const done = () => {
+    $("copyRoomBtn").textContent = "COPIED";
+    setTimeout(() => { $("copyRoomBtn").textContent = "COPY"; }, 1200);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(done).catch(() => {
+      try {
+        $("createdRoomDisplay").select();
+        document.execCommand("copy");
+        done();
+      } catch (e) { /* ignore */ }
+    });
+  } else {
+    try {
+      $("createdRoomDisplay").select();
+      document.execCommand("copy");
+      done();
+    } catch (e) { /* ignore */ }
+  }
+});
+
+// Prefill from QR / deep link → join flow only.
 if (PREFILL_ROOM) {
+  showLobbyForm("join");
   $("roomInput").value = PREFILL_ROOM;
-  if (!$("nameInput").value.trim()) { $("nameInput").value = generatedName(); }
-  // Guest path: no host START button (arena host is the laptop).
-  try {
-    $("startBtn").hidden = true;
-    $("startBtn").disabled = true;
-  } catch (e) { /* optional */ }
+  if (!$("nameInput").value.trim()) $("nameInput").value = generatedName();
+  iAmHost = false;
 } else {
-  try { $("lobbyQr").hidden = false; } catch (e) { /* qr block optional */ }
-  // Host laptop: load LAN join URL + dynamic QR so phones can scan in.
-  loadPhoneJoinInfo("GROK");
+  showModePick();
 }
 
-// Form submit catches phone keyboard "Go" / Enter without a separate keydown map.
+// Form submit = join path (Enter / Go on phone keyboard).
 $("lobbyForm").addEventListener("submit", (ev) => {
   ev.preventDefault();
-  if (!joined) doJoin();
+  if (joined) return;
+  if (lobbyMode === "create") doJoin({ asHost: true });
+  else doJoin({ asHost: false });
 });
 
 // The contract has no separate start message. "next" from the lobby kicks
@@ -765,6 +1022,8 @@ $("nextBtn").addEventListener("click", () => send({ t: "next", room: myRoom }));
 /** Populate QR + copyable URL for phone players on the same Wi‑Fi. */
 function loadPhoneJoinInfo(room) {
   const code = (room || "GROK").toUpperCase();
+  const label = $("qrLabel");
+  if (label) label.textContent = "SCAN TO PLAY · ROOM " + code;
   fetch("/join-info?room=" + encodeURIComponent(code))
     .then((r) => r.json())
     .then((j) => {
@@ -787,7 +1046,7 @@ function loadPhoneJoinInfo(room) {
             "Open this page as http://<your-laptop-ip>:8787 (not localhost), same Wi‑Fi as the phones, then rescan. Or set ARCADE_PUBLIC_URL.";
         } else {
           hint.textContent =
-            "Phone and laptop on the same Wi‑Fi. Scan the code or open the URL above. Room " + code + ".";
+            "Share code " + code + " or scan the QR. Same Wi‑Fi. Room " + code + ".";
         }
       }
     })
@@ -862,9 +1121,28 @@ function mockSocket(onMessage) {
     }
     return r;
   }
+  function mockStandings() {
+    const rows = players.slice().sort((a, b) => (b.score || 0) - (a.score || 0)
+      || String(a.name).localeCompare(String(b.name)));
+    return rows.map((p, i) => ({
+      rank: i + 1,
+      name: p.name,
+      score: p.score || 0,
+      streak: p.streak || 0,
+    }));
+  }
   function push() {
     const left = phase === "guessing" ? Math.max(0, 30000 - (Date.now() - roundStart)) : 0;
-    emit({ t: "state", room: myRoom || "MOCK", phase, players, round: publicRound(), reveal, deadline_ms: left });
+    emit({
+      t: "state",
+      room: myRoom || "MOCK",
+      phase,
+      players,
+      standings: mockStandings(),
+      round: publicRound(),
+      reveal,
+      deadline_ms: left,
+    });
   }
   function currentRound() { return ROUNDS[ri % ROUNDS.length]; }
 
@@ -890,14 +1168,23 @@ function mockSocket(onMessage) {
     clearTimeout(deadlineTimer);
     clearTimeout(botTimer);
     const r = currentRound();
-    if (winner) {
-      const p = players.find((x) => x.name === winner);
-      if (p) p.score = (p.score || 0) + 1;
+    const points_awarded = [];
+    for (const p of players) {
+      if (winner && p.name === winner) {
+        p.score = (p.score || 0) + 1;
+        p.streak = (p.streak || 0) + 1;
+        points_awarded.push({ name: p.name, delta: 1, reason: "first_correct" });
+      } else {
+        p.streak = 0;
+      }
     }
+    const board = mockStandings();
     reveal = {
       decoy_slot: r.decoy_slot,
       rationale: r.decoy_rationale,
       winner: winner || "house",
+      leaderboard: board.slice(0, 5),
+      points_awarded,
       share_card_url: "static-assets/cards/decoy-3f2710c0a9e6_demo.jpg",
     };
     push();
@@ -907,11 +1194,11 @@ function mockSocket(onMessage) {
     send(text) {
       const m = JSON.parse(text);
       if (m.t === "join") {
-        players.push({ name: m.name, score: 0, guessed: false });
+        players.push({ name: m.name, score: 0, streak: 0, guessed: false });
         push();
         setTimeout(() => {
           if (!players.find((p) => p.name === "GLITCH")) {
-            players.push({ name: "GLITCH", score: 0, guessed: false });
+            players.push({ name: "GLITCH", score: 0, streak: 0, guessed: false });
             push();
           }
         }, 900);

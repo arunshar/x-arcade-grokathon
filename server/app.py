@@ -212,6 +212,22 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
     return safe
 
 
+def _standings(room: dict[str, Any]) -> list[dict[str, Any]]:
+    """Players ranked by score (desc), then name. Always safe to show clients."""
+    ordered = sorted(
+        room["players"].values(), key=lambda p: (-p.score, p.name.lower())
+    )
+    return [
+        {
+            "rank": i + 1,
+            "name": p.name,
+            "score": p.score,
+            "streak": p.streak,
+        }
+        for i, p in enumerate(ordered)
+    ]
+
+
 def _public_state(room: dict[str, Any]) -> dict[str, Any]:
     return {
         "t": "state",
@@ -226,6 +242,9 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
             }
             for p in room["players"].values()
         ],
+        # Full ranked board every broadcast so lobby / guessing / reveal
+        # can show who is ahead without waiting for the reveal strip.
+        "standings": _standings(room),
         "round": _round_view(room),
         "reveal": room["reveal"],
         "deadline_ms": _deadline_ms(room),
@@ -286,17 +305,19 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     correct = [p for p in room["players"].values() if p.guess_slot == decoy_slot]
     correct.sort(key=lambda p: p.guess_order if p.guess_order is not None else 1 << 30)
     winner = correct[0].name if correct else "house"
+    # Scoring: first correct guess in server order gets +1 point and keeps a
+    # streak. Everyone else resets streak. House wins award no points.
+    points_awarded: list[dict[str, Any]] = []
     for p in room["players"].values():
         if p.name == winner:
             p.score += 1
             p.streak += 1
+            points_awarded.append({"name": p.name, "delta": 1, "reason": "first_correct"})
         else:
             p.streak = 0
     room["phase"] = "reveal"
     room["deadline_at"] = None
-    standings = sorted(
-        room["players"].values(), key=lambda p: (-p.score, p.name.lower())
-    )
+    standings = _standings(room)
     room["reveal"] = {
         "decoy_slot": decoy_slot,
         "rationale": rnd.get("decoy_rationale", ""),
@@ -304,8 +325,15 @@ async def _do_reveal(room: dict[str, Any]) -> None:
         # Top of the crowd at every reveal. In a duel this is just both
         # players, in an arena it is the scoreboard beat on the big screen.
         "leaderboard": [
-            {"name": p.name, "score": p.score} for p in standings[:5]
+            {
+                "rank": row["rank"],
+                "name": row["name"],
+                "score": row["score"],
+                "streak": row["streak"],
+            }
+            for row in standings[:5]
         ],
+        "points_awarded": points_awarded,
         # Demo mode attaches the committed card instantly. Live mode starts
         # with no card and a background task fills it in a few seconds later.
         "share_card_url": None if config.MODE == "live" else DEMO_CARD_URL,

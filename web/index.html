@@ -21,6 +21,8 @@
   <div class="topbar-right">
     <span class="chip chip-safety" id="safetyChip" hidden>ARENA CLEARED BY SAFETY GATES</span>
     <span class="chip chip-demo" id="demoBadge" hidden>DEMO</span>
+    <span class="chip chip-points" id="myPoints" hidden title="your points">YOU 0</span>
+    <span class="chip chip-lead" id="leadChip" hidden title="current leader">LEAD —</span>
     <span class="chip chip-conn" id="connChip" title="connection">…</span>
     <span class="chip" id="roundCounter">RND 00</span>
     <button class="chip chip-btn" id="muteBtn" type="button">SND ON</button>
@@ -32,32 +34,62 @@
   <section id="screen-lobby" class="screen">
     <h1 class="lobby-title">DECOY</h1>
     <p class="lobby-tag">Four real replies. One machine. Spot the imposter.</p>
-    <form class="lobby-form" id="lobbyForm" action="#" method="get">
+
+    <!-- Step 1: pick create vs join (skipped when ?room= is in the URL) -->
+    <div class="mode-pick" id="modePick">
+      <p class="section-label mode-pick-label">HOW DO YOU WANT TO PLAY?</p>
+      <button class="big-btn mode-btn" id="modeCreateBtn" type="button">CREATE ROOM</button>
+      <button class="big-btn mode-btn mode-btn-alt" id="modeJoinBtn" type="button">JOIN ROOM</button>
+      <p class="mode-hint">Create a private code for friends, or join with a code someone shared.</p>
+    </div>
+
+    <form class="lobby-form" id="lobbyForm" action="#" method="get" hidden>
       <label class="field">
         <span>PLAYER NAME</span>
         <input id="nameInput" name="name" maxlength="16" autocomplete="username"
           autocapitalize="characters" autocorrect="off" spellcheck="false"
           enterkeyhint="next" placeholder="PLAYER" inputmode="text">
       </label>
-      <label class="field">
-        <span>ROOM CODE</span>
-        <input id="roomInput" name="room" maxlength="8" autocomplete="off"
-          autocapitalize="characters" autocorrect="off" spellcheck="false"
-          enterkeyhint="go" placeholder="ABC" inputmode="text">
-      </label>
-      <button class="big-btn" id="joinBtn" type="submit">JOIN ROOM</button>
+
+      <!-- Create path: generated code, host enters immediately -->
+      <div id="createFields" hidden>
+        <div class="field">
+          <span>YOUR ROOM CODE</span>
+          <div class="room-code-row">
+            <input id="createdRoomDisplay" maxlength="8" readonly
+              spellcheck="false" aria-label="generated room code">
+            <button class="chip chip-btn copy-btn" id="copyRoomBtn" type="button" title="Copy code">COPY</button>
+          </div>
+        </div>
+        <p class="mode-hint" id="createHint">Share this code (or the QR below) so others can join.</p>
+        <button class="big-btn" id="createEnterBtn" type="button">ENTER ROOM</button>
+      </div>
+
+      <!-- Join path: type a code -->
+      <div id="joinFields" hidden>
+        <label class="field">
+          <span>ROOM CODE</span>
+          <input id="roomInput" name="room" maxlength="8" autocomplete="off"
+            autocapitalize="characters" autocorrect="off" spellcheck="false"
+            enterkeyhint="go" placeholder="ABCD" inputmode="text">
+        </label>
+        <button class="big-btn" id="joinBtn" type="submit">JOIN ROOM</button>
+      </div>
+
+      <button class="linkish" id="backToModeBtn" type="button">← BACK</button>
     </form>
+
     <div class="lobby-qr" id="lobbyQr" hidden>
-      <img id="qrImg" src="static-assets/qr.png" alt="scan to join room GROK" class="qr-img">
-      <div class="section-label">SCAN TO PLAY · ROOM GROK</div>
+      <img id="qrImg" src="static-assets/qr.png" alt="scan to join room" class="qr-img">
+      <div class="section-label" id="qrLabel">SCAN TO PLAY</div>
       <p class="join-url" id="joinUrl" hidden></p>
       <p class="join-hint" id="joinHint">Phone and laptop must be on the same Wi‑Fi. Open this page via your laptop’s LAN IP (not localhost) so the QR works.</p>
     </div>
     <div class="lobby-players">
-      <div class="section-label">PLAYERS PRESENT</div>
-      <ul id="lobbyPlayers" class="player-list"></ul>
+      <div class="section-label">STANDINGS · MOST POINTS</div>
+      <ul id="lobbyPlayers" class="player-list standings-list"></ul>
     </div>
-    <button class="big-btn btn-start" id="startBtn" type="button" disabled>START</button>
+    <button class="big-btn btn-start" id="startBtn" type="button" disabled hidden>START</button>
     <p class="wait-line" id="waitLine" hidden>WAITING FOR HOST TO START…</p>
     <p class="conn-line" id="connLine">LINKING...</p>
   </section>
@@ -84,12 +116,15 @@
       </div>
     </div>
 
+    <div class="live-standings" id="liveStandings" aria-label="standings"></div>
     <div class="opp-strip" id="oppStrip"></div>
 
     <div class="replies" id="replies"></div>
 
     <div class="reveal-panel" id="revealPanel" hidden>
       <div class="winner-banner" id="winnerBanner">HOUSE WINS</div>
+      <p class="points-flash" id="pointsFlash" hidden></p>
+      <div class="section-label reveal-standings-label">STANDINGS</div>
       <div class="score-strip" id="scoreStrip"></div>
       <div class="share-card-frame">
         <img class="share-card" id="shareCard" alt="share card" hidden>

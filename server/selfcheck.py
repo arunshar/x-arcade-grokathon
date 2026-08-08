@@ -153,6 +153,16 @@ async def main() -> int:
         check(restored, "reveal restores is_decoy and authors in the round")
         p2_row = next(p for p in state["players"] if p["name"] == "P2")
         check(p2_row["score"] == 1 and p2_row["streak"] == 1, "winner scores and streaks")
+        standings = state.get("standings") or []
+        check(len(standings) >= 2, "state carries ranked standings")
+        check(standings[0]["name"] == "P2" and standings[0]["score"] == 1, "standings leader is P2")
+        lb = (state.get("reveal") or {}).get("leaderboard") or []
+        check(lb and lb[0].get("name") == "P2", "reveal leaderboard tops with winner")
+        awarded = (state.get("reveal") or {}).get("points_awarded") or []
+        check(
+            awarded and awarded[0].get("name") == "P2" and awarded[0].get("delta") == 1,
+            "reveal reports +1 points_awarded",
+        )
 
         print("\n== round 2: both wrong, house wins ==")
         await p1.send(json.dumps({"t": "next", "room": "abc"}))
@@ -161,6 +171,10 @@ async def main() -> int:
         check(state["phase"] == "guessing", "next starts a new round")
         p2_row = next(p for p in state["players"] if p["name"] == "P2")
         check(p2_row["score"] == 1, "score persists across rounds")
+        check(
+            (state.get("standings") or [{}])[0].get("name") == "P2",
+            "standings still lead with P2 during next round",
+        )
         check_stripped(state)
 
         await p1.send(json.dumps({"t": "guess", "room": "abc", "slot": wrongs[0], "ms": 3000}))
