@@ -196,15 +196,18 @@ this workstream block on slow API calls.
 **Files to touch:** `cartridges/decoy/round_builder.py`, `cartridges/decoy/rounds/`,
 `cartridges/decoy/rounds/README.md`, `fixtures/api/`.
 
-Step one, and do this before anything else, is a one-line import fix. `round_builder.py` line 451
-reads `from plugins.safety import screen_round`. That import always raises `ImportError`, because
-`screen_round` lives in the submodule `plugins.safety.screen` and there is no `__init__.py` anywhere
-in this repo. The `except` branch then stamps every round it builds with
-`{"screened": false, "gate_codes": []}`, so the builder never tells you a round is unservable. Change
-it to `from plugins.safety.screen import screen_round`, which is the form `integration_check.py`
-already uses correctly.
+Step one is ALREADY DONE as of commit `7a4e012`. Do not redo it. It is described here so you
+understand what the builder now reports and why.
 
-Verify the fix:
+`round_builder.py` line 451 used to read `from plugins.safety import screen_round`. That import
+always raised `ImportError`, because `screen_round` lives in the submodule `plugins.safety.screen`
+and there is no `__init__.py` anywhere in this repo. The `except` branch then stamped every round it
+built with `{"screened": false, "gate_codes": []}`, so the builder never told you a round was
+unservable. Serving was never at risk, because `server/app.py` re-screens every round at load. The
+builder was the blind part. It now reads `from plugins.safety.screen import screen_round`, the form
+`integration_check.py` already used correctly.
+
+Confirm it is still correct before you build anything:
 
 ```bash
 python3 -c "import sys; sys.path.insert(0,'.'); from cartridges.decoy.round_builder import _screen; import json; print(_screen(json.load(open('cartridges/decoy/rounds/decoy_ai.json'))))"
