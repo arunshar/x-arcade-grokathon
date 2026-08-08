@@ -434,3 +434,29 @@ main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
   padding: 8px; background: #fff;
 }
 .score.leader b { color: var(--accent, #22d3ee); text-shadow: 0 0 8px var(--accent, #22d3ee); }
+/* Corner QR: visible on the projector during a round so people arriving late
+   can still scan in. Suppressed under 768px, because on a phone the player is
+   already in the game and it would sit on top of the reply cards. */
+.corner-qr {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 10px 8px;
+  background: rgba(4, 7, 11, 0.92);
+  border: 1px solid rgba(34, 211, 238, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.18);
+}
+.corner-qr img { width: 104px; height: 104px; display: block; image-rendering: pixelated; }
+.corner-qr span {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: #93a9b9;
+}
+@media (max-width: 768px) { .corner-qr { display: none !important; } }
+

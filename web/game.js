@@ -454,6 +454,9 @@ function render(s) {
   const inLobby = s.phase === "lobby";
   $("screen-lobby").hidden = !inLobby;
   $("screen-game").hidden = inLobby;
+  // Corner QR rides along outside the lobby so latecomers can scan mid-round.
+  // CSS hides it under 768px so it never covers a player's reply cards.
+  try { $("cornerQr").hidden = inLobby; } catch (e) { /* optional */ }
   if (inLobby) renderLobby(s); else renderGame(s);
 }
 
@@ -672,9 +675,11 @@ function generatedName() {
 if (PREFILL_ROOM) {
   $("roomInput").value = PREFILL_ROOM;
   if (!$("nameInput").value.trim()) { $("nameInput").value = generatedName(); }
-} else {
-  try { $("lobbyQr").hidden = false; } catch (e) { /* qr block optional */ }
 }
+// The QR is always on screen in the lobby. It used to appear only without a
+// ?room= param, which hid it in exactly the case that matters: the host opens
+// the room link on the big screen and wants the crowd to scan.
+try { $("lobbyQr").hidden = false; } catch (e) { /* qr block optional */ }
 
 $("joinBtn").addEventListener("click", () => {
   let name = $("nameInput").value.trim().toUpperCase();
