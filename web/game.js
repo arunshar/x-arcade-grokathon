@@ -341,16 +341,34 @@ function onGuess(slot, card) {
 // with one tap, and show the QR block on the big screen (no ?room param) so
 // the audience can scan it off the projector.
 const PREFILL_ROOM = (new URLSearchParams(location.search).get("room") || "").toUpperCase();
+
+// A scanned phone gets a generated name too, otherwise "one tap" is a lie: the
+// grey placeholder reads as a filled field, the player taps JOIN, and the only
+// feedback is a validation line they have to decode. In a crowd that is the
+// difference between playing and giving up.
+const HANDLES = ["NEON", "VOLT", "PIXEL", "GHOST", "RELAY", "QUARK", "ORBIT", "FLUX",
+                 "VAPOR", "CIPHER", "NOVA", "RIFT", "ECHO", "DRIFT", "PRISM", "ONYX"];
+function generatedName() {
+  const word = HANDLES[Math.floor(Math.random() * HANDLES.length)];
+  return word + Math.floor(Math.random() * 90 + 10);
+}
+
 if (PREFILL_ROOM) {
   $("roomInput").value = PREFILL_ROOM;
+  if (!$("nameInput").value.trim()) { $("nameInput").value = generatedName(); }
 } else {
   try { $("lobbyQr").hidden = false; } catch (e) { /* qr block optional */ }
 }
 
 $("joinBtn").addEventListener("click", () => {
-  const name = $("nameInput").value.trim().toUpperCase();
+  let name = $("nameInput").value.trim().toUpperCase();
   const room = $("roomInput").value.trim().toUpperCase();
-  if (!name || !room) { setConn("NAME AND ROOM CODE REQUIRED"); return; }
+  if (!room) { setConn("ENTER A ROOM CODE"); return; }
+  // Never block a player on an empty name. Fill it and let them in.
+  if (!name) {
+    name = generatedName();
+    $("nameInput").value = name;
+  }
   myName = name;
   myRoom = room;
   joined = true;
@@ -358,6 +376,9 @@ $("joinBtn").addEventListener("click", () => {
   $("roomInput").disabled = true;
   $("joinBtn").disabled = true;
   send({ t: "join", room: myRoom, name: myName });
+  // Clear any stale validation text, otherwise the lobby keeps showing the
+  // error from a failed attempt after the join has already succeeded.
+  setConn("JOINED " + myRoom + ". TAP START WHEN READY.");
 });
 
 // The contract has no separate start message. "next" from the lobby kicks

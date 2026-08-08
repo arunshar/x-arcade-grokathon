@@ -440,7 +440,13 @@ async def ws_endpoint(ws: WebSocket) -> None:
                     # player tapping NEXT must not skip the room forward.
                     continue
                 in_reveal = room["phase"] == "reveal"
-                lobby_ready = room["phase"] == "lobby" and len(room["players"]) >= 2
+                # A duel needs both players before the first round. An arena is
+                # driven by the host, who must be able to open a round on stage
+                # before anyone has scanned in. The client enables START at one
+                # player, so requiring two here made the button silently dead.
+                lobby_ready = room["phase"] == "lobby" and (
+                    room["arena"] or len(room["players"]) >= 2
+                )
                 if in_reveal or lobby_ready:
                     await _start_round(room)
 

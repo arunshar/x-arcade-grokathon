@@ -1510,7 +1510,7 @@ Three phases, and the transitions are few enough to enumerate.
 
 ```text
 lobby ──(2nd join in a non-arena room)──> guessing
-lobby ──(next, with >= 2 players)───────> guessing
+lobby ──(next: arena host any time, duel at >= 2)──> guessing
 guessing ──(all players guessed)────────> reveal
 guessing ──(server timer expires)───────> reveal
 guessing ──(last un-guessed player disconnects)──> reveal
@@ -1867,10 +1867,19 @@ elif t == "next":
     if room["arena"] and (joined is None or joined[1] != room["host"]):
         continue
     in_reveal = room["phase"] == "reveal"
-    lobby_ready = room["phase"] == "lobby" and len(room["players"]) >= 2
+    lobby_ready = room["phase"] == "lobby" and (
+        room["arena"] or len(room["players"]) >= 2
+    )
     if in_reveal or lobby_ready:
         await _start_round(room)
 ```
+
+The arena branch in `lobby_ready` is load-bearing and was missing until commit
+`c005b28`. `renderLobby` enables START at one player, but this handler required two,
+so a host alone in room `GROK` tapped a live-looking button and the server dropped the
+message with no reply. An arena never auto-starts, so START was the only way out of
+that lobby and the one path that could not work. A duel still needs both players before
+its first round, which is correct, because a duel has nobody to host it.
 
 Host election is first-come. `join` sets `room["host"] = name` when it is still `None`, so the first
 socket to join the room owns it. The runbook depends on this: the presenter opens the room and joins
