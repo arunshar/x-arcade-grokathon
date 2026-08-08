@@ -9,36 +9,36 @@
   "replies": [
     {
       "slot": 0,
+      "text": "No chance Arsenal let him walk straight to a rival, especially with how crucial he’s been for the midfield engine.",
+      "author": "@TacticaHQ",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
       "text": "Chelsea want Zubimendi now? Absolute clowns thinking arsenal will just hand him over 😂",
       "author": "decoy",
       "is_decoy": true
     },
     {
-      "slot": 1,
-      "text": "What happened to the shin kicker??😂",
-      "author": "@TradeforGoals",
-      "is_decoy": false
-    },
-    {
       "slot": 2,
-      "text": "Chelsea targeting Zubimendi? Arsenal fans just laughed and carried on with their day. 😂🔴",
-      "author": "@Obynodollar",
-      "is_decoy": false
-    },
-    {
-      "slot": 3,
       "text": "Is Chelsea mad? What’s wiry going after anyrhing Arsenal? Can’t they stand on their own?",
       "author": "@Richinbodymind",
       "is_decoy": false
     },
     {
+      "slot": 3,
+      "text": "Chelsea targeting Zubimendi? Arsenal fans just laughed and carried on with their day. 😂🔴",
+      "author": "@Obynodollar",
+      "is_decoy": false
+    },
+    {
       "slot": 4,
-      "text": "No chance Arsenal let him walk straight to a rival, especially with how crucial he’s been for the midfield engine.",
-      "author": "@TacticaHQ",
+      "text": "What happened to the shin kicker??😂",
+      "author": "@TradeforGoals",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 0,
+  "decoy_slot": 1,
   "decoy_rationale": "The phrase “absolute clowns” feels slightly too generic and polished as banter, lacking the specific quirky typos or abrupt slang shifts seen in the real replies.",
   "safety": {
     "screened": true,

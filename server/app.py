@@ -186,6 +186,7 @@ async def _next_round() -> dict[str, Any]:
         except Exception:
             pass
     fallback = copy.deepcopy(FALLBACK_ROUND)
+    decoy_queue.randomize_decoy_position(fallback)
     fallback["safety"] = safety_screen.screen_round(fallback)
     return fallback
 

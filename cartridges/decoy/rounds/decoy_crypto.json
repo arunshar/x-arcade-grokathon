@@ -9,21 +9,21 @@
   "replies": [
     {
       "slot": 0,
-      "text": "the honest answer is that low volatility usually precedes a significant move up or down. market sentiment hasn't changed, but the lack of price discovery might indicate a shift in investor behavior.",
-      "author": "@adelbucetta",
-      "is_decoy": false
-    },
-    {
-      "slot": 1,
       "text": "cheap insurance before the next blowup\n\neveryone too comfortable rn",
       "author": "@brita_lisa",
       "is_decoy": false
     },
     {
-      "slot": 2,
+      "slot": 1,
       "text": "these vol levels never hold, something always breaks soon after",
       "author": "decoy",
       "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "the honest answer is that low volatility usually precedes a significant move up or down. market sentiment hasn't changed, but the lack of price discovery might indicate a shift in investor behavior.",
+      "author": "@adelbucetta",
+      "is_decoy": false
     },
     {
       "slot": 3,
@@ -38,7 +38,7 @@
       "is_decoy": false
     }
   ],
-  "decoy_slot": 2,
+  "decoy_slot": 1,
   "decoy_rationale": "The phrasing stays cleanly parallel and risk-neutral without any of the slight emotional shading or shorthand fragments that mark the real replies.",
   "safety": {
     "screened": true,

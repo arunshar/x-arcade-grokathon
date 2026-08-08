@@ -465,7 +465,13 @@ def _assemble(
         for r in thread["replies"]
     ]
     entries.append({"text": decoy_text, "author": "decoy", "is_decoy": True})
-    random.Random(seed).shuffle(entries)
+    # Mix seed with topic so decoy slot is not correlated across rounds that
+    # happen to share similar post_id hash structure (many landed on slot 2).
+    shuffle_seed = int(
+        hashlib.sha256(f"{seed}:{topic}:{decoy_text[:40]}".encode()).hexdigest()[:12],
+        16,
+    )
+    random.Random(shuffle_seed).shuffle(entries)
 
     replies = [
         {

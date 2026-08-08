@@ -9,14 +9,14 @@
   "replies": [
     {
       "slot": 0,
-      "text": "Most restaurants have a no outside food or drink policy but would allow for exceptions for something like a birthday cake with permission. They said they called ahead. That’s just bad business.",
-      "author": "@kingofkings0247",
+      "text": "@JoeyTomatoes staff behavior was abhorrent, just outright assholes ruining a birthday party .",
+      "author": "@saralynne65",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "@JoeyTomatoes staff behavior was abhorrent, just outright assholes ruining a birthday party .",
-      "author": "@saralynne65",
+      "text": "That business owner would have lost my business FOR LIFE.\nWhy would ANY business owner treat their customers like that?!\nWhen you lose 1 customer, it could be 10. Word of mouth is the best, or worst, advertising one can get.",
+      "author": "@William02216755",
       "is_decoy": false
     },
     {
@@ -33,8 +33,8 @@
     },
     {
       "slot": 4,
-      "text": "That business owner would have lost my business FOR LIFE.\nWhy would ANY business owner treat their customers like that?!\nWhen you lose 1 customer, it could be 10. Word of mouth is the best, or worst, advertising one can get.",
-      "author": "@William02216755",
+      "text": "Most restaurants have a no outside food or drink policy but would allow for exceptions for something like a birthday cake with permission. They said they called ahead. That’s just bad business.",
+      "author": "@kingofkings0247",
       "is_decoy": false
     }
   ],
