@@ -1,0 +1,20 @@
+.github/workflows/deploy-space.yml
+  s_da6f3933cdb62d::t_e0b2f09a5c9327 1-56,61-105
+  s_da6f3933cdb62d::t_d742c56ab08be3 57-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "90515b8b68de1b23ea5260e54cb33d25f7670827",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
