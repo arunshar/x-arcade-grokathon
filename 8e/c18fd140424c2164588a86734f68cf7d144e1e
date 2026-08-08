@@ -1,0 +1,43 @@
+CONTRACT.md
+  s_da6f3933cdb62d::t_69035008a079f1 64
+DEMO.md
+  s_da6f3933cdb62d::t_c9ca7ad6e0f917 9,30,147,213,219,231,259
+ONBOARDING.md
+  s_da6f3933cdb62d::t_5b0d39bcf636b7 19,190,232,628
+X_Arcade_deck_portable.html
+  s_da6f3933cdb62d::t_a77212c5389e64 95
+cartridges/decoy/rounds/README.md
+  s_da6f3933cdb62d::t_0ff9fd9a4e8ec5 3
+deploy/huggingface/README.space.md
+  s_da6f3933cdb62d::t_db07694c13eec0 16
+paper/VISION.md
+  s_da6f3933cdb62d::t_95e3e6ef71970c 3,5,13,27
+services/REALTIME_NOTES.md
+  s_da6f3933cdb62d::t_091be21f58cb3f 7
+services/card_forge.py
+  s_da6f3933cdb62d::t_cf8fdcb7748704 6,111
+services/voice_host.py
+  s_da6f3933cdb62d::t_1671d13e0e680a 6,9,75
+slides/_deck_data.json
+  s_da6f3933cdb62d::t_3575e3665b9fd5 24,38,64,71,108,141,145,151,179,190
+slides/index.html
+  s_da6f3933cdb62d::t_ff8eeae7f56987 87
+web/game.js
+  s_da6f3933cdb62d::t_44fb9bf959c246 372
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "8ec18fd140424c2164588a86734f68cf7d144e1e",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
