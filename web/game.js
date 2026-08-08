@@ -1403,11 +1403,20 @@ function renderGame(s) {
   const src = r.source || {};
   $("postAuthor").textContent = src.post_author || "@unknown";
   $("postAvatar").textContent = (src.post_author || "?").replace("@", "").charAt(0) || "?";
-  $("postTopic").textContent = src.topic || "";
+  const fmt = (r.format === "gif") ? "gif" : "text";
+  const topic = src.topic || "";
+  $("postTopic").textContent = topic
+    ? (topic + " · " + (fmt === "gif" ? "GIF ROUND" : "TEXT ROUND"))
+    : (fmt === "gif" ? "GIF ROUND" : "TEXT ROUND");
   $("postText").textContent = src.post_text || "";
   $("timerWrap").style.visibility = s.phase === "guessing" ? "visible" : "hidden";
+  const postCard = $("postCard");
+  if (postCard) {
+    postCard.classList.toggle("is-gif-round", fmt === "gif");
+    postCard.classList.toggle("is-text-round", fmt !== "gif");
+  }
 
-  // Post text-only. Replies are GIF cards (humans + one Imagine loop).
+  // Post stays text. Replies are plain text or GIF cards depending on format.
   hidePostRoundArt();
   renderLiveStandings(s);
   renderOpponents(s);
