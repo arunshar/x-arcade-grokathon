@@ -178,11 +178,80 @@ def _pick_human_gif(round_id: str, slot: int, text: str, used: set[str]) -> Path
     return ordered[0] if ordered else None
 
 
+def resolve_round_format(
+    round_data: dict[str, Any],
+    *,
+    session_index: int = 0,
+) -> str:
+    """Pick ``text`` or ``gif`` for this round.
+
+    Priority:
+      1. Explicit ``format`` on the round JSON (``text`` | ``gif``)
+      2. ``config.GIF_ROUND_MODE``:
+         - alternate (default): session_index even → text, odd → gif
+         - always_gif / always_text
+         - half: stable ~50% from round_id hash
+    """
+    explicit = str(round_data.get("format") or "").strip().lower()
+    if explicit in ("text", "gif"):
+        return explicit
+
+    mode = str(getattr(config, "GIF_ROUND_MODE", "alternate") or "alternate").lower()
+    if mode in ("always_gif", "gif", "all_gif"):
+        return "gif"
+    if mode in ("always_text", "text", "all_text", "never_gif"):
+        return "text"
+    if mode in ("half", "hash", "random"):
+        rid = str(round_data.get("round_id") or "")
+        seed = str(round_data.get("seed") or "")
+        digest = hashlib.sha256(f"{rid}:{seed}".encode()).hexdigest()
+        return "gif" if int(digest[:8], 16) % 2 == 0 else "text"
+
+    # alternate (default): classic text first, then gif, then text…
+    return "gif" if int(session_index) % 2 == 1 else "text"
+
+
+def clear_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
+    """Strip GIF/Imagine fields so the round plays as plain text."""
+    for rep in round_data.get("replies") or []:
+        if not isinstance(rep, dict):
+            continue
+        for key in (
+            "media_url",
+            "media_type",
+            "media_status",
+            "media_source",
+            "art_url",
+            "art_status",
+        ):
+            rep.pop(key, None)
+    round_data["format"] = "text"
+    round_data["decoy_media_status"] = "none"
+    round_data["human_media_status"] = "none"
+    round_data["reply_art_status"] = "none"
+    round_data.pop("decoy_media_placeholder", None)
+    round_data.pop("art_url", None)
+    round_data["art_status"] = "none"
+    return round_data
+
+
+def prepare_round_presentation(
+    round_data: dict[str, Any],
+    *,
+    session_index: int = 0,
+) -> dict[str, Any]:
+    """Apply text vs gif presentation for a freshly loaded round."""
+    fmt = resolve_round_format(round_data, session_index=session_index)
+    if fmt == "gif":
+        return attach_reply_media(round_data)
+    return clear_reply_media(round_data)
+
+
 def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
     """Stamp media_url onto every reply. Mutates round_data.
 
     Humans get GIFs immediately. Decoy gets existing Imagine video/gif if
-    present, else pending (live will generate).
+    present, else pending (live will generate). Only call for GIF-format rounds.
     """
     rid = str(round_data.get("round_id") or "round")
     decoy = _decoy_slot(round_data)

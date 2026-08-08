@@ -31,3 +31,7 @@ ROUND_SECONDS = 30
 LOBBY_SECONDS = 10
 REVEAL_SECONDS = 14
 REPLIES_PER_ROUND = 5
+# How often GIF rounds appear when a round JSON does not set "format".
+# "alternate" → text, gif, text, gif… within a room session (default).
+# "always_gif" / "always_text" → force one mode. "half" → ~50% by round_id hash.
+GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "alternate").strip().lower()

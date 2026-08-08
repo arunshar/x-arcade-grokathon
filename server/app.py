@@ -154,6 +154,7 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "deadline_at": None,
             "timer": None,
             "guess_counter": 0,
+            "rounds_played": 0,
             "arena": room_id in ARENA_ROOMS,
             "host": None,
             "auto_timer": None,
@@ -250,8 +251,15 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
         # Never send media_source / is_decoy / author during guessing.
         safe_replies.append(item)
     safe["replies"] = safe_replies
-    if rnd.get("format"):
-        safe["format"] = rnd["format"]
+    # Always advertise format so clients can mix text vs gif presentation.
+    fmt = str(rnd.get("format") or "text").lower()
+    safe["format"] = "gif" if fmt == "gif" else "text"
+    # Text rounds must not leak leftover media fields.
+    if safe["format"] != "gif":
+        for item in safe["replies"]:
+            item.pop("media_url", None)
+            item.pop("media_type", None)
+            item.pop("media_status", None)
     return safe
 
 
@@ -371,14 +379,16 @@ async def _start_round(room: dict[str, Any]) -> None:
     _cancel_timer(room)
     _cancel_auto(room)
     rnd = await _next_round()
-    # GIF rounds: 4 human reaction GIFs + 1 Grok Imagine looping video.
+    # Mix text rounds (classic replies) with GIF rounds (human gifs + Imagine).
+    session_index = int(room.get("rounds_played") or 0)
+    room["rounds_played"] = session_index + 1
     try:
-        from services.reply_gifs import attach_reply_media
+        from services.reply_gifs import prepare_round_presentation
 
-        attach_reply_media(rnd)
+        prepare_round_presentation(rnd, session_index=session_index)
     except Exception as exc:
-        print(f"attach_reply_media failed: {exc}", file=sys.stderr)
-        rnd.setdefault("format", "gif")
+        print(f"prepare_round_presentation failed: {exc}", file=sys.stderr)
+        rnd.setdefault("format", "text")
         rnd.setdefault("decoy_media_status", "none")
     room["round"] = rnd
     room["reveal"] = None
@@ -392,8 +402,12 @@ async def _start_round(room: dict[str, Any]) -> None:
     room["deadline_at"] = asyncio.get_running_loop().time() + config.ROUND_SECONDS
     room["timer"] = asyncio.create_task(_round_timer(room))
     await _broadcast(room)
-    # Live: if decoy Imagine gif missing, generate in background (may finish mid-round).
-    if config.MODE == "live" and rnd.get("decoy_media_status") != "ready":
+    # Live GIF rounds only: forge a unique decoy Imagine clip in the background.
+    if (
+        config.MODE == "live"
+        and rnd.get("format") == "gif"
+        and rnd.get("decoy_media_status") != "ready"
+    ):
         asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
 
 
@@ -445,7 +459,10 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     await _broadcast(room)
     if config.MODE == "live":
         asyncio.create_task(_attach_live_card(room, rnd, winner))
-        if rnd.get("decoy_media_status") != "ready":
+        if (
+            rnd.get("format") == "gif"
+            and rnd.get("decoy_media_status") != "ready"
+        ):
             asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
 
 
@@ -479,9 +496,11 @@ async def _attach_decoy_imagine_gif(room: dict[str, Any], rnd: dict[str, Any]) -
 
     Uses vision style-brief + reference_images so the robot loop blends with
     the four human reaction GIFs. Safe to broadcast during guessing once ready
-    (media_source stays stripped in _round_view).
+    (media_source stays stripped in _round_view). No-op for text rounds.
     """
     if room.get("round") is not rnd:
+        return
+    if rnd.get("format") != "gif":
         return
     try:
         # Prefer the full agent; fall back to reply_gifs wrapper.
@@ -514,7 +533,7 @@ async def health() -> dict[str, Any]:
         "tts_voice": getattr(config, "TTS_VOICE", "eve"),
         "image_model": config.MODEL_IMAGE,
         "video_model": getattr(config, "MODEL_VIDEO", ""),
-        "round_format": "gif",
+        "gif_round_mode": getattr(config, "GIF_ROUND_MODE", "alternate"),
     }
 
 

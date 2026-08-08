@@ -1589,16 +1589,18 @@ function renderReplies(s) {
   const canTap = s.phase === "guessing" && myGuessSlot === null && !myGuessConfirmed(s);
   const replies = r.replies || [];
   const isReveal = s.phase === "reveal" && !!reveal;
-  const isGifRound = r.format === "gif"
-    || replies.some((rep) => rep && (rep.media_url || rep.media_status));
+  // Server sets format explicitly. Only gif rounds show media cards.
+  const isGifRound = r.format === "gif";
 
   // Recenter once when the media set for this round is ready.
-  const mediaKey = replies
-    .map((rep) => (rep && rep.media_url) || (rep && rep.media_status) || "")
-    .join("|");
+  const mediaKey = isGifRound
+    ? replies
+        .map((rep) => (rep && rep.media_url) || (rep && rep.media_status) || "")
+        .join("|")
+    : "";
   let didScheduleCenter = false;
   const maybeCenter = (url) => {
-    if (didScheduleCenter) return;
+    if (!isGifRound || didScheduleCenter) return;
     if (!mediaKey || mediaKey === lastCenteredReplyArtKey) return;
     if (!replies.some((rep) => rep && rep.media_url)) return;
     didScheduleCenter = true;
@@ -1629,11 +1631,13 @@ function renderReplies(s) {
       front.appendChild(badge);
     }
 
-    // All five cards show looping GIFs; decoy is Imagine video-as-gif.
-    const media = buildReplyMedia(reply, isDecoy, maybeCenter);
-    if (media) {
-      card.classList.add("has-media");
-      front.appendChild(media);
+    // GIF rounds only: human reaction gifs + Imagine decoy loop.
+    if (isGifRound) {
+      const media = buildReplyMedia(reply, isDecoy, maybeCenter);
+      if (media) {
+        card.classList.add("has-media");
+        front.appendChild(media);
+      }
     }
 
     const text = document.createElement("p");
@@ -1644,7 +1648,7 @@ function renderReplies(s) {
     const author = document.createElement("span");
     author.className = "reply-author";
     if (isDecoy) {
-      author.textContent = "grok imagine · this gif";
+      author.textContent = isGifRound ? "grok imagine · this gif" : "grok wrote this one";
     } else if (isReveal && reply.author) {
       author.textContent = reply.author;
     } else {
