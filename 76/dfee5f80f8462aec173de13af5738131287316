@@ -1,0 +1,47 @@
+config.py
+  s_da6f3933cdb62d::t_6217b9827e8f2f 20-24
+CONTRACT.md
+  s_da6f3933cdb62d::t_9dad5eafe339de 44,47,53-58
+  s_da6f3933cdb62d::t_9391ed22ead48b 59
+web/game.js
+  s_da6f3933cdb62d::t_562aea75651c1d 613-614,622-624,627,632-653
+  s_da6f3933cdb62d::t_cae89150a49232 733-747
+  s_da6f3933cdb62d::t_62327649768a35 435
+  s_da6f3933cdb62d::t_a39c581203762a 654
+integration_check.py
+  s_da6f3933cdb62d::t_da6fd97f58cb42 225-229
+  s_da6f3933cdb62d::t_0be0de7f98eba7 197-200
+  s_da6f3933cdb62d::t_b58c4501f6bff0 165,169,174-181
+server/selfcheck.py
+  s_da6f3933cdb62d::t_5affca47a55991 133-139
+server/app.py
+  s_da6f3933cdb62d::t_761f9b3fdd125c 389-391
+  s_da6f3933cdb62d::t_31908f20d0bf7f 281-319
+  s_da6f3933cdb62d::t_04196b38711021 615-621
+  s_da6f3933cdb62d::t_dd54d2a9eb1931 332
+  s_da6f3933cdb62d::t_0da1a38d4cdc9f 235-237,248,252
+  s_da6f3933cdb62d::t_d0de5796e73dab 123-126
+  s_da6f3933cdb62d::t_cae86117edcb08 144-145
+  s_da6f3933cdb62d::t_2d7268acb301f2 649,651-654
+  s_da6f3933cdb62d::t_fb43e664ea441e 675
+artifacts/integration_trace.txt
+  s_da6f3933cdb62d::t_c07f12247c244a 11,14-17,20,28,42,53,67,78,92,103,117,128,142,153,167,178,192
+web/style.css
+  s_da6f3933cdb62d::t_e35b12702323ac 728-750
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "76dfee5f80f8462aec173de13af5738131287316",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
