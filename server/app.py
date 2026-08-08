@@ -120,9 +120,10 @@ ROOMS: dict[str, dict[str, Any]] = {}
 app = FastAPI(title="X Arcade")
 
 
-# Arena rooms are crowd rooms: any number of players join by scanning the QR,
-# auto-start is disabled, and only the host (the first joiner, the host on stage)
-# advances rounds. Everything else keeps the normal duel behavior.
+# Historical: rooms used to split into host-driven arenas and auto-starting
+# duels, and the mismatch between the two produced three dead-button bugs in
+# one day. Every room is now time driven by the session clock and these
+# fields are kept only so older clients reading them do not break.
 ARENA_ROOMS = {"GROK"}
 
 
@@ -140,6 +141,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "guess_counter": 0,
             "arena": room_id in ARENA_ROOMS,
             "host": None,
+            "auto_timer": None,
+            "auto_deadline_at": None,
         }
         ROOMS[room_id] = room
     return room
@@ -229,6 +232,9 @@ def _standings(room: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _public_state(room: dict[str, Any]) -> dict[str, Any]:
+    # Who picked which reply is public at reveal and only at reveal. During
+    # guessing it would leak strategy, so the strip rule keeps it server side.
+    at_reveal = room["phase"] == "reveal"
     return {
         "t": "state",
         "room": room["room_id"],
@@ -239,9 +245,11 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
                 "score": p.score,
                 "streak": p.streak,
                 "guessed": p.guessed,
+                **({"guess_slot": p.guess_slot} if at_reveal else {}),
             }
             for p in room["players"].values()
         ],
+        "auto_ms": _auto_ms(room),
         # Full ranked board every broadcast so lobby / guessing / reveal
         # can show who is ahead without waiting for the reveal strip.
         "standings": _standings(room),
@@ -270,6 +278,45 @@ def _cancel_timer(room: dict[str, Any]) -> None:
     room["timer"] = None
 
 
+def _cancel_auto(room: dict[str, Any]) -> None:
+    timer = room.get("auto_timer")
+    if timer is not None and not timer.done():
+        timer.cancel()
+    room["auto_timer"] = None
+    room["auto_deadline_at"] = None
+
+
+def _schedule_auto(room: dict[str, Any], delay: float) -> None:
+    """Arm the session clock: the round machine advances itself.
+
+    The game is time driven rather than host driven. A lobby with anyone in
+    it rolls into a round, and a reveal rolls into the next round. Manual
+    START / NEXT ROUND just skips the wait.
+    """
+    _cancel_auto(room)
+    room["auto_deadline_at"] = asyncio.get_running_loop().time() + delay
+    room["auto_timer"] = asyncio.create_task(_auto_advance(room, delay))
+
+
+async def _auto_advance(room: dict[str, Any], delay: float) -> None:
+    try:
+        await asyncio.sleep(delay)
+    except asyncio.CancelledError:
+        return
+    if ROOMS.get(room["room_id"]) is not room or not room["players"]:
+        return
+    if room["phase"] in ("lobby", "reveal"):
+        await _start_round(room)
+
+
+def _auto_ms(room: dict[str, Any]) -> int | None:
+    """Milliseconds until the session clock advances, for the countdown UI."""
+    if room["phase"] not in ("lobby", "reveal") or room["auto_deadline_at"] is None:
+        return None
+    remaining = room["auto_deadline_at"] - asyncio.get_running_loop().time()
+    return max(0, int(remaining * 1000))
+
+
 async def _round_timer(room: dict[str, Any]) -> None:
     """Server-side deadline. Fires the reveal when the clock runs out."""
     try:
@@ -282,6 +329,7 @@ async def _round_timer(room: dict[str, Any]) -> None:
 
 async def _start_round(room: dict[str, Any]) -> None:
     _cancel_timer(room)
+    _cancel_auto(room)
     room["round"] = await _next_round()
     room["reveal"] = None
     room["phase"] = "guessing"
@@ -338,6 +386,9 @@ async def _do_reveal(room: dict[str, Any]) -> None:
         # with no card and a background task fills it in a few seconds later.
         "share_card_url": None if config.MODE == "live" else DEMO_CARD_URL,
     }
+    # Arm the session clock: the next round starts itself after the reveal
+    # has had time to land. Anyone tapping NEXT ROUND just skips the wait.
+    _schedule_auto(room, config.REVEAL_SECONDS)
     await _broadcast(room)
     if config.MODE == "live":
         asyncio.create_task(_attach_live_card(room, rnd, winner))
@@ -554,13 +605,6 @@ async def ws_endpoint(ws: WebSocket) -> None:
             if t == "join":
                 name = str(msg.get("name", "")).strip() or "anon"
                 room = _get_room(room_id)
-                # A room made with CREATE ROOM is host driven like the stage
-                # arena: it must not auto-start the moment a second phone
-                # scans in, and only its creator advances it. The flag is
-                # honored once, by whoever opens the room. Later joiners
-                # cannot flip an existing room's behavior.
-                if msg.get("arena") and not room["players"] and room["host"] is None:
-                    room["arena"] = True
                 existing = room["players"].get(name)
                 if existing is not None:
                     # Reconnect under the same name keeps score and streak.
@@ -568,19 +612,13 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 else:
                     room["players"][name] = PlayerState(name=name, ws=ws)
                 joined = (room_id, name)
-                if room["host"] is None:
-                    room["host"] = name
-                if (
-                    not room["arena"]
-                    and room["phase"] == "lobby"
-                    and len(room["players"]) >= 2
-                ):
-                    # Two players in a duel lobby auto-start the first round.
-                    # Arena rooms never auto-start; the host starts on stage
-                    # once the crowd has scanned in.
-                    await _start_round(room)
-                else:
-                    await _broadcast(room)
+                # No host. The session clock runs the room: the first player
+                # in a lobby arms the countdown, and solo play is a real game
+                # against the house. Later joiners land in whatever phase is
+                # running and play the next beat.
+                if room["phase"] == "lobby" and room["auto_timer"] is None:
+                    _schedule_auto(room, config.LOBBY_SECONDS)
+                await _broadcast(room)
 
             elif t == "guess":
                 room = ROOMS.get(room_id)
@@ -608,24 +646,12 @@ async def ws_endpoint(ws: WebSocket) -> None:
 
             elif t == "next":
                 room = ROOMS.get(room_id)
-                if room is None:
+                if room is None or joined is None:
                     continue
-                if room["arena"] and (joined is None or joined[1] != room["host"]):
-                    # Only the stage host advances an arena. A scanned-in
-                    # player tapping NEXT must not skip the room forward.
-                    continue
-                in_reveal = room["phase"] == "reveal"
-                # The host may always open a round, alone or not, in any room.
-                # The client shows START to the host, so any stricter rule here
-                # produces a button that looks live and does nothing. A duel
-                # between two people who both typed the same code still needs
-                # both of them before the first round, since it has no host on
-                # a stage waiting to begin.
-                is_host = joined is not None and joined[1] == room["host"]
-                lobby_ready = room["phase"] == "lobby" and (
-                    room["arena"] or is_host or len(room["players"]) >= 2
-                )
-                if in_reveal or lobby_ready:
+                # Any joined player may skip the wait. The session clock will
+                # advance on its own either way, so this button can never be
+                # load bearing and never dead.
+                if room["phase"] in ("lobby", "reveal") and room["players"]:
                     await _start_round(room)
 
     except WebSocketDisconnect:
@@ -646,6 +672,7 @@ async def ws_endpoint(ws: WebSocket) -> None:
                             await _broadcast(room)
                     else:
                         _cancel_timer(room)
+                        _cancel_auto(room)
                         ROOMS.pop(joined[0], None)
 
 

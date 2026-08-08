@@ -41,14 +41,21 @@ Server -> client: `{"t": "state", ...}` full room state on every change:
 
 ```json
 {"t": "state", "room": "abc", "phase": "lobby|guessing|reveal",
- "players": [{"name": "PLAYER1", "score": 2, "guessed": true}],
+ "players": [{"name": "PLAYER1", "score": 2, "guessed": true, "guess_slot": 2}],
  "round": <Round with is_decoy and decoy_slot STRIPPED during guessing>,
  "reveal": {"decoy_slot": 2, "rationale": "...", "winner": "PLAYER1"} | null,
- "deadline_ms": 30000}
+ "deadline_ms": 30000, "auto_ms": 10000}
 ```
 
 The server strips `is_decoy`, `decoy_slot`, and real `author` values before broadcasting during the
 guessing phase. Reveal restores them. First correct guess wins the round. Both wrong = house wins.
+
+Sessions are time driven, with no host. The first player landing in a lobby arms a countdown
+(`LOBBY_SECONDS`), a reveal arms the next-round countdown (`REVEAL_SECONDS`), and `auto_ms` reports
+the time remaining on whichever countdown is live, null during guessing. A `next` from any joined
+player skips the wait; it can never be load bearing, because the clock advances the room regardless.
+Solo play is a real game against the house. Per-player `guess_slot` appears at reveal and only at
+reveal; during guessing the strip rule keeps everyone's pick server side.
 
 ## Config (config.py)
 

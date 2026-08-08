@@ -725,3 +725,26 @@ main {
   .card.locked .card-front { opacity: 0.35; }
   .card.locked .card-back { position: relative; transform: none; }
 }
+
+/* Reveal: who picked which reply. Chips render under the reply text, one per
+   player, with the local player highlighted. */
+.picked-by {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.picker-chip {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(147, 169, 185, 0.5);
+  color: #93a9b9;
+  background: rgba(11, 20, 30, 0.85);
+}
+.picker-chip.me {
+  border-color: #22d3ee;
+  color: #22d3ee;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.25);
+}

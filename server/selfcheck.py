@@ -130,7 +130,13 @@ async def main() -> int:
         await p2.send(json.dumps({"t": "join", "room": "abc", "name": "P2"}))
         state = await recv_state(p1, "P1")
         await recv_state(p2, "P2")
-        check(state["phase"] == "guessing", "second join auto-starts guessing")
+        check(state["phase"] == "lobby", "second join waits for the session clock")
+
+        # Any joined player may skip the countdown into the round.
+        await p1.send(json.dumps({"t": "next", "room": "abc"}))
+        state = await recv_state(p1, "P1")
+        await recv_state(p2, "P2")
+        check(state["phase"] == "guessing", "skip starts guessing")
         check(state["deadline_ms"] is not None and state["deadline_ms"] > 0, "deadline is live")
         check_stripped(state)
 

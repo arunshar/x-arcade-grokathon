@@ -162,15 +162,23 @@ async def main() -> int:
     url = f"ws://{HOST}:{PORT}/ws"
     served_ids: list[str] = []
     async with websockets.connect(url) as p1, websockets.connect(url) as p2:
-        log("== join x2, auto-start ==")
+        log("== join x2, session clock armed, skip the wait ==")
         await p1.send(json.dumps({"t": "join", "room": ROOM, "name": "P1"}))
         state = await recv_state(p1, "P1")
         check(state["phase"] == "lobby" and len(state["players"]) == 1, "first join lands in lobby")
+        check(isinstance(state.get("auto_ms"), int), "lobby carries the session-clock countdown")
 
         await p2.send(json.dumps({"t": "join", "room": ROOM, "name": "P2"}))
         state = await recv_state(p1, "P1")
         await recv_state(p2, "P2")
-        check(state["phase"] == "guessing", "second join auto-starts guessing")
+        check(state["phase"] == "lobby", "second join waits for the clock, no auto-start")
+
+        # Any joined player may skip the countdown. The clock would fire on
+        # its own; the check skips it to stay fast and deterministic.
+        await p2.send(json.dumps({"t": "next", "room": ROOM}))
+        state = await recv_state(p1, "P1")
+        await recv_state(p2, "P2")
+        check(state["phase"] == "guessing", "any player skips the wait into guessing")
 
         # Play one full cycle plus one round so the queue is proven to wrap.
         total_rounds = len(servable) + 1
@@ -186,6 +194,10 @@ async def main() -> int:
             clean = all("is_decoy" not in r and "author" not in r for r in rnd["replies"])
             check(clean, "guessing replies carry no is_decoy and no author")
             check(len(rnd["replies"]) == 5, "round has exactly 5 replies")
+            check(
+                all("guess_slot" not in p for p in state["players"]),
+                "guessing hides who picked what",
+            )
 
             decoy_slot = key[rid]["decoy_slot"]
             wrong_slot = next(s for s in range(5) if s != decoy_slot)
@@ -210,6 +222,11 @@ async def main() -> int:
                 "author" in r for r in state["round"]["replies"]
             )
             check(restored, "reveal restores is_decoy and authors")
+            picks = {p["name"]: p.get("guess_slot") for p in state["players"]}
+            check(
+                picks.get("P1") == wrong_slot and picks.get("P2") == decoy_slot,
+                "reveal shows who picked which reply",
+            )
 
             if round_no < total_rounds:
                 await p1.send(json.dumps({"t": "next", "room": ROOM}))

@@ -17,4 +17,9 @@ MODE = os.environ.get("ARCADE_MODE", "demo")
 RECORD = os.environ.get("ARCADE_RECORD", "") == "1"
 
 ROUND_SECONDS = 30
+# The session is time driven, no host. A round starts this many seconds after
+# the first player lands in a lobby, and the next round starts this many
+# seconds after a reveal. Anyone may tap START / NEXT ROUND to skip the wait.
+LOBBY_SECONDS = 10
+REVEAL_SECONDS = 14
 REPLIES_PER_ROUND = 5

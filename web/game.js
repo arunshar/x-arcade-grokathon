@@ -432,6 +432,7 @@ function setConn(text) {
 function handleState(s) {
   const was = state ? state.phase : null;
   state = s;
+  noteAutoDeadline(s);
 
   if (s.phase === "guessing" && s.round && s.round.round_id !== lastRoundId) {
     lastRoundId = s.round.round_id;
@@ -609,28 +610,47 @@ function renderLobby(s) {
     }
     ul.appendChild(li);
   }
-  // Host (created the room) can START; joiners wait. Deep-link guests are never host.
+  // No host. The session clock starts the round on its own and the countdown
+  // says when. START just skips the wait, so anyone joined may press it.
   const start = $("startBtn");
   const wait = $("waitLine");
   if (!joined) {
     start.hidden = true;
     start.disabled = true;
     if (wait) wait.hidden = true;
-  } else if (iAmHost) {
-    start.hidden = false;
-    // Duel needs 2 players; arena (e.g. GROK) can open with 1 — server enforces too.
-    const needTwo = myRoom !== "GROK";
-    start.disabled = needTwo ? players.length < 2 : players.length < 1;
-    if (wait) wait.hidden = true;
   } else {
-    start.hidden = true;
-    start.disabled = true;
+    start.hidden = false;
+    start.disabled = players.length < 1;
+    start.textContent = "START NOW";
     if (wait) {
       wait.hidden = false;
-      wait.textContent = "IN " + (myRoom || "ROOM") + " · WAITING FOR HOST TO START…";
+      wait.textContent = autoCountdownText(s, "ROUND STARTS");
     }
   }
 }
+
+// The server sends auto_ms, the time until the session clock advances on its
+// own. Freeze it into a wall-clock deadline at receipt so the ticker can
+// count down between broadcasts.
+let autoEndAt = 0;
+function noteAutoDeadline(s) {
+  autoEndAt = typeof s.auto_ms === "number" ? performance.now() + s.auto_ms : 0;
+}
+function autoCountdownText(s, prefix) {
+  if (!autoEndAt) return "";
+  const left = Math.max(0, Math.ceil((autoEndAt - performance.now()) / 1000));
+  return prefix + " IN " + left + "s";
+}
+setInterval(() => {
+  if (!state || !autoEndAt) return;
+  if (state.phase === "lobby" && $("waitLine") && !$("waitLine").hidden) {
+    $("waitLine").textContent = autoCountdownText(state, "ROUND STARTS");
+  }
+  if (state.phase === "reveal" && !$("revealPanel").hidden) {
+    const t = autoCountdownText(state, "NEXT ROUND");
+    if (t) $("nextBtn").textContent = t + " · TAP TO SKIP";
+  }
+}, 500);
 
 function renderGame(s) {
   const r = s.round || {};
@@ -710,11 +730,21 @@ function renderReplies(s) {
       why.textContent = reveal.rationale;
       front.appendChild(why);
     }
-    if (s.phase === "reveal" && myGuessSlot === reply.slot) {
-      const pick = document.createElement("span");
-      pick.className = "pick-tag";
-      pick.textContent = "YOUR PICK";
-      front.appendChild(pick);
+    if (s.phase === "reveal") {
+      // Who picked this reply. The server only exposes guess_slot at reveal,
+      // so this can never render during guessing.
+      const pickers = (s.players || []).filter((p) => p.guess_slot === reply.slot);
+      if (pickers.length) {
+        const row = document.createElement("div");
+        row.className = "picked-by";
+        for (const p of pickers) {
+          const chip = document.createElement("span");
+          chip.className = "picker-chip" + (p.name === myName ? " me" : "");
+          chip.textContent = p.name === myName ? "YOU" : p.name;
+          row.appendChild(chip);
+        }
+        front.appendChild(row);
+      }
     }
 
     const back = document.createElement("div");
