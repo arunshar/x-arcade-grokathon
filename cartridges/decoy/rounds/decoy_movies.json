@@ -41,7 +41,7 @@
   "decoy_slot": 0,
   "decoy_rationale": "The subtle tell is the slightly forced slang closer 'fr' that feels tacked on rather than organic to the thread's natural mix of typos and incomplete thoughts.",
   "safety": {
-    "screened": false,
+    "screened": true,
     "gate_codes": []
   },
   "seed": 897422272

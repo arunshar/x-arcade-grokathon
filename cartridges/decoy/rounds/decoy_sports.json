@@ -41,7 +41,7 @@
   "decoy_slot": 0,
   "decoy_rationale": "The phrase “absolute clowns” feels slightly too generic and polished as banter, lacking the specific quirky typos or abrupt slang shifts seen in the real replies.",
   "safety": {
-    "screened": false,
+    "screened": true,
     "gate_codes": []
   },
   "seed": 948117227

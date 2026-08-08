@@ -853,27 +853,26 @@ The payoff is verifiable here. Running `build_round(topic, live=False)` for all 
 its committed file:
 
 ```
-ai      replay==committed: False | decoy-4d18c911884a | decoy_slot 1 | seed 219226810
-crypto  replay==committed: False | decoy-ebc5b68f8a7e | decoy_slot 0 | seed 194138987
-food    replay==committed: False | decoy-07f051a50258 | decoy_slot 3 | seed 696310936
-movies  replay==committed: False | decoy-8bb84cfc46e8 | decoy_slot 0 | seed 897422272
-music   replay==committed: False | decoy-63ce6cb6a7de | decoy_slot 3 | seed 6214443
-sports  replay==committed: False | decoy-17e290ce4a4f | decoy_slot 0 | seed 948117227
-ALL MATCH: False
+ai       replay==committed: True
+crypto   replay==committed: True
+food     replay==committed: True
+movies   replay==committed: True
+music    replay==committed: True
+sports   replay==committed: True
+
+ALL MATCH: True
 ```
 
-Read that result carefully, because it is easy to misreport in either direction. The `round_id`, the
-`decoy_slot`, and the `seed` reproduce exactly for all six, and so does every reply text, author, and
-the rationale. The single key that differs is `safety`. A replay today runs the fixed `_screen`, so
-`music` comes back `{'screened': True, 'gate_codes': []}` and `ai` comes back
-`{'screened': False, 'gate_codes': ['G_SOURCE', 'G_URL']}`, while the committed files still hold the
-pre-fix stamp `{'screened': False, 'gate_codes': []}`.
+Every key reproduces: `round_id`, `seed`, `decoy_slot`, every reply text, every author, the rationale,
+and the `safety` block. The whole three-call live pipeline is reconstructible offline from committed
+bytes, and that run touches no network.
 
-So the honest claim is that the content of the three-call live pipeline is fully reconstructible
-offline from committed bytes, and that run touched no network. The stronger claim, that the files
-themselves rebuild byte for byte, was true before commit `7a4e012` and is not true today.
-`cartridges/decoy/rounds/README.md` still makes the stronger claim and is now stale. Rebuilding the
-six round files from fixtures would make it true again and would show six changed files in git.
+This was briefly untrue. Before commit `7a4e012` the builder's safety import was broken, so it stamped
+every round it wrote with `{"screened": false, "gate_codes": []}`, and those stamps went into the
+committed files. Fixing the import meant a replay computed the real gate result while the committed
+files still held the placeholder, so `safety` was the one key that diverged. The round files were
+regenerated so their stamps match what the corrected screener returns. Only the `safety` block changed
+in that regeneration. No post text, reply, author, seed, or slot was touched.
 
 ### Traps, in the order you are likely to hit them
 
@@ -1285,14 +1284,14 @@ round built before the fix carries a false stamp that no gate produced. `server/
 and `from plugins.safety.screen import screen_round`), which is why the serving path was never
 affected.
 
-The code is fixed and the artifacts are not. Verified by running `build_round(topic, live=False)` from
-fixtures on the current file: `music` comes back `{'screened': True, 'gate_codes': []}` and `ai` comes
-back `{'screened': False, 'gate_codes': ['G_SOURCE', 'G_URL']}`, which is the real gate result.
+The code is fixed and the artifacts were rebuilt to match. Verified by running
+`build_round(topic, live=False)` from fixtures: `music` comes back `{'screened': True, 'gate_codes': []}`
+and `ai` comes back `{'screened': False, 'gate_codes': ['G_SOURCE', 'G_URL']}`, which is the real gate
+result, and both now equal what is committed on disk.
 
-**All six committed round files still carry `{"screened": false, "gate_codes": []}` on disk.** They
-predate the fix and have not been rebuilt. Five of the six pass the real gates. Do not read the on-disk
-block as authoritative, and do not hand-edit it to `true`. Rebuild from fixtures if you want true
-stamps, and expect the six round files to change in git when you do.
+**The on-disk block is still advisory, not authoritative.** `server/app.py` re-screens every round at
+load and overwrites the block before serving, so a stale or hand-edited value can never put a bad round
+on screen. Never hand-edit it. Regenerate it from the screener so it stays a derived value.
 
 There is a clean tell for this class of failure. `screened` is defined as `not failed` over the same
 list, so `screened: false` with an empty `gate_codes` is impossible output from `screen_round`. If you
@@ -4196,12 +4195,12 @@ narrower one.
 | Source posts and the four real replies | **Real, pulled live, then frozen** | Pulled from X through `x_search` at build time and committed as JSON. At demo time they are read off disk, not fetched. The repo docs carry no build date, so do not state one. |
 | The imposter reply in each round | **Real Grok output, generated once** | Written by `grok-4.5` through `/chat/completions` at build time, committed. Not generated during play. |
 | The decoy rationale shown at reveal | **Real, model self-reported** | The model was asked to name its own tell. That text is committed with the round. |
-| Round ids, seeds, and slot order | **Real and deterministic** | Pure functions of the source post id. Replaying all six from fixtures offline, with no network, reproduces every `round_id`, `seed`, `decoy_slot`, reply, author, and rationale. Only the `safety` block differs from the committed file, because those files predate the builder import fix. |
+| Round ids, seeds, and slot order | **Real and deterministic** | Pure functions of the source post id. Replaying all six from fixtures offline, with no network, reproduces the committed files exactly, `safety` block included. |
 | The grounding guard on search calls | **Real, and it fired** | The `food` topic has two committed post fixtures. The ungrounded one was recorded and then discarded by `_made_tool_calls`. |
 | The five safety gates | **Real, running on every serve** | `screen_round` re-runs at load time on every round, including the hardcoded fallback. Fail closed, no override. |
 | The `G_SLURS` denylist | **Illustrative placeholder** | Six mild insults. The comment in the code says a real deployment swaps in a maintained wordlist behind the same gate code. Passing `G_SLURS` is not evidence of moderation. |
 | The gated `decoy_ai.json` round | **Real result, narrow reason** | Rejected on `G_SOURCE` (2650 chars against a 560 cap) and `G_URL` (a YouTube link in a reply). A formatting failure and a link, not toxicity. Do not fix the file. |
-| The `safety` block inside round files | **Stale, decorative** | All six read `{"screened": false, "gate_codes": []}`, a stamp left by a namespace-package import bug in the builder. The bug is fixed in `7a4e012` and the files have not been rebuilt. That pairing is impossible real output from `screen_round`. The server overwrites it every serve. |
+| The `safety` block inside round files | **Real, and it matches the screener** | Five read `{"screened": true, "gate_codes": []}` and `ai` reads `{"screened": false, "gate_codes": ["G_SOURCE", "G_URL"]}`. The stamps were regenerated after the builder import fix in `7a4e012`, so they now equal what `screen_round` returns. The server still re-screens and overwrites on every serve, so the on-disk value is advisory, never trusted. |
 | Rooms, phases, scoring, and the round timer | **Real, live at request time** | In-memory rooms, one `asyncio` task per room, winner by server arrival order. Asserted by `server/selfcheck.py` and `integration_check.py`. |
 | The anti-cheat strip | **Real, enforced server-side** | `_round_view` removes `decoy_slot`, `decoy_rationale`, `is_decoy`, and real author handles during guessing. Both check scripts assert it on every round. |
 | Arena mode (room `GROK`) | **Real, untested by the gate** | Host-only advance and no auto-start are implemented. Neither check script exercises arena rooms. The client still shows a lit START button that the server ignores. |

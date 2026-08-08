@@ -41,7 +41,7 @@
   "decoy_slot": 0,
   "decoy_rationale": "The subtle tell is the absolute 'nobody' generalization paired with perfect grammar that feels polished compared to the rawer real replies.",
   "safety": {
-    "screened": false,
+    "screened": true,
     "gate_codes": []
   },
   "seed": 194138987

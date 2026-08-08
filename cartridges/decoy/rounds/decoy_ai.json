@@ -42,7 +42,10 @@
   "decoy_rationale": "The phrasing is slightly too polished and definitive without any hedging, typo, or emoji that the real replies casually include.",
   "safety": {
     "screened": false,
-    "gate_codes": []
+    "gate_codes": [
+      "G_SOURCE",
+      "G_URL"
+    ]
   },
   "seed": 219226810
 }

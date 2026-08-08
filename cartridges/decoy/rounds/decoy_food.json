@@ -41,7 +41,7 @@
   "decoy_slot": 3,
   "decoy_rationale": "The slightly polished phrasing and word choice 'zinger' stand out as more writerly than the plain, direct praise in the real replies.",
   "safety": {
-    "screened": false,
+    "screened": true,
     "gate_codes": []
   },
   "seed": 696310936

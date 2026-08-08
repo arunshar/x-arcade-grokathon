@@ -41,7 +41,7 @@
   "decoy_slot": 3,
   "decoy_rationale": "The mix of correct artist capitalization with dropped articles feels slightly over-crafted compared to the uneven casual typos in the real replies.",
   "safety": {
-    "screened": false,
+    "screened": true,
     "gate_codes": []
   },
   "seed": 6214443
