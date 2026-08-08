@@ -1,0 +1,105 @@
+name: Deploy to Hugging Face Space
+
+# Manual only, on purpose. During an event the Space is what a room full of
+# phones is pointed at, so a deploy should be a decision someone makes, not a
+# side effect of pushing. Flip to `push:` after the event if you want it
+# automatic.
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "What is in this deploy (shown in the Space commit)"
+        required: false
+        default: "Manual deploy from main"
+
+concurrency:
+  group: deploy-space
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          python -m pip install --quiet --upgrade pip
+          python -m pip install --quiet huggingface_hub
+          python -m pip install --quiet -r requirements.txt
+
+      - name: Verify before deploying
+        run: |
+          python -m compileall -q server cartridges plugins services config.py fixtures_core.py
+          python integration_check.py
+
+      - name: Stage the Space tree
+        run: |
+          mkdir -p /tmp/space
+          bash deploy/huggingface/stage.sh /tmp/space
+          echo "staged:" && ls /tmp/space
+
+      - name: Refuse to ship a secret
+        run: |
+          if grep -rilE 'xai-[A-Za-z0-9]{20}|sk-[A-Za-z0-9]{20}|hf_[A-Za-z0-9]{20}' /tmp/space; then
+            echo "::error::a credential-shaped string is in the staged tree"
+            exit 1
+          fi
+          echo "secret scan clean"
+
+      - name: Upload to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          # Passed through the environment on purpose. Interpolating a
+          # workflow input straight into the script body would let the text
+          # of that input run as code.
+          DEPLOY_REASON: ${{ inputs.reason }}
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.environ.get("HF_TOKEN")
+          if not token:
+              raise SystemExit("HF_TOKEN secret is not set on this repository")
+
+          reason = os.environ.get("DEPLOY_REASON") or "Manual deploy from main"
+          url = HfApi(token=token).upload_folder(
+              folder_path="/tmp/space",
+              repo_id="Arun0808/x-arcade",
+              repo_type="space",
+              commit_message=reason,
+          )
+          print("uploaded:", url)
+          PY
+
+      - name: Wait for the Space to come back up
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, time
+          from huggingface_hub import HfApi
+
+          api = HfApi(token=os.environ["HF_TOKEN"])
+          for attempt in range(60):
+              stage = api.get_space_runtime("Arun0808/x-arcade").stage
+              if stage == "RUNNING":
+                  print(f"space RUNNING after ~{attempt * 10}s")
+                  break
+              print(f"  {stage} ...")
+              time.sleep(10)
+          else:
+              raise SystemExit("space did not reach RUNNING")
+          PY
+
+      - name: Smoke test the live Space
+        run: |
+          code=$(curl -s -L -m 30 -o /dev/null -w '%{http_code}' https://arun0808-x-arcade.hf.space/)
+          echo "GET / -> $code"
+          [ "$code" = "200" ] || exit 1
+          curl -s -L -m 30 https://arun0808-x-arcade.hf.space/health
