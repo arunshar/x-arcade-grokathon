@@ -369,7 +369,7 @@ $("nextBtn").addEventListener("click", () => send({ t: "next", room: myRoom }));
 // Emulates just enough server: join adds you plus a bot, next starts a round,
 // a guess on the decoy slot wins, both wrong means the house wins. All content
 // below is fixture data for the mock. Round A's source post is the real post
-// captured by the 7 Aug x_search probe.
+// captured by the x_search probe.
 function mockSocket(onMessage) {
   const ROUNDS = [
     {

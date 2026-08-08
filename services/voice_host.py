@@ -3,10 +3,10 @@
 Two duties:
 1. mint_token() gets a short-lived realtime client secret so the browser can
    talk to the realtime voice API directly. The server key never reaches the
-   browser. Probed 7 Aug: 200 in 0.13s.
+   browser. Probed at build time: 200 in 0.13s.
 2. render_host_lines() pre-renders every scripted host line to mp3 through
    /v1/tts at build time. The demo plays committed files and needs no network.
-   Probed 7 Aug: 1.78s per line, and the "language" field is required.
+   Probed at build time: 1.78s per line, and the "language" field is required.
 
 Build-time render (writes the committed assets):
     ARCADE_MODE=live ARCADE_RECORD=1 python3 services/voice_host.py
@@ -72,7 +72,7 @@ def _post(path: str, payload: dict[str, Any], timeout: int = 60) -> bytes:
 def mint_token() -> dict[str, Any]:
     """Mint an ephemeral realtime client secret for browser-direct voice.
 
-    Returns the parsed response. Observed shape on 7 Aug 2026:
+    Returns the parsed response. Observed shape at build time:
     {"value": "<ephemeral token>", "expires_at": <unix seconds>}.
     The caller hands "value" to the browser and nothing else. Never log
     the value. See REALTIME_NOTES.md for the browser wiring.

@@ -4,7 +4,7 @@ How the browser talks to Grok voice live, so wiring it tomorrow is a 30-minute
 task. The demo does not depend on any of this. Pre-rendered mp3s in
 `web/static-assets/` cover every scripted moment offline.
 
-## What is verified (probed 7 Aug 2026)
+## What is verified (probed at build time)
 
 - `POST https://api.x.ai/v1/realtime/client_secrets` with the server key and an
   empty JSON body returns 200 in 0.13s.

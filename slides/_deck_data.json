@@ -21,7 +21,7 @@
         "chartRef": "",
         "figureRef": "",
         "equations": [],
-        "notes": "Open on the number. In April 2026 Nikita Bier said X was suspending roughly 208 bot accounts every minute (x.com/nikitabier/status/2042121229998682517). That figure and the other market claims in this deck come from the 7 August research sweep of public reporting. They are quoted as reported, not measured by us. Second beat: in November 2025 the About this account feature went viral as spot-the-fake entertainment. People already play this game for free in the quote tweets. X Arcade gives it a scoreboard. The line to land: we turned X's biggest embarrassment into a game."
+        "notes": "Open on the number. In April 2026 Nikita Bier said X was suspending roughly 208 bot accounts every minute (x.com/nikitabier/status/2042121229998682517). That figure and the other market claims in this deck come from the research sweep of public reporting. They are quoted as reported, not measured by us. Second beat: in November 2025 the About this account feature went viral as spot-the-fake entertainment. People already play this game for free in the quote tweets. X Arcade gives it a scoreboard. The line to land: we turned X's biggest embarrassment into a game."
       },
       {
         "n": 2,
@@ -35,7 +35,7 @@
           "That promise is still unshipped",
           "X's head of product resigned on 5 August",
           "WeChat shows mini-games can anchor a super app",
-          "Source: 7 Aug research sweep, public reporting"
+          "Source: research sweep, public reporting"
         ],
         "highlights": [
           {"label": "Games shipped by X", "value": "0"},
@@ -61,14 +61,14 @@
           "Reveal shows real authors and the imposter's rationale"
         ],
         "highlights": [
-          {"label": "Rounds built live, 7 Aug", "value": "6"},
+          {"label": "Rounds built live", "value": "6"},
           {"label": "Grok voice host lines", "value": "5"},
           {"label": "Share card, Imagine", "value": "1"}
         ],
         "chartRef": "loop",
         "figureRef": "",
         "equations": [],
-        "notes": "This slide matches the lobby the judges will see: near-black, neon cyan, CRT scanlines, all CSS. The loop is one breath long. Real threads, pulled live on 7 August: deedydas on AI, Cointelegraph on crypto, Variety on movies, DeadlineDayLive on sports. Four replies are read verbatim from the thread, with post URLs preserved in the round files under cartridges/decoy/rounds/. Grok writes the fifth in the same register. Thirty seconds on the clock, two players, first correct tap wins. At reveal the real handles come back and Grok explains how it faked the register. The host voice is Grok TTS, five lines pre-rendered on 7 August."
+        "notes": "This slide matches the lobby the judges will see: near-black, neon cyan, CRT scanlines, all CSS. The loop is one breath long. Real threads, pulled live: deedydas on AI, Cointelegraph on crypto, Variety on movies, DeadlineDayLive on sports. Four replies are read verbatim from the thread, with post URLs preserved in the round files under cartridges/decoy/rounds/. Grok writes the fifth in the same register. Thirty seconds on the clock, two players, first correct tap wins. At reveal the real handles come back and Grok explains how it faked the register. The host voice is Grok TTS, five lines pre-rendered at build time."
       },
       {
         "n": 4,
@@ -105,7 +105,7 @@
         "chartRef": "pipeline",
         "figureRef": "",
         "equations": [],
-        "notes": "The pipeline in five beats. x_search finds a trending thread, a second grounded call reads its replies, and the builder rejects any response that made no x_search call. Grok writes the imposter. Five deterministic gates screen every round, fail closed, no override. The queue serves only clean rounds. The four numbers below are probes measured the morning of 7 August, saved under artifacts/probes/. The 42 second x_search latency is exactly why rounds pre-build into a queue and are never fetched inline. The proof beat: integration_check.py plays a full two-player round offline with a socket guard active, zero network egress, trace at artifacts/integration_trace.txt. Voice runs browser-direct over an ephemeral token endpoint, minted in 0.13 seconds, and no secret ever reaches the client."
+        "notes": "The pipeline in five beats. x_search finds a trending thread, a second grounded call reads its replies, and the builder rejects any response that made no x_search call. Grok writes the imposter. Five deterministic gates screen every round, fail closed, no override. The queue serves only clean rounds. The four numbers below are probes measured at build time, saved under artifacts/probes/. The 42 second x_search latency is exactly why rounds pre-build into a queue and are never fetched inline. The proof beat: integration_check.py plays a full two-player round offline with a socket guard active, zero network egress, trace at artifacts/integration_trace.txt. Voice runs browser-direct over an ephemeral token endpoint, minted in 0.13 seconds, and no secret ever reaches the client."
       },
       {
         "n": 6,
@@ -138,17 +138,17 @@
           "A cartridge ships rounds behind one small contract",
           "The cabinet runs rooms, scoring, voice, share cards",
           "Gates are platform infrastructure, not per-game code",
-          "They rejected 1 of 6 rounds built 7 Aug",
+          "They rejected 1 of 6 rounds built",
           "Second cartridge Crux exists as a sketch"
         ],
         "highlights": [
-          {"label": "Rounds rejected, 7 Aug", "value": "1/6"},
+          {"label": "Rounds rejected", "value": "1/6"},
           {"label": "Gates, fail closed", "value": "5"}
         ],
         "chartRef": "gates",
         "figureRef": "",
         "equations": [],
-        "notes": "The platform claim rests on the seam. A cartridge ships rounds that satisfy one small contract in CONTRACT.md, and the cabinet supplies rooms, websocket state, scoring, the voice host, and the share card forge. The gates are what judges should remember: they run at load, deterministic, fail closed, and on 7 August they proved themselves on real content, rejecting the AI-topic round on G_SOURCE and G_URL failures, so five of six rounds serve. A rejected round is not a bug. It is the screen working. Crux, the second cartridge, exists as a sketch only and is claimed as exactly that."
+        "notes": "The platform claim rests on the seam. A cartridge ships rounds that satisfy one small contract in CONTRACT.md, and the cabinet supplies rooms, websocket state, scoring, the voice host, and the share card forge. The gates are what judges should remember: they run at load, deterministic, fail closed, and they proved themselves on real content, rejecting the AI-topic round on G_SOURCE and G_URL failures, so five of six rounds serve. A rejected round is not a bug. It is the screen working. Crux, the second cartridge, exists as a sketch only and is claimed as exactly that."
       },
       {
         "n": 8,
@@ -176,7 +176,7 @@
         "layout": "closing",
         "body": [
           "Code: github.com/arunshar/x-arcade-grokathon, public, MIT",
-          "Built 7 August, the day before this event",
+          "Built before this event",
           "Post-back and video are staged, said openly",
           "The ask: ship one cartridge on X, measure the flywheel"
         ],
@@ -187,7 +187,7 @@
         "chartRef": "",
         "figureRef": "",
         "equations": [],
-        "notes": "Close on candor. The whole thing was built yesterday, the day before the event, on the xAI API surfaces: x_search, Grok 4.5 text, Imagine image, Grok voice TTS. What is real: live rounds from real threads, two-player websocket rooms, gates that rejected real content on 7 August, and an offline proof with zero network egress. What is staged and stated as staged: the post-back to X and the pre-generated video. The ask is small and concrete: ship one cartridge behind a real X surface and instrument the guess stream to test the flywheel thesis for real."
+        "notes": "Close on candor. The whole thing was built before the event, on the xAI API surfaces: x_search, Grok 4.5 text, Imagine image, Grok voice TTS. What is real: live rounds from real threads, two-player websocket rooms, gates that rejected real content, and an offline proof with zero network egress. What is staged and stated as staged: the post-back to X and the pre-generated video. The ask is small and concrete: ship one cartridge behind a real X surface and instrument the guess stream to test the flywheel thesis for real."
       }
     ],
     "design": {

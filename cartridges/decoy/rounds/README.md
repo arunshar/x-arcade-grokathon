@@ -1,6 +1,6 @@
 # Decoy demo rounds
 
-Six rounds built live on 7 Aug 2026 with real xAI calls (`ARCADE_MODE=live ARCADE_RECORD=1`).
+Six rounds built live with real xAI calls (`ARCADE_MODE=live ARCADE_RECORD=1`).
 Each round holds 4 real replies read verbatim from the source thread plus 1 Grok-written
 imposter, shuffled by a seed derived from the source post id. These files are the offline
 demo content. `queue.py` serves them in sorted filename order, so the demo sequence is

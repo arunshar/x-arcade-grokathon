@@ -6,7 +6,7 @@ said out loud has a file path in the numbers card at the bottom of this file. An
 not on that card does not get said.
 
 Timing honesty, stated once here and volunteered on stage before anyone asks: the shell
-was built the day before the event, in public commits on github.com/arunshar/x-arcade-grokathon.
+was built before the event, in public commits on github.com/arunshar/x-arcade-grokathon.
 What is from the event day is the same-day round refresh (if it ran, see the checkbox in
 preflight) and whatever the day queue shipped. Never blur this.
 
@@ -27,7 +27,7 @@ preflight) and whatever the day queue shipped. Never blur this.
 7. Room code chosen and typed into the laptop tab: use `GROK`.
 8. Checkbox, fill in on the day: [ ] same-day round refresh ran and passed the gates.
    If checked, the rounds on screen are from this morning's threads. If not, they are
-   from 7 August, dated and linked, and you say so.
+   from the original build, dated and linked, and you say so.
 
 ## The cold open (0:00 to 0:15, spoken)
 
@@ -144,7 +144,7 @@ for X."
   the laptop, volunteer drives one of them. The game plays identically.
 - Total catastrophe, server will not start: open `web/index.html?mock=1` in any
   browser, straight from disk. Mock mode drives every screen with no server at all,
-  and its first round is built on a real post captured by the 7 August probe.
+  and its first round is built on a real post captured by the recorded probe.
 
 ## The five hardest questions
 
@@ -210,13 +210,13 @@ The only figures said out loud. Paths relative to the repo root.
 | Offline proof | full two-player round, zero network egress | `artifacts/integration_trace.txt` |
 | Post-back status | STAGED, never sent | `services/poster.py` |
 
-All probes measured the morning of 7 August 2026. Market size, engagement, and revenue
+All probes measured at build time. Market size, engagement, and revenue
 figures do not exist in this project except as labeled projections.
 
 ## Claim sources
 
 The strategy claims in the cold open and the close (bot suspension rate, no games on X,
-the unshipped AI-game promise, WeChat mini-games) come from the 7 August research
+the unshipped AI-game promise, WeChat mini-games) come from the research
 sweep. The rule: a claim gets said with attribution only if its recorded URL is on the
 phone card in your pocket. No URL in hand means the claim is UNVERIFIED on the spot,
 so drop the attribution or drop the sentence. The script above marks the swap lines.
@@ -228,7 +228,7 @@ The recorded URLs, for the phone card:
 - WeChat mini-games at 500M MAU: https://technode.com/2025/06/26/wechat-mini-program-games-hit-500-million-monthly-users-pc-usage-surges/
 - Head of product resigned (5 Aug 2026): https://techcrunch.com/2026/08/05/nikita-bier-steps-down-as-xs-head-of-product/
 
-## The QR open (updated 7 Aug, supersedes the cold open above)
+## The QR open (supersedes the cold open above)
 
 Slide 4 stays on screen while people settle. It shows the QR only.
 
@@ -256,5 +256,5 @@ screenshot. Then paste:
 > smaller than 14pt. Slide 4 is the live-demo slide: nothing on it except the QR code image, the
 > words SCAN TO PLAY, and room code GROK. Hard rules: never use an em dash anywhere, do not invent
 > any number not present in the attached files, keep every date exactly as written (the build
-> happened on 7 August, the demo is on 8 August), and label the business figures as projections
+> predates the demo), and label the business figures as projections
 > wherever they appear.

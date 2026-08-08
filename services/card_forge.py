@@ -3,7 +3,7 @@
 make_share_card() turns a finished round into a retro arcade wanted poster
 via /v1/images/generations. Every call goes through the content-addressed
 fixture store, so demo mode replays the committed fixture with zero network
-and record mode refreshes it. Probed 7 Aug: 6.5s per image, live-safe.
+and record mode refreshes it. Probed at build time: 6.5s per image, live-safe.
 
 Build-time record (writes the committed demo card and its fixture):
     ARCADE_MODE=live ARCADE_RECORD=1 python3 services/card_forge.py
@@ -108,7 +108,7 @@ def make_share_card(round_data: dict[str, Any], winner: str) -> Path:
 
 # Demo round for the committed asset. The card path reads only round_id and
 # source.topic, so replies are omitted here. The source post is the real one
-# the x_search probe surfaced on 7 Aug (see artifacts/probes/x_search.json).
+# the x_search probe surfaced (see artifacts/probes/x_search.json).
 DEMO_ROUND: dict[str, Any] = {
     "round_id": "decoy-" + hashlib.sha256(b"2085772302130753606:xarcade").hexdigest()[:12],
     "source": {

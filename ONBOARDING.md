@@ -16,7 +16,7 @@ the repo. Every round, host voice line, and share card is a committed asset repl
 so the whole thing plays end to end with the network cable pulled. Live mode turns on real xAI calls
 and is an enhancement, not a dependency.
 
-**State right now.** The shell was built on 7 August, the day before the event, in public commits.
+**State right now.** The shell was built shortly before the event, in public commits.
 That is disclosed on stage and it is stated once here so nobody has to guess. The demo works. Two
 browser clients play a full match offline today, and `integration_check.py` proves it with a socket
 guard that hard-fails on any connection outside loopback. The committed run at
@@ -187,7 +187,7 @@ minutes as a rough ordering signal and not as a measurement.
 
 This is the workstream that changes what we can honestly say on stage. `DEMO.md` preflight step 8 is
 a checkbox: if the same-day refresh ran and passed the gates, the rounds on screen are from this
-morning's threads. If it did not run, the rounds are from 7 August and the presenter says so.
+morning's threads. If it did not run, the rounds are from the original build and the presenter says so.
 
 **Effort:** about 100 minutes total. **Difficulty:** medium.
 **You want to be comfortable with:** Python, shell, and reading rule code closely. Several steps in
@@ -229,7 +229,7 @@ ARCADE_RECORD=1 python3 cartridges/decoy/round_builder.py --live --all
 ```
 
 Each topic makes two grounded search calls and one writer call. `CONTRACT.md` records `x_search` at
-about 42 seconds measured on 7 August, and there is a broad-search retry that can double the two
+about 42 seconds measured at build time, and there is a broad-search retry that can double the two
 search calls, so budget generously.
 
 Step three, screen everything and decide what to do with failures:
@@ -625,7 +625,7 @@ way `services/REALTIME_NOTES.md` already marks the WebSocket subprotocol strings
 
 **Anything staged is described as staged.** `services/poster.py` returns a fake permalink and touches
 no network, and the docs say so in three places. The host voice lines are mp3s pre-rendered at build
-time, not synthesized on stage. The shell was built on 7 August. Every one of those is fine, and every
+time, not synthesized on stage. The shell was built before the event. Every one of those is fine, and every
 one of them stays true only if we keep saying it. If you make a staged thing real, update the code and
 both `DEMO.md` and `README.md` in the same change, so the spoken script never describes a state the
 repo left behind.

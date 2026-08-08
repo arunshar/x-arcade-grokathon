@@ -61,7 +61,7 @@ Every model id is one value: `MODEL_TEXT = "grok-4.5"`, `MODEL_IMAGE = "grok-ima
 `fixtures/api/` content-addressed replay, ported from Adjacency. The default is read-only replay,
 and `ARCADE_RECORD=1` writes. The demo must complete with the network cable pulled.
 
-## Measured surface behavior (probes, 7 Aug)
+## Measured surface behavior (probes)
 
 image gen 6.5s (live-safe), x_search 42s (NEVER inline, rounds pre-build into a queue),
 voice token mint 0.13s, TTS 1.78s (requires `language` field). Host lines are pre-rendered mp3s
