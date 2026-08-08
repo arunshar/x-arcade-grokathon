@@ -227,6 +227,7 @@ def describe_gif_style(
     *,
     topic: str = "",
     reply_texts: list[str] | None = None,
+    post_text: str = "",
 ) -> str:
     """Vision pass: one short style brief matching the human GIF room."""
     if not data_urls:
@@ -242,13 +243,15 @@ def describe_gif_style(
         content.append({"type": "image_url", "image_url": {"url": url}})
 
     human_bits = "; ".join(_snippet(t, 40) for t in (reply_texts or [])[:4] if t)
+    post_bit = _snippet(post_text, 120)
     content.append(
         {
             "type": "text",
             "text": (
                 f"Topic context: {topic or 'general'}. "
+                f"Original post (do not quote as on-screen text): {post_bit or 'n/a'}. "
                 f"Human reply vibes (text only): {human_bits or 'n/a'}. "
-                "Write the style brief now."
+                "Write the style brief now so a fifth gif blends into this thread."
             ),
         }
     )
@@ -320,6 +323,7 @@ def build_decoy_video_prompt(
     style_brief: str,
     topic: str,
     decoy_text: str,
+    post_text: str = "",
     abstract_only: bool = False,
 ) -> str:
     """Prompt that steals the human GIF look while carrying the decoy vibe."""
@@ -329,6 +333,7 @@ def build_decoy_video_prompt(
         "the reference GIFs. Match their visual language exactly.",
     )
     vibe = _snippet(decoy_text, 90)
+    post_bit = _snippet(post_text, 110)
     brief = _sanitize_style_brief(style_brief)
     safety = (
         "CRITICAL SAFETY: no real people, no celebrity likeness, no copyrighted "
@@ -336,17 +341,23 @@ def build_decoy_video_prompt(
         "no UI chrome. Use generic anonymous silhouettes, objects, animals, or "
         "abstract shapes only."
     )
+    thread = (
+        f"Original post vibe (do not render text): {post_bit}. "
+        if post_bit
+        else ""
+    )
     if abstract_only:
         return (
             "Short seamless looping reaction gif, square 1:1, compressed web-meme look. "
-            f"Topic mood: {topic or 'general'}. Reply vibe (abstract): {vibe}. "
+            f"Topic mood: {topic or 'general'}. {thread}"
+            f"Reply vibe (abstract): {vibe}. "
             f"Visual energy only (no copying faces): {brief}. "
             f"{safety}"
         )
     return (
         f"{skill} "
         f"Style brief from the human GIFs in this round: {brief} "
-        f"Topic: {topic or 'general'}. "
+        f"Topic: {topic or 'general'}. {thread}"
         f"Mood of this one reply (abstract, no readable text): {vibe}. "
         "Square 1:1, 3-second seamless loop, looks like a compressed chat GIF "
         f"not a polished film. {safety}"
@@ -544,16 +555,24 @@ def generate_matching_decoy(
         if rep.get("text"):
             human_texts.append(str(rep["text"]))
 
-    topic = str((round_data.get("source") or {}).get("topic") or "arcade")
+    src = round_data.get("source") or {}
+    topic = str(src.get("topic") or "arcade")
+    post_text = str(src.get("post_text") or "")
     decoy_rep = _decoy_reply(round_data)
     decoy_text = str((decoy_rep or {}).get("text") or topic)
 
     style_brief = describe_gif_style(
-        data_urls, topic=topic, reply_texts=human_texts
+        data_urls,
+        topic=topic,
+        reply_texts=human_texts,
+        post_text=post_text,
     )
     result["style_brief"] = style_brief
     prompt = build_decoy_video_prompt(
-        style_brief=style_brief, topic=topic, decoy_text=decoy_text
+        style_brief=style_brief,
+        topic=topic,
+        decoy_text=decoy_text,
+        post_text=post_text,
     )
     result["prompt"] = _snippet(prompt, 200)
 
@@ -592,6 +611,7 @@ def generate_matching_decoy(
                     style_brief=style_brief,
                     topic=topic,
                     decoy_text=decoy_text,
+                    post_text=post_text,
                     abstract_only=True,
                 )
                 result["prompt"] = _snippet(safe_prompt, 200)

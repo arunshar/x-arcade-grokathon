@@ -40,18 +40,44 @@ GIF_DIR = REPO_ROOT / "web" / "static-assets" / "reply-gifs"
 DECOY_DIR = GIF_DIR / "decoy"
 ROUNDS_DIR = REPO_ROOT / "cartridges" / "decoy" / "rounds"
 
-# Keyword → preferred gif stems (pool still falls back to full set).
-_KEYWORD_STEMS: list[tuple[tuple[str, ...], str]] = [
-    (("lol", "lmao", "haha", "laugh", "funny"), "laugh"),
-    (("wow", "insane", "crazy", "wtf", "whoa"), "wow"),
-    (("yes", "agree", "this", "facts", "true"), "yes"),
-    (("no", "nope", "nah", "wrong"), "nope"),
-    (("think", "maybe", "hmm", "idk"), "think"),
-    (("cool", "nice", "fire", "lit", "based"), "cool"),
-    (("sus", "cap", "fake", "bot"), "sus"),
-    (("side", "eye", "look"), "sideeye"),
-    (("mind", "blown", "shocked"), "mindblown"),
+# Reply-text vibe → gif stems (scored, not hard-assigned).
+_KEYWORD_STEMS: list[tuple[tuple[str, ...], tuple[str, ...]]] = [
+    (("lol", "lmao", "haha", "laugh", "funny", "lmfao", "rofl"), ("laugh", "slowclap", "popcorn")),
+    (("wow", "insane", "crazy", "wtf", "whoa", "holy", "damn"), ("wow", "mindblown", "micdrop")),
+    (("yes", "agree", "this", "facts", "true", "exactly", "real"), ("yes", "salute", "handshake")),
+    (("no", "nope", "nah", "wrong", "never", "pass"), ("nope", "eyeroll", "facepalm")),
+    (("think", "maybe", "hmm", "idk", "wonder", "perhaps"), ("think", "confused", "nervous")),
+    (("cool", "nice", "fire", "lit", "based", "hard", "clean"), ("cool", "micdrop", "salute")),
+    (("sus", "cap", "fake", "bot", "lie", "scam"), ("sus", "sideeye", "eyeroll")),
+    (("side", "eye", "look", "stare", "watch"), ("sideeye", "eyeroll", "popcorn")),
+    (("mind", "blown", "shocked", "unreal", "speechless"), ("mindblown", "wow", "micdrop")),
+    (("cry", "sad", "pain", "hurt", "rip", "dead"), ("cry", "facepalm", "nervous")),
+    (("money", "cash", "rich", "pay", "price", "cost", "$", "£"), ("money", "dealwithit", "cool")),
+    (("angry", "mad", "rage", "hate", "furious"), ("angry", "eyeroll", "nope")),
+    (("confus", "what", "huh", "??", "wait"), ("confused", "think", "nervous")),
+    (("food", "eat", "pizza", "cake", "cook", "chef", "hungry"), ("chef", "yes", "mindblown")),
+    (("sport", "goal", "win", "match", "game", "transfer", "club"), ("cool", "salute", "micdrop")),
+    (("music", "song", "album", "guitar", "beat", "track"), ("cool", "micdrop", "yes")),
+    (("movie", "film", "actor", "scene", "cast", "show"), ("popcorn", "wow", "mindblown")),
+    (("crypto", "bitcoin", "btc", "eth", "token", "chart", "vol"), ("money", "mindblown", "sus")),
+    (("ai", "model", "gpt", "claude", "llm", "agent", "code"), ("think", "mindblown", "sus")),
+    (("clap", "respect", "legend", "goat", "king"), ("slowclap", "salute", "handshake")),
+    (("deal", "done", "locked", "settled"), ("dealwithit", "handshake", "yes")),
+    (("nervous", "scared", "worry", "anxious", "uh"), ("nervous", "cry", "confused")),
 ]
+
+# Topic tag → stems that should surface more often for that post theme.
+_TOPIC_STEMS: dict[str, tuple[str, ...]] = {
+    "ai": ("think", "mindblown", "sus", "confused", "nervous"),
+    "crypto": ("money", "mindblown", "sus", "cool", "nervous"),
+    "sports": ("cool", "salute", "micdrop", "yes", "angry"),
+    "music": ("cool", "micdrop", "yes", "mindblown", "salute"),
+    "movies": ("popcorn", "wow", "mindblown", "cry", "laugh"),
+    "food": ("chef", "yes", "mindblown", "angry", "cry"),
+    "tech": ("think", "mindblown", "cool", "sus", "confused"),
+    "politics": ("sideeye", "eyeroll", "popcorn", "angry", "facepalm"),
+    "default": ("wow", "think", "laugh", "cool", "sus"),
+}
 
 
 def _slug(value: str) -> str:
@@ -152,30 +178,207 @@ def existing_decoy_media_url_for_round(
             return "/static-assets/reply-gifs/decoy/_probe.mp4", "video"
     return None
 
-def _pick_human_gif(round_id: str, slot: int, text: str, used: set[str]) -> Path | None:
+def _seeded_shuffle(items: list[Path], seed: str) -> list[Path]:
+    """Deterministic Fisher–Yates so the same round always gets the same order."""
+    arr = list(items)
+    if len(arr) <= 1:
+        return arr
+    h = hashlib.sha256(seed.encode("utf-8")).digest()
+    # Expand digest into a stream of ints.
+    buf = h
+    i = 0
+
+    def nxt() -> int:
+        nonlocal buf, i
+        if i + 4 > len(buf):
+            buf = hashlib.sha256(buf).digest()
+            i = 0
+        val = int.from_bytes(buf[i : i + 4], "big")
+        i += 4
+        return val
+
+    for idx in range(len(arr) - 1, 0, -1):
+        j = nxt() % (idx + 1)
+        arr[idx], arr[j] = arr[j], arr[idx]
+    return arr
+
+
+def _post_context(round_data: dict[str, Any]) -> tuple[str, str, str]:
+    src = round_data.get("source") or {}
+    topic = str(src.get("topic") or "").strip().lower()
+    post = str(src.get("post_text") or "").strip()
+    author = str(src.get("post_author") or "").strip()
+    return topic, post, author
+
+
+def _score_gif_for_reply(
+    stem: str,
+    *,
+    reply_text: str,
+    topic: str,
+    post_text: str,
+    round_bias: int = 0,
+) -> int:
+    """Higher = better match. Pure function of content + stem."""
+    stem_l = stem.lower()
+    reply_l = (reply_text or "").lower()
+    post_l = (post_text or "").lower()
+    topic_l = (topic or "").lower() or "default"
+    score = 0
+
+    for keys, stems in _KEYWORD_STEMS:
+        if any(k in reply_l for k in keys) and stem_l in stems:
+            # Earlier stems in the tuple are stronger matches.
+            try:
+                score += 40 - stems.index(stem_l) * 6
+            except ValueError:
+                score += 24
+        if any(k in post_l for k in keys) and stem_l in stems:
+            score += 12
+
+    topic_stems = _TOPIC_STEMS.get(topic_l) or _TOPIC_STEMS["default"]
+    if stem_l in topic_stems:
+        try:
+            score += 28 - topic_stems.index(stem_l) * 4
+        except ValueError:
+            score += 16
+
+    # Light bonus if stem word appears in reply/post literally.
+    if stem_l in reply_l:
+        score += 18
+    if stem_l in post_l:
+        score += 8
+
+    # Tiny deterministic jitter so ties break differently per round without
+    # collapsing every round onto the same top stems.
+    jitter = (round_bias ^ hashlib.sha1(stem_l.encode()).digest()[0]) % 7
+    score += jitter
+    return score
+
+
+def assign_human_gifs(
+    round_data: dict[str, Any],
+    *,
+    recent_stems: set[str] | None = None,
+) -> dict[int, Path]:
+    """Pick a diverse set of human GIFs for this round.
+
+    Strategy:
+      1. Seed-shuffle the full pool from round_id + topic + post (so different
+         posts start from different ends of the library).
+      2. Score every gif against each human reply using reply text, post text,
+         and topic tags.
+      3. Greedy assign highest unused score per slot; penalize stems used in
+         the previous few rounds (``recent_stems``) so sessions don't loop.
+    """
     pool = list_human_gifs()
     if not pool:
+        return {}
+
+    rid = str(round_data.get("round_id") or "round")
+    topic, post, author = _post_context(round_data)
+    seed = str(round_data.get("seed") or "")
+    shuffle_key = f"{rid}|{topic}|{author}|{post[:160]}|{seed}"
+    ordered_pool = _seeded_shuffle(pool, shuffle_key)
+    round_bias = int(hashlib.sha256(shuffle_key.encode()).hexdigest()[:8], 16)
+    recent = {s.lower() for s in (recent_stems or set())}
+
+    decoy = _decoy_slot(round_data)
+    human_slots: list[tuple[int, str]] = []
+    for rep in round_data.get("replies") or []:
+        if not isinstance(rep, dict):
+            continue
+        try:
+            slot = int(rep.get("slot"))
+        except (TypeError, ValueError):
+            continue
+        if decoy is not None and slot == decoy:
+            continue
+        human_slots.append((slot, str(rep.get("text") or "")))
+
+    if not human_slots:
+        return {}
+
+    # Precompute scores: slot → [(score, path), ...]
+    scored: dict[int, list[tuple[int, Path]]] = {}
+    for slot, text in human_slots:
+        ranked: list[tuple[int, Path]] = []
+        for path in ordered_pool:
+            stem = path.stem.lower()
+            s = _score_gif_for_reply(
+                stem,
+                reply_text=text,
+                topic=topic,
+                post_text=post,
+                round_bias=round_bias + slot * 17,
+            )
+            if stem in recent:
+                s -= 22  # push away from last round's set
+            ranked.append((s, path))
+        ranked.sort(key=lambda t: (-t[0], t[1].name))
+        scored[slot] = ranked
+
+    # Assign higher-confidence slots first so strong keyword hits win their gif.
+    slot_order = sorted(
+        human_slots,
+        key=lambda st: (-(scored[st[0]][0][0] if scored[st[0]] else 0), st[0]),
+    )
+    used: set[str] = set()
+    assignment: dict[int, Path] = {}
+    for slot, _text in slot_order:
+        for _s, path in scored[slot]:
+            if path.stem.lower() not in used:
+                used.add(path.stem.lower())
+                assignment[slot] = path
+                break
+        if slot not in assignment and ordered_pool:
+            # Exhausted unique — take next from round shuffle.
+            for path in ordered_pool:
+                if path.stem.lower() not in used:
+                    used.add(path.stem.lower())
+                    assignment[slot] = path
+                    break
+            if slot not in assignment:
+                assignment[slot] = ordered_pool[slot % len(ordered_pool)]
+
+    return assignment
+
+
+def _pick_human_gif(
+    round_id: str,
+    slot: int,
+    text: str,
+    used: set[str],
+    *,
+    topic: str = "",
+    post_text: str = "",
+    pool: list[Path] | None = None,
+) -> Path | None:
+    """Legacy single-slot picker kept for CLI/tools. Prefer assign_human_gifs."""
+    pool = pool or list_human_gifs()
+    if not pool:
         return None
-    by_stem = {p.stem.lower(): p for p in pool}
-    text_l = (text or "").lower()
-    preferred: list[Path] = []
-    for keys, stem in _KEYWORD_STEMS:
-        if any(k in text_l for k in keys) and stem in by_stem:
-            preferred.append(by_stem[stem])
-    # Deterministic rotation from round+slot, skipping already-used stems.
-    seed = f"{round_id}:{slot}:{text}"
-    digest = hashlib.sha256(seed.encode()).hexdigest()
-    start = int(digest[:8], 16)
-    ordered = preferred + [p for p in pool if p not in preferred]
-    # Rotate full pool from start index for variety when no keyword hit.
-    if not preferred:
-        ordered = pool[start % len(pool) :] + pool[: start % len(pool)]
-    for path in ordered:
+    ordered = _seeded_shuffle(pool, f"{round_id}:{slot}:{text}:{topic}")
+    bias = int(hashlib.sha256(f"{round_id}:{slot}".encode()).hexdigest()[:8], 16)
+    ranked = sorted(
+        pool,
+        key=lambda p: (
+            -_score_gif_for_reply(
+                p.stem,
+                reply_text=text,
+                topic=topic,
+                post_text=post_text,
+                round_bias=bias,
+            ),
+            ordered.index(p) if p in ordered else 99,
+            p.name,
+        ),
+    )
+    for path in ranked:
         if path.stem not in used:
             used.add(path.stem)
             return path
-    # All used — allow reuse.
-    return ordered[0] if ordered else None
+    return ranked[0] if ranked else None
 
 
 def resolve_round_format(
@@ -239,23 +442,27 @@ def prepare_round_presentation(
     round_data: dict[str, Any],
     *,
     session_index: int = 0,
+    recent_stems: set[str] | None = None,
 ) -> dict[str, Any]:
     """Apply text vs gif presentation for a freshly loaded round."""
     fmt = resolve_round_format(round_data, session_index=session_index)
     if fmt == "gif":
-        return attach_reply_media(round_data)
+        return attach_reply_media(round_data, recent_stems=recent_stems)
     return clear_reply_media(round_data)
 
 
-def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
+def attach_reply_media(
+    round_data: dict[str, Any],
+    *,
+    recent_stems: set[str] | None = None,
+) -> dict[str, Any]:
     """Stamp media_url onto every reply. Mutates round_data.
 
-    Humans get GIFs immediately. Decoy gets existing Imagine video/gif if
-    present, else pending (live will generate). Only call for GIF-format rounds.
+    Humans get diverse GIFs scored from reply + post + topic. Decoy gets
+    existing Imagine video/gif if present, else pending (live will generate).
+    Only call for GIF-format rounds.
     """
-    rid = str(round_data.get("round_id") or "round")
     decoy = _decoy_slot(round_data)
-    used: set[str] = set()
     human_ready = 0
     human_total = 0
 
@@ -268,12 +475,11 @@ def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
     using_probe_only = (
         not has_own_decoy
         and decoy_media is not None
-        and " /static-assets/reply-gifs/decoy/_probe.mp4" in f" {decoy_media[0]}"
-    ) or (
-        not has_own_decoy
-        and decoy_media is not None
         and str(decoy_media[0]).endswith("/_probe.mp4")
     )
+
+    # One diverse hand of human GIFs for the whole round (post-aware).
+    human_map = assign_human_gifs(round_data, recent_stems=recent_stems)
 
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
@@ -307,7 +513,7 @@ def attach_reply_media(round_data: dict[str, Any]) -> dict[str, Any]:
             continue
 
         human_total += 1
-        path = _pick_human_gif(rid, slot, str(rep.get("text") or ""), used)
+        path = human_map.get(slot)
         if path:
             rep["media_url"] = _gif_public_url(path)
             rep["media_type"] = "gif"

@@ -155,6 +155,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "timer": None,
             "guess_counter": 0,
             "rounds_played": 0,
+            # Stems of human GIFs used on recent gif rounds — for diversity.
+            "recent_gif_stems": [],
             "arena": room_id in ARENA_ROOMS,
             "host": None,
             "auto_timer": None,
@@ -382,14 +384,32 @@ async def _start_round(room: dict[str, Any]) -> None:
     # Mix text rounds (classic replies) with GIF rounds (human gifs + Imagine).
     session_index = int(room.get("rounds_played") or 0)
     room["rounds_played"] = session_index + 1
+    recent = set(room.get("recent_gif_stems") or [])
     try:
         from services.reply_gifs import prepare_round_presentation
 
-        prepare_round_presentation(rnd, session_index=session_index)
+        prepare_round_presentation(
+            rnd, session_index=session_index, recent_stems=recent
+        )
     except Exception as exc:
         print(f"prepare_round_presentation failed: {exc}", file=sys.stderr)
         rnd.setdefault("format", "text")
         rnd.setdefault("decoy_media_status", "none")
+    # Remember this round's human GIF stems so the next gif round diversifies.
+    if rnd.get("format") == "gif":
+        stems: list[str] = []
+        for rep in rnd.get("replies") or []:
+            if not isinstance(rep, dict) or rep.get("media_source") != "human":
+                continue
+            url = str(rep.get("media_url") or "")
+            if not url:
+                continue
+            stem = Path(url).stem.lower()
+            if stem and stem not in stems:
+                stems.append(stem)
+        # Keep last ~12 stems (~3 gif rounds) so the pool can rotate.
+        prev = [s for s in (room.get("recent_gif_stems") or []) if s not in stems]
+        room["recent_gif_stems"] = (stems + prev)[:12]
     room["round"] = rnd
     room["reveal"] = None
     room["phase"] = "guessing"
