@@ -2,7 +2,7 @@
 
 **Vision paper. 7 August 2026.**
 
-A note on provenance before anything else. The system this paper describes was built on 7 August 2026, one day before the xAI Grokathon in San Francisco where it demos. That timing is stated here and everywhere else timing comes up, because a paper about spotting fakes should not open with one. Every measured number in this paper comes from a probe or run artifact committed to the repository, and the artifact path appears next to the number. Every market or revenue figure is a projection or an illustration and is labeled as one. The repository is public at github.com/OWNER/x-arcade under the MIT license.
+A note on provenance before anything else. The system this paper describes was built on 7 August 2026, one day before the xAI Grokathon in San Francisco where it demos. That timing is stated here and everywhere else timing comes up, because a paper about spotting fakes should not open with one. Every measured number in this paper comes from a probe or run artifact committed to the repository, and the artifact path appears next to the number. Every market or revenue figure is a projection or an illustration and is labeled as one. The repository is public at github.com/arunshar/x-arcade-grokathon under the MIT license.
 
 ## 1. The gap
 

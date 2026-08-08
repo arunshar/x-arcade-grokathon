@@ -448,7 +448,7 @@ def _write_decoy(
 
 def _screen(round_dict: dict[str, Any]) -> dict[str, Any]:
     try:
-        from plugins.safety import screen_round
+        from plugins.safety.screen import screen_round
     except ImportError:
         return {"screened": False, "gate_codes": []}
     try:

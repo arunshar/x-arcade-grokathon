@@ -33,14 +33,19 @@ match going.
 
 ## Deploying your own
 
-Two placeholders are left in the docs on purpose. `github.com/OWNER/x-arcade`
+Two placeholders are left in the docs on purpose. `github.com/arunshar/x-arcade-grokathon`
 is wherever you push this, and `YOUR-SPACE.hf.space` is wherever you host it.
 `deploy/huggingface/` holds a Dockerfile and a staging script for a Hugging
 Face Space, which runs the app in demo mode with no secrets attached.
 
-The lobby QR in `web/static-assets/qr.png` currently points at
-`http://localhost:7860/?room=GROK` so it works out of the box for local play.
-Once you have a hosted URL, regenerate it:
+Note the two ports. `run.sh` serves on 8787 for local development. The Space
+Dockerfile serves on 7860, because that is the port a Hugging Face Space
+expects.
+
+The lobby QR in `web/static-assets/qr.png` is a placeholder. It encodes
+`http://localhost:8787/?room=GROK`, which only resolves on the machine running
+the server. A phone cannot reach another machine's localhost, so you must
+regenerate the QR against a hosted URL before any crowd demo:
 
 ```sh
 python -c "import segno; segno.make('https://YOUR-SPACE.hf.space/?room=GROK', error='h').save('web/static-assets/qr.png', scale=8, border=2, dark='#04070B', light='#FFFFFF')"

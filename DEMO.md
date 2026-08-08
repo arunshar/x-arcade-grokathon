@@ -6,7 +6,7 @@ said out loud has a file path in the numbers card at the bottom of this file. An
 not on that card does not get said.
 
 Timing honesty, stated once here and volunteered on stage before anyone asks: the shell
-was built the day before the event, in public commits on github.com/OWNER/x-arcade.
+was built the day before the event, in public commits on github.com/arunshar/x-arcade-grokathon.
 What is from the event day is the same-day round refresh (if it ran, see the checkbox in
 preflight) and whatever the day queue shipped. Never blur this.
 
@@ -150,7 +150,7 @@ for X."
 
 **"Did you build this today?"**
 "The shell, no, and I want you to check. I built it yesterday, the commits are public
-on github.com/OWNER/x-arcade with timestamps. What is from today: the round refresh
+on github.com/arunshar/x-arcade-grokathon with timestamps. What is from today: the round refresh
 from this morning's threads if it ran, the live voice wiring, and whatever else the day
 queue shipped, and I will tell you exactly which items those are. The architecture doc
 is the real answer to the question: CONTRACT.md defines the round spine, and a new
