@@ -1481,21 +1481,34 @@ function renderLobby(s) {
     }
     ul.appendChild(li);
   }
-  // No host. The session clock starts the round on its own and the countdown
-  // says when. START just skips the wait, so anyone joined may press it.
+  // START skips the lobby wait. Multiplayer needs 2+ players; solo needs 1.
   const start = $("startBtn");
   const wait = $("waitLine");
+  const minPlayers = (typeof s.min_players === "number")
+    ? s.min_players
+    : (isSoloFriendlyRoom(s.room || myRoom) ? 1 : 2);
+  const canStart = (typeof s.can_start === "boolean")
+    ? s.can_start
+    : players.length >= minPlayers;
   if (!joined) {
     start.hidden = true;
     start.disabled = true;
     if (wait) wait.hidden = true;
   } else {
     start.hidden = false;
-    start.disabled = players.length < 1;
-    start.textContent = "START NOW";
+    start.disabled = !canStart;
+    start.textContent = canStart
+      ? "START NOW"
+      : ("NEED " + minPlayers + " PLAYERS");
     if (wait) {
       wait.hidden = false;
-      wait.textContent = autoCountdownText(s, "ROUND STARTS");
+      if (!canStart) {
+        wait.textContent = "WAITING FOR PLAYERS · "
+          + players.length + "/" + minPlayers;
+      } else {
+        wait.textContent = autoCountdownText(s, "ROUND STARTS")
+          || ("READY · " + players.length + " PLAYERS");
+      }
     }
   }
 }

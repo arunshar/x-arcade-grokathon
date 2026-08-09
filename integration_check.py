@@ -267,23 +267,25 @@ async def main() -> int:
 
     log("== match cap: reveal at the cap goes to results, then back to lobby ==")
     config.MATCH_ROUNDS = 1
+    # SOLO* rooms may start with one player; normal multiplayer needs 2.
+    cap_room = "SOLOCAP"
     try:
         async with websockets.connect(url) as c1:
-            await c1.send(json.dumps({"t": "join", "room": "CAP", "name": "C1"}))
+            await c1.send(json.dumps({"t": "join", "room": cap_room, "name": "C1"}))
             state = await recv_state(c1, "C1")
-            await c1.send(json.dumps({"t": "next", "room": "CAP"}))
+            await c1.send(json.dumps({"t": "next", "room": cap_room}))
             state = await recv_state(c1, "C1")
             check(state["phase"] == "guessing", "capped match round starts")
-            await c1.send(json.dumps({"t": "guess", "room": "CAP", "slot": 0, "ms": 1}))
+            await c1.send(json.dumps({"t": "guess", "room": cap_room, "slot": 0, "ms": 1}))
             state = await recv_state(c1, "C1")
             check(state["phase"] == "reveal", "capped match reveals")
             check(state.get("match_over") is True, "last reveal flags match_over")
-            await c1.send(json.dumps({"t": "next", "room": "CAP"}))
+            await c1.send(json.dumps({"t": "next", "room": cap_room}))
             state = await recv_state(c1, "C1")
             check(state["phase"] == "results", "next after the cap enters results")
             check(bool(state.get("results")), "results phase carries a results payload")
             # next from results is PLAY AGAIN: scores reset, round 1 starts.
-            await c1.send(json.dumps({"t": "next", "room": "CAP"}))
+            await c1.send(json.dumps({"t": "next", "room": cap_room}))
             state = await recv_state(c1, "C1")
             check(state["phase"] == "guessing", "next after results starts a new match")
             me = state["players"][0]
@@ -291,6 +293,19 @@ async def main() -> int:
                   "new match resets score and round counter")
     finally:
         config.MATCH_ROUNDS = max(64, len(servable) + 5)
+
+    log("== multiplayer lobby refuses to start with one player ==")
+    try:
+        async with websockets.connect(url) as m1:
+            await m1.send(json.dumps({"t": "join", "room": "DUO1", "name": "A"}))
+            state = await recv_state(m1, "A")
+            check(state.get("min_players") == 2, "multiplayer min_players is 2")
+            check(state.get("can_start") is False, "one player cannot start multiplayer")
+            await m1.send(json.dumps({"t": "next", "room": "DUO1"}))
+            state = await recv_state(m1, "A")
+            check(state["phase"] == "lobby", "next with one player stays in lobby")
+    except Exception as exc:
+        check(False, f"multiplayer min-players check errored: {exc}")
 
     server.should_exit = True
     await serve_task

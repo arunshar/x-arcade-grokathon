@@ -216,13 +216,25 @@ ALLOW_SOLO = os.environ.get("ARCADE_ALLOW_SOLO", "") == "1"
 
 
 def _allows_solo(room: dict[str, Any]) -> bool:
-    """True when a single player may start a round from the lobby."""
-    if room.get("arena"):
-        return True
+    """True when a single player may start a round from the lobby.
+
+    Only explicit solo practice rooms (code starts with SOLO) or the
+    ARCADE_ALLOW_SOLO env override. Normal create/join multiplayer always
+    needs two players — ``arena`` is not a solo flag.
+    """
     if ALLOW_SOLO:
         return True
     rid = str(room.get("room_id") or "").upper()
     return rid.startswith("SOLO")
+
+
+def _min_players_to_start(room: dict[str, Any]) -> int:
+    """Solo rooms: 1. Normal multiplayer rooms: 2."""
+    return 1 if _allows_solo(room) else 2
+
+
+def _enough_players_to_start(room: dict[str, Any]) -> bool:
+    return len(room.get("players") or {}) >= _min_players_to_start(room)
 
 
 def _get_room(room_id: str) -> dict[str, Any]:
@@ -652,6 +664,8 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
         "rounds_played": rounds_played,
         # Topic filter chosen at room create ([] = random mix).
         "topic_filter": list(room.get("topic_filter") or []),
+        "min_players": _min_players_to_start(room),
+        "can_start": _enough_players_to_start(room),
         # True on the last reveal of the match (NEXT → results, not another round).
         "match_over": room["phase"] == "results"
         or (
@@ -710,6 +724,12 @@ async def _auto_advance(room: dict[str, Any], delay: float) -> None:
     phase = room["phase"]
     match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     if phase == "lobby":
+        # Multiplayer needs 2+ players; solo rooms may start alone.
+        if not _enough_players_to_start(room):
+            if room["players"]:
+                _schedule_auto(room, config.LOBBY_SECONDS)
+                await _broadcast(room)
+            return
         await _start_round(room)
         return
     if phase == "reveal":
@@ -769,6 +789,20 @@ async def _start_round(room: dict[str, Any]) -> None:
     # Reveal after the last round should open results, not start another.
     if room["phase"] == "reveal" and rounds_played >= match_rounds:
         await _enter_results(room)
+        return
+
+    # Starting a match from lobby (or restart) requires the player minimum.
+    # Mid-match advances (reveal → next round) keep going even if someone left.
+    starting_fresh = room["phase"] in ("lobby", "results") or rounds_played == 0
+    if starting_fresh and room["phase"] != "reveal" and not _enough_players_to_start(room):
+        room["phase"] = "lobby"
+        room["round"] = None
+        room["reveal"] = None
+        room["results"] = None
+        room["deadline_at"] = None
+        if room["players"]:
+            _schedule_auto(room, config.LOBBY_SECONDS)
+        await _broadcast(room)
         return
 
     room["results"] = None
@@ -1672,6 +1706,12 @@ async def ws_endpoint(ws: WebSocket) -> None:
                     room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6
                 )
                 if phase == "lobby":
+                    if not _enough_players_to_start(room):
+                        # Keep waiting — do not start a 1-player multiplayer match.
+                        if room["auto_timer"] is None and room["players"]:
+                            _schedule_auto(room, config.LOBBY_SECONDS)
+                        await _broadcast(room)
+                        continue
                     await _start_round(room)
                 elif phase == "reveal":
                     if int(room.get("rounds_played") or 0) >= match_rounds:
