@@ -32,6 +32,9 @@ os.environ["ARCADE_NO_SHUFFLE"] = "1"  # suite asserts against committed round f
 # default 6-round match cap. Cap is raised after the answer key is loaded
 # (pool can grow past 20). The cap itself gets focused coverage below.
 os.environ["ARCADE_MATCH_ROUNDS"] = "64"
+# The match-cap test plays a deliberate 1-round match; production floors
+# multiplayer matches at 6 unless this escape hatch is set.
+os.environ["ARCADE_ALLOW_SHORT_MATCH"] = "1"
 os.environ.pop("ARCADE_FORCE_FALLBACK", None)
 
 # Any connection attempt that leaves loopback is an integration failure.
