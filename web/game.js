@@ -511,12 +511,54 @@ function voiceMeta(extra) {
 }
 
 /**
+ * Drop model prompt-echo / instruction dumps before anything hits TTS.
+ * Server also cleans; this is the last client guard so Grok Voice never
+ * reads "You are the live commentator…" out loud.
+ */
+function sanitizeHostLine(text) {
+  let raw = String(text || "").trim();
+  if (!raw) return "";
+  // Never speak multi-line skill/JSON dumps.
+  if (raw.indexOf("\n") >= 0) {
+    const parts = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+    raw = parts.find((p) => !looksLikePromptEcho(p)) || "";
+  }
+  raw = raw.replace(/^["'“‘]|["'”’]$/g, "").trim();
+  raw = raw.replace(
+    /^(line|host|commentator|commentary|announcer|output|response|answer)\s*[:\-–—]\s*/i,
+    ""
+  ).trim();
+  if (!raw || looksLikePromptEcho(raw)) return "";
+  if (raw.length > 180) {
+    const cut = raw.slice(0, 180);
+    const sp = cut.lastIndexOf(" ");
+    raw = (sp > 40 ? cut.slice(0, sp) : cut).trim();
+  }
+  return raw;
+}
+
+function looksLikePromptEcho(text) {
+  const s = String(text || "").trim();
+  if (!s || s.length < 2) return true;
+  if (s.length > 280) return true;
+  if (/^[\{\[`#]/.test(s)) return true;
+  if (s.indexOf('"event"') >= 0 && (s.indexOf('"phase"') >= 0 || s.indexOf('"standings"') >= 0)) {
+    return true;
+  }
+  const meta = /you are the live commentator|output only the (spoken )?line|write the next commentator|pre-?reveal safety|do not introduce yourself|one short punchy sentence|no hashtags,? no emojis|recent_lines|observation json|reply with only the spoken|sports-desk arcade|never name the decoy|pick_reply \(1-5\)|##\s*(style|variety)/i;
+  if (meta.test(s)) return true;
+  if ((s.match(/\s-\s/g) || []).length >= 2) return true;
+  if (s.split(/\s+/).length > 40) return true;
+  return false;
+}
+
+/**
  * Grok Voice TTS via our server (POST /tts → Eve mp3).
  * Works whenever ARCADE_MODE=live + XAI_API_KEY, no realtime socket required.
  */
 function speakGrokTts(text) {
   return (async () => {
-    const line = String(text || "").trim();
+    const line = sanitizeHostLine(text);
     if (!line) return;
     const r = await fetch("/tts", {
       method: "POST",
@@ -542,7 +584,7 @@ function speakGrokTts(text) {
 
 /** Prefer Grok Voice TTS (stable) then realtime, then browser. Never overlaps. */
 async function speakWithGrok(text) {
-  const line = String(text || "").trim();
+  const line = sanitizeHostLine(text);
   if (!line || muted) return;
   // Prefer /tts — one clip at a time on voiceBus. Realtime is easy to stack.
   if (arcadeMode === "live" && !MOCK) {
@@ -961,7 +1003,7 @@ const commentary = {
         // Timed-out agent: short template only if still on the same beat.
         if (!this.stillCurrent(gen, phase, roundId)) return;
         if (!this.eventAllowed(event, state && state.phase)) return;
-        const fb = this.templateLine(event, s || state, extra || {});
+        const fb = sanitizeHostLine(this.templateLine(event, s || state, extra || {}));
         if (!fb) return;
         const lowFb = fb.toLowerCase();
         if (this.recentLines.some((r) => r.toLowerCase() === lowFb)) return;
@@ -976,7 +1018,9 @@ const commentary = {
       // Only speak if we are still on this moment.
       if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
       if (!this.eventAllowed(event, state && state.phase)) return;
-      const line = got.line;
+      // Drop prompt-echo before queueing so we never TTS instruction text.
+      const line = sanitizeHostLine(got.line);
+      if (!line) return;
       // Skip near-duplicates of something we just said.
       const low = line.toLowerCase();
       if (this.recentLines.some((r) => r.toLowerCase() === low)) return;
