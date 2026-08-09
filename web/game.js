@@ -1558,10 +1558,33 @@ function pushThemeToServer() {
   send(msg);
 }
 
+/** Drop the legacy mock bot if it ever appears in a state payload. */
+function stripFakePlayers(s) {
+  if (!s || typeof s !== "object") return s;
+  const kill = (list) => (list || []).filter(
+    (p) => p && String(p.name || "").toUpperCase() !== "GLITCH"
+  );
+  if (Array.isArray(s.players)) s.players = kill(s.players);
+  if (Array.isArray(s.standings)) {
+    s.standings = kill(s.standings).map((p, i) => Object.assign({}, p, { rank: i + 1 }));
+  }
+  if (s.reveal && Array.isArray(s.reveal.leaderboard)) {
+    s.reveal.leaderboard = kill(s.reveal.leaderboard).map((p, i) =>
+      Object.assign({}, p, { rank: i + 1 })
+    );
+  }
+  if (s.results && Array.isArray(s.results.standings)) {
+    s.results.standings = kill(s.results.standings).map((p, i) =>
+      Object.assign({}, p, { rank: i + 1 })
+    );
+  }
+  return s;
+}
+
 function handleRaw(text) {
   let msg = null;
   try { msg = JSON.parse(text); } catch (e) { return; }
-  if (msg && msg.t === "state") handleState(msg);
+  if (msg && msg.t === "state") handleState(stripFakePlayers(msg));
 }
 
 function connect() {
@@ -3662,18 +3685,9 @@ function mockSocket(onMessage) {
         if (!players.find((p) => p.name === m.name)) {
           players.push({ name: m.name, score: 0, streak: 0, guessed: false });
         }
+        // Never inject a fake "GLITCH" bot — solo and mock are you vs the house.
+        players = players.filter((p) => String(p.name || "").toUpperCase() !== "GLITCH");
         push();
-        // Bot only for offline multiplayer mock — never in SOLO practice.
-        const roomCode = String(m.room || myRoom || "").toUpperCase();
-        const soloMock = roomCode.indexOf("SOLO") === 0 || lobbyMode === "solo";
-        if (!soloMock) {
-          setTimeout(() => {
-            if (!players.find((p) => p.name === "GLITCH")) {
-              players.push({ name: "GLITCH", score: 0, streak: 0, guessed: false });
-              push();
-            }
-          }, 900);
-        }
       } else if (m.t === "next") {
         if (phase === "results") restartMatch();
         else if (phase === "reveal" && roundsPlayed >= MATCH_ROUNDS) enterResults();
