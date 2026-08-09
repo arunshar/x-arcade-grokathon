@@ -52,7 +52,16 @@ FIGURES = {
             "winner would post back to X. The demo stages that post-back "
             "rather than posting live."
         ),
-    }
+    },
+    "system_design": {
+        "src": "system_design.png",
+        "cap": (
+            "One game server, an offline round pipeline, and the xAI surfaces "
+            "behind it. Numbered flows: 1 join and guess over wss, 2 serve a "
+            "gated round, 3 fetch opaque media, 4 attach the Imagine card async, "
+            "5 host lines. Latencies are measured probes."
+        ),
+    },
 }
 
 HTML = r"""<!DOCTYPE html>
@@ -109,6 +118,9 @@ h1.title{font-family:var(--fh);font-weight:600;font-size:40px;line-height:1.11;l
 .cap{font-size:12px;color:var(--inkDim);margin-top:8px;line-height:1.4;max-width:100ch}
 .figWrap{flex:1;margin-top:13px;display:flex;flex-direction:column;align-items:center;min-height:0}
 .figWrap img{max-width:100%;max-height:360px;object-fit:contain;border:1px solid var(--grid);border-radius:9px;background:#0b141e}
+.layout-figure.wide .figWrap{margin-top:6px}
+.layout-figure.wide .figWrap img{max-height:520px;background:#f8f9fa;padding:8px}
+.layout-figure.wide .body{max-width:none}
 .split .figWrap{margin-top:0;justify-content:center}
 table.tbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px;table-layout:fixed}
 table.tbl th,table.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--grid);vertical-align:top;line-height:1.35;overflow-wrap:anywhere}
@@ -228,7 +240,7 @@ function renderChart(ref){const c=CHARTS[ref];if(!c)return'';let content='';
 function blockBody(s){return s.body?.length?`<ul class="body">${s.body.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`:'';}
 function blockHighlights(s){return s.highlights?.length?`<div class="hl">${s.highlights.map(h=>`<div class="stat"><span class="v">${esc(h.value)}</span><span class="l">${esc(h.label)}</span></div>`).join('')}</div>`:'';}
 function blockFigure(s){if(!s.figureRef)return'';const f=FIGURES[s.figureRef];return `<div class="figWrap"><img src="${f.src}" alt="X Arcade share card"/><div class="cap">${esc(f.cap)}</div></div>`;}
-function buildSlide(s,i,total){const el=document.createElement('section');el.className='slide layout-'+s.layout;el.style.setProperty('--sys','var(--accent)');
+function buildSlide(s,i,total){const el=document.createElement('section');el.className='slide layout-'+s.layout+(s.wide?' wide':'');el.style.setProperty('--sys','var(--accent)');
   const kick=`<div class="kicker"><span class="dot"></span>${esc(s.kicker||s.section)}</div>`;
   const title=`<h1 class="title">${emph(s.title)}</h1><div class="titleRule"></div>`;let mid='';
   if(s.layout==='title')mid=`<div class="sub">${s.body.map(esc).join(' · ')}</div>`+blockHighlights(s);

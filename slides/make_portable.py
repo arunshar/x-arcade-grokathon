@@ -64,11 +64,17 @@ html = re.sub(r'\s*<link rel="preconnect"[^>]*>', "", html)
 html = re.sub(r'\s*<link href="https://fonts\.googleapis[^\"]*"[^>]*>', "", html)
 html = html.replace("<style>", "<style>\n" + "\n".join(faces) + "\n", 1)
 
-image_path = HERE / "share_card.jpg"
-image_data = base64.b64encode(image_path.read_bytes()).decode("ascii")
-html = html.replace("share_card.jpg", f"data:image/jpeg;base64,{image_data}")
+# Inline every figure image referenced by the deck as a data URI, so the
+# portable file is fully self-contained. Add new figures here by filename.
+_MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png"}
+for name in ("share_card.jpg", "system_design.png"):
+    fig = HERE / name
+    if name in html and fig.is_file():
+        mime = _MIME[fig.suffix.lower()]
+        data = base64.b64encode(fig.read_bytes()).decode("ascii")
+        html = html.replace(name, f"data:{mime};base64,{data}")
 
-external = re.findall(r'(?:src|href)\s*=\s*["\'](?:https?:|share_card\.jpg)', html)
+external = re.findall(r'(?:src|href)\s*=\s*["\'](?:https?:|share_card\.jpg|system_design\.png)', html)
 if external:
     raise RuntimeError(f"portable deck still has {len(external)} external references")
 

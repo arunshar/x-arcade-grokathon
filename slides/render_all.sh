@@ -10,7 +10,9 @@ mkdir -p slides_png
 if [[ "$#" -gt 0 ]]; then
   IDS=("$@")
 else
-  IDS=(1 2 3 4 5 6 7 8 9)
+  # Derive the slide count from the deck data so new slides render automatically.
+  N=$(python3 -c "import json;d=json.load(open('_deck_data.json'));r=d.get('result',d);print(len(r['slides']))")
+  IDS=($(seq 1 "$N"))
 fi
 
 for id in "${IDS[@]}"; do

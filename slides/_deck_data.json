@@ -159,6 +159,84 @@
     },
     {
       "n": 6,
+      "section": "SYSTEM DESIGN",
+      "kicker": "ONE PAGE, EVERY MOVING PART",
+      "title": "One server, an *offline pipeline*, xAI behind it",
+      "layout": "figure",
+      "wide": true,
+      "figureRef": "system_design",
+      "body": [],
+      "highlights": [],
+      "chartRef": "",
+      "equations": [],
+      "notes": "SAY: Here is the whole system on one page. On the left, players join over a websocket. In the middle, one FastAPI server holds the rooms in memory, runs the clock, and serves rounds. The rounds are not pulled live during play, that is the offline pipeline at the bottom: a search finds the thread, Grok writes the imposter, it gets recorded to fixtures and committed. And the slow, expensive xAI calls on the right, Imagine and voice, are all off the round path, fired async so they never block a guess.  CUE: trace the five numbered arrows if the room is technical, otherwise say the one line: everything slow is pre-built or async, nothing slow is on the clock."
+    },
+    {
+      "n": 7,
+      "section": "TECHNICAL COMPLEXITY",
+      "kicker": "JUDGING CRITERION 2",
+      "title": "The hard parts were *correctness under load*",
+      "layout": "split",
+      "chartRef": "gates",
+      "figureRef": "",
+      "equations": [],
+      "body": [
+        "Grounded two-call pull that rejects any answer with no search call",
+        "Opaque uniform media so the decoy cannot be found by inspection",
+        "Time-driven session machine, no host, so no dead-button race",
+        "Offline demo with a socket guard proving zero network egress",
+        "32-check abuse battery, malformed frames to a 30-player room"
+      ],
+      "highlights": [
+        {
+          "label": "Abuse battery",
+          "value": "32/32"
+        },
+        {
+          "label": "Safety gates, fail closed",
+          "value": "5"
+        },
+        {
+          "label": "Network egress, offline proof",
+          "value": "0"
+        },
+        {
+          "label": "Topic rounds",
+          "value": "24"
+        }
+      ],
+      "notes": "SAY: The game is easy to describe and hard to make correct. Three things I would point a judge at. One, we do not trust the model to read the thread, we make two grounded calls and reject any response that did not actually search. Two, the anti-cheat: during guessing the answer never leaves the server, and every reply's media is served through an identical opaque URL, because the fake used to be findable in dev tools three different ways. Three, the whole thing runs offline from fixtures with a socket guard that fails on any network call, and a 32-check abuse suite, including a thirty-player room, passes against the live deploy.  CUE: this is the technical-complexity slide, every number is from a committed run."
+    },
+    {
+      "n": 8,
+      "section": "WAR SCARS",
+      "kicker": "ALL FROM BUILD DAY",
+      "title": "What broke, and *what it taught us*",
+      "layout": "default",
+      "chartRef": "",
+      "figureRef": "",
+      "equations": [],
+      "body": [
+        "Host-driven rooms gave three dead-button bugs, so we deleted the host and went time-driven",
+        "The GIF decoy leaked three ways, so media now serves through one opaque proxy",
+        "The Space said RUNNING while hung, so the runbook is restart, not redeploy",
+        "Live pulls kept hitting culture-war threads that pass the gates, so every fresh round gets a human read",
+        "A shuffle broke the test suites and byte-replay, so the suites pin it and the shuffle got its own invariants"
+      ],
+      "highlights": [
+        {
+          "label": "Dead-button bugs, one day",
+          "value": "3"
+        },
+        {
+          "label": "Ways the decoy leaked",
+          "value": "3"
+        }
+      ],
+      "notes": "SAY: A few honest scars, all from today. We built host-controlled rooms and it produced three separate dead-button bugs where the client and server disagreed on who could start, so we deleted the host entirely and made the room run on a clock. The GIF decoy leaked three ways at once, its URL said decoy, it was the only mp4, and the client even labeled it, so now every reply's media serves through one identical opaque URL. And the gates check integrity, not taste, so live pulls kept landing on divisive threads that passed every gate, which is why a human still reads a fresh round before it serves.  CUE: tell one of these as a story if you have time, the dead-button one lands best."
+    },
+    {
+      "n": 9,
       "section": "FLYWHEEL",
       "kicker": "THESIS, NOT A RESULT",
       "title": "Every guess is a *labeled judgment*",
@@ -185,7 +263,7 @@
       "notes": "SAY: Here is the thesis. X drew a bright line at AI with no human in the loop. Enforcing that line is starved for data about what reads as machine-written to real people. Every guess in the game is exactly that label, and the wrong guesses are the richest half, real people who read like bots. We have measured none of this yet, and it says so on the slide.  CUE: say the word thesis out loud, it is your honesty anchor."
     },
     {
-      "n": 7,
+      "n": 10,
       "section": "PLATFORM",
       "kicker": "CARTRIDGES + GATES",
       "title": "One cabinet, *many cartridges*",
@@ -212,7 +290,7 @@
       "notes": "SAY: This is a platform, not one game. A cartridge ships rounds behind one small contract, and the cabinet supplies the rooms, the clock, scoring, the voice host, and the share cards. The gates are infrastructure. A rejected round is not a bug, it is the screen working.  CUE: keep this short unless a judge asks."
     },
     {
-      "n": 8,
+      "n": 11,
       "section": "BUSINESS",
       "kicker": "PROJECTIONS, LABELED",
       "title": "Sponsored arenas, *shareable wins*",
@@ -239,7 +317,7 @@
       "notes": "SAY: The money is the sponsored arena. A brand picks a topic, the game stays identical, and the winner's share card carries the sponsor mark, so every share is brand reach next to a topic the brand chose. Tie it to the receipts: X killed pay-to-post because it makes slop, and this aligns the incentive with brand-safe human play. Every number here is illustrative and labeled as such.  CUE: never quote a market size, there is not a real one."
     },
     {
-      "n": 9,
+      "n": 12,
       "section": "CLOSE",
       "kicker": "THE ASK",
       "title": "Built in *a day* on the API",
