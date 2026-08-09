@@ -32,9 +32,10 @@ LOBBY_SECONDS = 10
 REVEAL_SECONDS = 14
 REPLIES_PER_ROUND = 5
 # How often GIF rounds appear when a round JSON does not set "format".
-# "always_gif" (default) → every round uses human pool GIFs + Grok Imagine decoy video.
-# "alternate" → text, gif, text…  "always_text" → text only. "half" → ~50% by hash.
-GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "always_gif").strip().lower()
+# "alternate" (default) → text, gif, text… so both classic and media rounds appear.
+# "always_gif" → every round uses human pool GIFs + Grok Imagine decoy video.
+# "always_text" → text only. "half" → ~50% by hash of round_id.
+GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "alternate").strip().lower()
 # When true (default), the decoy reply media MUST be produced by Grok Imagine:
 #   grok-imagine-image → still, then grok-imagine-video → short loop mp4.
 # Never a human pool .gif, never an uncertified probe clone.

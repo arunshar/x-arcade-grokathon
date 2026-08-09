@@ -9,6 +9,8 @@ COPY . .
 # Default offline demo. The HF Space secrets panel can set ARCADE_MODE=live
 # plus XAI_API_KEY so Imagine / voice run for real.
 ENV ARCADE_MODE=demo
+# Mix classic text rounds with GIF/Imagine rounds (same as local default).
+ENV ARCADE_GIF_MODE=alternate
 # Prefer prebaked decoy mp4s; when generating live, use the fast path
 # (text brief + short T2V, no vision still) so rounds are not stuck on "loading".
 ENV ARCADE_IMAGINE_FAST=1
