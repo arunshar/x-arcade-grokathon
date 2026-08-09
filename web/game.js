@@ -2299,9 +2299,8 @@ function renderTopicChips() {
     btn.type = "button";
     btn.className = "topic-chip";
     btn.dataset.topicId = id;
-    const count = typeof g.count === "number" ? g.count : null;
     const label = g.label || id.toUpperCase();
-    btn.textContent = count != null && id !== "random" ? (label + " · " + count) : label;
+    btn.textContent = label;
     const on = id === "random" ? isRandom : selectedTopicGroups.indexOf(id) >= 0;
     if (on) btn.classList.add("is-on");
     btn.setAttribute("aria-pressed", on ? "true" : "false");
