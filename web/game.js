@@ -3482,7 +3482,7 @@ function loadPhoneJoinInfo(room) {
 }
 
 // ---------- mock mode: the last-ditch stage fallback ----------
-// Emulates just enough server: join adds you plus a bot, next starts a round,
+// Emulates just enough server: join adds only you (no bot), next starts a round,
 // a guess on the decoy slot wins, both wrong means the house wins. All content
 // below is fixture data for the mock. Round A's source post is the real post
 // captured by the x_search probe.
