@@ -51,6 +51,7 @@ ONE short punchy sentence. Output ONLY the spoken line."""
 
 _FALLBACK_REVEAL = """You are the live commentator for DECOY at REVEAL.
 The decoy is public — be funny and specific. ONE short punchy sentence.
+Never open with "Got it" or "Wrong". Vary the line every time.
 Output ONLY the spoken line."""
 
 
@@ -306,26 +307,108 @@ def _fallback_line(obs: dict[str, Any]) -> str:
     if event == "reveal":
         w = obs.get("winner")
         decoy_reply = obs.get("decoy_reply")
+        listener = str(obs.get("listener") or "").strip()
+        correct = obs.get("correct")
+        local_win = bool(correct) or (
+            bool(w) and w != "house" and listener and str(w) == listener
+        )
+        seed = rn_i + (int(decoy_reply) if decoy_reply else 0) * 5
+
         if not w or w == "house":
             opts = [
-                f"House wins. The decoy was reply {decoy_reply}." if decoy_reply else "House takes it.",
-                f"Nobody had it. Decoy hid in reply {decoy_reply}." if decoy_reply else "House keeps the point.",
-                "Machine walks. House cashes.",
+                (
+                    f"Nobody snagged it. Fake sat on reply {decoy_reply}."
+                    if decoy_reply
+                    else "Nobody snagged it. House takes the point."
+                ),
+                (
+                    f"Clean miss. The bot hid in reply {decoy_reply}."
+                    if decoy_reply
+                    else "Clean miss. Machine walks."
+                ),
+                (
+                    f"House cashes — decoy was reply {decoy_reply}."
+                    if decoy_reply
+                    else "House cashes this one."
+                ),
+                "The machine slips through. Point to the house.",
+                (
+                    f"Tough board. Reply {decoy_reply} was the imposter."
+                    if decoy_reply
+                    else "Tough board. House keeps it."
+                ),
+                "All humans fooled. Arcade laughs.",
+                "Robot night. Nobody read the room.",
             ]
-            return _pick_unused(opts, recent, rn_i)
-        if decoy_reply:
+            return _pick_unused(opts, recent, seed)
+
+        if local_win:
             opts = [
-                f"{w} called it — decoy was reply {decoy_reply}.",
-                f"{w} sniffs out reply {decoy_reply}. Plus one.",
-                f"Point to {w}. Fake lived in reply {decoy_reply}.",
+                (
+                    f"You sniffed out reply {decoy_reply}. Point yours."
+                    if decoy_reply
+                    else "You sniffed it out. Point yours."
+                ),
+                (
+                    f"Sharp eye — reply {decoy_reply} was the bot."
+                    if decoy_reply
+                    else "Sharp eye. That's a point."
+                ),
+                "Machine busted. Nice read.",
+                (
+                    f"You had the read. Fake was reply {decoy_reply}."
+                    if decoy_reply
+                    else "You had the read. Plus one."
+                ),
+                "Caught the imposter cold. Well played.",
+                (
+                    f"That's the one — reply {decoy_reply}. Clean pick."
+                    if decoy_reply
+                    else "That's the one. Clean pick."
+                ),
+                "Bot exposed. You take the board.",
+                "Arcade nods. That was the tell.",
+                (
+                    f"Dead giveaway on reply {decoy_reply}. Point to you."
+                    if decoy_reply
+                    else "Dead giveaway. Point to you."
+                ),
             ]
-        else:
-            opts = [
-                f"{w} called it! Plus one.",
-                f"{w} takes the round.",
-                f"Board goes to {w}.",
-            ]
-        return _pick_unused(opts, recent, rn_i + len(str(w)))
+            return _pick_unused(opts, recent, seed + 11)
+
+        who = str(w)
+        opts = [
+            (
+                f"{who} nails it — decoy was reply {decoy_reply}."
+                if decoy_reply
+                else f"{who} nails it. Point theirs."
+            ),
+            (
+                f"{who} had the read. Fake hid in reply {decoy_reply}."
+                if decoy_reply
+                else f"{who} had the read."
+            ),
+            f"Not this time — {who} got there first.",
+            (
+                f"Point to {who}. Reply {decoy_reply} was the machine."
+                if decoy_reply
+                else f"Point to {who}."
+            ),
+            f"{who} saw through the noise.",
+            (
+                f"{who} sniffs reply {decoy_reply}. Board goes their way."
+                if decoy_reply
+                else f"{who} sniffs the fake."
+            ),
+            f"Credit {who} — machine's busted.",
+            f"Close, but {who} claimed the point.",
+            (
+                f"{who} calls reply {decoy_reply}. That's the decoy."
+                if decoy_reply
+                else f"{who} calls it clean."
+            ),
+        ]
+        return _pick_unused(opts, recent, seed + len(who))
     if top and top.get("score", 0) > 0:
         return f"{top['name']} leads with {top['score']} points."
     return _pick_unused(

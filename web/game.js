@@ -29,12 +29,13 @@ let firstRoundOfSession = true;
 
 // Scripted host lines — keep in sync with services/voice_host.py LINES.
 // Live realtime forces these exact strings; mp3s were rendered from the same text.
+// win/lose mp3s are legacy; reveal outcomes now use varied Grok Voice lines.
 const HOST_LINES = {
   intro: "Welcome to the arcade. Tonight, one of the players at this cabinet is not a player at all.",
   round: "Four humans. One machine. Thirty seconds.",
   reveal: "Hands off the buttons. The decoy was...",
-  win: "Got it! The machine never stood a chance.",
-  lose: "Wrong! The machine walks free. House wins.",
+  win: "Point locked. The machine never stood a chance.",
+  lose: "House cashes. The machine walks free.",
 };
 
 // ---------- audio (mp3 always available; live voice is best-effort) ----------
@@ -1018,19 +1019,95 @@ const commentary = {
       const rev = (s && s.reveal) || {};
       const decoy = (typeof rev.decoy_slot === "number") ? rev.decoy_slot + 1
         : (typeof extra.decoy_slot === "number" ? extra.decoy_slot + 1 : null);
+      const myPick = (typeof extra.pick_reply === "number") ? extra.pick_reply : null;
+      const localCorrect = !!(extra.correct) || (w && w === myName);
+      const seed = rn * 31
+        + (decoy || 0) * 7
+        + (myPick || 0) * 3
+        + String(w || "house").length
+        + (localCorrect ? 17 : 0);
+
+      // Nobody found it — house point.
       if (!w || w === "house") {
         return this._rotate([
-          decoy ? ("House wins. Decoy was reply " + decoy + ".") : "House takes it.",
-          decoy ? ("Nobody had it. Fake hid in reply " + decoy + ".") : "House keeps the point.",
-          "Machine walks. House cashes.",
-        ], rn + (decoy || 0));
+          decoy
+            ? ("Nobody snagged it. Fake sat on reply " + decoy + ".")
+            : "Nobody snagged it. House takes the point.",
+          decoy
+            ? ("Clean miss. The bot hid in reply " + decoy + ".")
+            : "Clean miss. Machine walks.",
+          decoy
+            ? ("House cashes — decoy was reply " + decoy + ".")
+            : "House cashes this one.",
+          "The machine slips through. Point to the house.",
+          decoy
+            ? ("Tough board. Reply " + decoy + " was the imposter.")
+            : "Tough board. House keeps it.",
+          "All humans fooled. Arcade laughs.",
+          decoy
+            ? ("Swing and a miss. Bot lived in reply " + decoy + ".")
+            : "Swing and a miss. House wins the beat.",
+          "Robot night. Nobody read the room.",
+        ], seed);
       }
-      const who = w === myName ? "You" : w;
+
+      // Local player found the decoy.
+      if (localCorrect) {
+        return this._rotate([
+          decoy
+            ? ("You sniffed out reply " + decoy + ". Point yours.")
+            : "You sniffed it out. Point yours.",
+          decoy
+            ? ("Sharp eye — reply " + decoy + " was the bot.")
+            : "Sharp eye. That's a point.",
+          "Machine busted. Nice read.",
+          decoy
+            ? ("You had the read. Fake was reply " + decoy + ".")
+            : "You had the read. Plus one.",
+          "Caught the imposter cold. Well played.",
+          decoy
+            ? ("That's the one — reply " + decoy + ". Clean pick.")
+            : "That's the one. Clean pick.",
+          "Bot exposed. You take the board.",
+          decoy
+            ? ("You pinned reply " + decoy + ". Machine never blended.")
+            : "You pinned the fake. Machine never blended.",
+          "Arcade nods. That was the tell.",
+          decoy
+            ? ("Dead giveaway on reply " + decoy + ". Point to you.")
+            : "Dead giveaway. Point to you.",
+        ], seed);
+      }
+
+      // Someone else got it (local wrong or no pick).
+      const who = String(w);
       return this._rotate([
-        decoy ? (who + " called it — decoy was reply " + decoy + ".") : (who + " called it! Plus one."),
-        decoy ? (who + " sniffs out reply " + decoy + ". Plus one.") : (who + " takes the round."),
-        decoy ? ("Point to " + who + ". Fake lived in reply " + decoy + ".") : ("Board goes to " + who + "."),
-      ], rn + String(w).length + (decoy || 0));
+        decoy
+          ? (who + " nails it — decoy was reply " + decoy + ".")
+          : (who + " nails it. Point theirs."),
+        decoy
+          ? (who + " had the read. Fake hid in reply " + decoy + ".")
+          : (who + " had the read."),
+        myPick
+          ? ("Not this time — " + who + " got there first.")
+          : (who + " takes the round."),
+        decoy
+          ? ("Point to " + who + ". Reply " + decoy + " was the machine.")
+          : ("Point to " + who + "."),
+        myPick
+          ? (who + " saw it. Your card wasn't the one.")
+          : (who + " saw through the noise."),
+        decoy
+          ? (who + " sniffs reply " + decoy + ". Board goes their way.")
+          : (who + " sniffs the fake. Board goes their way."),
+        "Credit " + who + " — machine's busted.",
+        myPick
+          ? ("Close, but " + who + " claimed the point.")
+          : (who + " claims the point."),
+        decoy
+          ? (who + " calls reply " + decoy + ". That's the decoy.")
+          : (who + " calls it clean."),
+      ], seed);
     }
     if (event === "next_round") {
       return this._rotate([
@@ -1188,20 +1265,7 @@ const commentary = {
     }
 
     if (s.phase === "reveal" && was !== "reveal") {
-      // handleState already bumped the queue for the phase change + win/lose
-      // stinger. Do NOT bump again here or we cut the stinger. Sync gen only.
-      this.gen = voiceQueue.epoch;
-      const w = s.reveal && s.reveal.winner;
-      const mySlot = myGuessSlot;
-      const decoy = s.reveal && typeof s.reveal.decoy_slot === "number" ? s.reveal.decoy_slot : null;
-      const correct = (w && w === myName) || (decoy !== null && mySlot === decoy);
-      // One reveal line after outcome stinger (same epoch).
-      this.comment("reveal", s, {
-        winner: w || "house",
-        pick_reply: (typeof mySlot === "number") ? mySlot + 1 : null,
-        picker: myName,
-        correct: correct,
-      }, { delayMs: 550 });
+      // handleState calls speakReveal — don't double-fire here.
       this.lastLeader = leader;
     }
 
@@ -1212,6 +1276,72 @@ const commentary = {
     }
 
     if (s.phase !== "lobby") this.lastLobbyCount = players.length;
+  },
+
+  /**
+   * Reveal outcome line — varied by correct / wrong / house.
+   * Skips the old fixed "Got it!" / "Wrong!" mp3s; speaks Grok Voice (or
+   * template) immediately so every reveal sounds different.
+   */
+  speakReveal(s) {
+    if (!this.canSpeak() || !s || s.phase !== "reveal") return;
+    this.gen = voiceQueue.epoch;
+    const gen = this.gen;
+    const phase = "reveal";
+    const roundId = s.round && s.round.round_id ? s.round.round_id : null;
+    const w = s.reveal && s.reveal.winner;
+    const mySlot = myGuessSlot;
+    const decoy = s.reveal && typeof s.reveal.decoy_slot === "number"
+      ? s.reveal.decoy_slot
+      : null;
+    const correct = (w && w === myName)
+      || (decoy !== null && mySlot === decoy);
+    const extra = {
+      winner: w || "house",
+      pick_reply: (typeof mySlot === "number") ? mySlot + 1 : null,
+      picker: myName,
+      correct: correct,
+      decoy_slot: decoy,
+    };
+    const fallback = sanitizeHostLine(this.templateLine("reveal", s, extra))
+      || (correct ? "You sniffed it out." : "House cashes this one.");
+
+    let spoken = false;
+    const speakOnce = async (line) => {
+      if (spoken) return;
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      if (!this.eventAllowed("reveal", state && state.phase)) return;
+      const text = sanitizeHostLine(line);
+      if (!text) return;
+      // Avoid back-to-back identical reveals across rounds.
+      const low = text.toLowerCase();
+      if (this.recentLines.some((r) => r.toLowerCase() === low)) return;
+      spoken = true;
+      await speakWithGrok(text, { epoch: gen });
+      this.rememberLine(text);
+    };
+
+    // Race a short agent color line vs a ready template so audio starts fast.
+    this.inFlight += 1;
+    const agentPromise = this.askAgent("reveal", s, extra).finally(() => {
+      this.inFlight -= 1;
+    });
+
+    try { voiceQueue.items = []; } catch (e) { /* ignore */ }
+    voiceQueue.enqueue(async () => {
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      const raced = await Promise.race([
+        agentPromise.then((got) => ({ t: "agent", got: got })),
+        new Promise((resolve) => setTimeout(() => resolve({ t: "timeout" }), 450)),
+      ]);
+      if (!this.stillCurrent(gen, phase, roundId) || muted) return;
+      if (state && state.phase !== "reveal") return;
+      if (raced.t === "agent" && raced.got && raced.got.line) {
+        await speakOnce(raced.got.line);
+        if (spoken) return;
+      }
+      await speakOnce(fallback);
+    }, voiceMeta({ phase: phase, roundId: roundId, epoch: gen }));
   },
 
   /**
@@ -1430,10 +1560,9 @@ function handleState(s) {
   }
   if (s.phase === "reveal" && was !== "reveal") {
     unlockAudio();
-    const winner = s.reveal && s.reveal.winner;
-    const outcome = (!winner || winner === "house") ? "lose" : "win";
-    // Hard outcome sting only — agent reveal line comes from onState (delayed).
-    playHost(outcome);
+    // Varied Grok Voice line by correct/wrong/house — never the old fixed
+    // "Got it!" / "Wrong!" mp3 loop.
+    try { commentary.speakReveal(s); } catch (e) { /* ignore */ }
     requestAnimationFrame(() => {
       const panel = $("revealPanel");
       if (panel && !panel.hidden && panel.scrollIntoView) {
@@ -1444,8 +1573,42 @@ function handleState(s) {
   }
   if (s.phase === "results" && was !== "results") {
     unlockAudio();
-    // One sting on match end only — no agent color (avoids talking over scores).
-    try { playHost("win"); } catch (e) { /* ignore */ }
+    // Match-end: short varied line, not the legacy win mp3.
+    try {
+      if (commentary.canSpeak() && !muted) {
+        const board = getStandings(s);
+        const top = board[0];
+        const name = top && top.name ? top.name : null;
+        const youWin = name && name === myName;
+        const line = commentary._rotate(
+          youWin
+            ? [
+              "Match over. You take the cabinet.",
+              "Final board is yours. Well played.",
+              "You close it out. Arcade lights up.",
+              "Session done — you finish on top.",
+            ]
+            : name
+              ? [
+                "Match over. " + name + " owns the cabinet.",
+                "Final call — " + name + " leads the board.",
+                "Session done. Crown goes to " + name + ".",
+                name + " closes the night on top.",
+              ]
+              : [
+                "Match over. That's a wrap.",
+                "Session done. Reset when you're ready.",
+                "Arcade dark. Good games.",
+              ],
+          roundNo * 13 + (name ? name.length : 0)
+        );
+        voiceQueue.enqueue(async () => {
+          if (muted || !commentary.canSpeak()) return;
+          await speakWithGrok(line);
+          commentary.rememberLine(line);
+        }, voiceMeta({ phase: "results" }));
+      }
+    } catch (e) { /* ignore */ }
     requestAnimationFrame(() => {
       const panel = $("screen-results");
       if (panel && !panel.hidden && panel.scrollIntoView) {
