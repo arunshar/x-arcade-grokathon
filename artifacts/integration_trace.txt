@@ -1,6 +1,7 @@
-answer key: 6 servable rounds, gated out: []
+answer key: 65 servable rounds, gated out: []
+match cap for wrap proof: 70
 == http checks ==
-GET /health -> 200 {'mode': 'demo', 'rounds_available': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'tts_voice': 'eve', 'image_model': 'grok-imagine-image', 'video_model': 'grok-imagine-video-1.5', 'gif_round_mode': 'always_gif', 'match_rounds': 20}
+GET /health -> 200 {'mode': 'demo', 'rounds_available': 65, 'decoy_media_ready': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'tts_voice': 'eve', 'image_model': 'grok-imagine-image', 'video_model': 'grok-imagine-video-1.5', 'imagine_decoy_required': True, 'decoy_engine': 'grok-imagine-image+grok-imagine-video-1.5', 'gif_round_mode': 'alternate', 'match_rounds': 70, 'imagine_fast': True}
   [PASS] /health reports demo mode
   [PASS] /health counts screened rounds
 GET /token -> 200 keys=['demo', 'detail', 'expires_at', 'model', 'value']
@@ -15,10 +16,10 @@ P1 <- phase=lobby round=- P1(score=0 guessed=False)
 P1 <- phase=lobby round=- P1(score=0 guessed=False) P2(score=0 guessed=False)
 P2 <- phase=lobby round=- P1(score=0 guessed=False) P2(score=0 guessed=False)
   [PASS] second join waits for the clock, no auto-start
-P1 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score=0 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score=0 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=False) P2(score=0 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=False) P2(score=0 guessed=False) deadline_ms=14999
   [PASS] any player skips the wait into guessing
-== round 1: decoy-f6ad9d10aa85 ==
+== round 1: decoy-b13c9225b0d2 ==
   [PASS] served round comes from the committed queue
   [PASS] gated round is never served
   [PASS] round carries fresh gate result
@@ -26,17 +27,13 @@ P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
-  [PASS] gif round serves media on all five or none
-  [PASS] guessing media urls are opaque proxy paths
-  [PASS] guessing media type and status are uniform
-  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
-P1 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=0 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=0 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=0 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=0 guessed=False) deadline_ms=14999
   [PASS] one guess keeps the round open
 P2 -> guess slot=3 (the decoy)
-P1 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=1 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=1 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P1 <- phase=reveal round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=1 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=1 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
   [PASS] all guesses trigger reveal
   [PASS] reveal decoy_slot matches the round file
   [PASS] first correct guesser wins
@@ -44,10 +41,10 @@ P2 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=1 
   [PASS] reveal carries the demo share card
   [PASS] reveal restores is_decoy and authors
   [PASS] reveal shows who picked which reply
-P1 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=False) P2(score=1 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=False) P2(score=1 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-209820925ff6 P1(score=0 guessed=False) P2(score=1 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-209820925ff6 P1(score=0 guessed=False) P2(score=1 guessed=False) deadline_ms=14999
   [PASS] next starts the following round
-== round 2: decoy-5913ef31dd6d ==
+== round 2: decoy-209820925ff6 ==
   [PASS] served round comes from the committed queue
   [PASS] gated round is never served
   [PASS] round carries fresh gate result
@@ -60,12 +57,12 @@ P2 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=False) P2(score
   [PASS] guessing media type and status are uniform
   [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
-P1 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=1 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=1 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-209820925ff6 P1(score=0 guessed=True) P2(score=1 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-209820925ff6 P1(score=0 guessed=True) P2(score=1 guessed=False) deadline_ms=14999
   [PASS] one guess keeps the round open
 P2 -> guess slot=1 (the decoy)
-P1 <- phase=reveal round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=2 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=2 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P1 <- phase=reveal round=decoy-209820925ff6 P1(score=0 guessed=True) P2(score=2 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-209820925ff6 P1(score=0 guessed=True) P2(score=2 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
   [PASS] all guesses trigger reveal
   [PASS] reveal decoy_slot matches the round file
   [PASS] first correct guesser wins
@@ -73,10 +70,35 @@ P2 <- phase=reveal round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=2 
   [PASS] reveal carries the demo share card
   [PASS] reveal restores is_decoy and authors
   [PASS] reveal shows who picked which reply
-P1 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=False) P2(score=2 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=False) P2(score=2 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-9d1c8d1a83c4 P1(score=0 guessed=False) P2(score=2 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-9d1c8d1a83c4 P1(score=0 guessed=False) P2(score=2 guessed=False) deadline_ms=14999
   [PASS] next starts the following round
-== round 3: decoy-fdc7764b7ebb ==
+== round 3: decoy-9d1c8d1a83c4 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-9d1c8d1a83c4 P1(score=0 guessed=True) P2(score=2 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-9d1c8d1a83c4 P1(score=0 guessed=True) P2(score=2 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-9d1c8d1a83c4 P1(score=0 guessed=True) P2(score=3 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-9d1c8d1a83c4 P1(score=0 guessed=True) P2(score=3 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-ccf9c8132f74 P1(score=0 guessed=False) P2(score=3 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-ccf9c8132f74 P1(score=0 guessed=False) P2(score=3 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 4: decoy-ccf9c8132f74 ==
   [PASS] served round comes from the committed queue
   [PASS] gated round is never served
   [PASS] round carries fresh gate result
@@ -89,12 +111,91 @@ P2 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=False) P2(score
   [PASS] guessing media type and status are uniform
   [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
-P1 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=2 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=2 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-ccf9c8132f74 P1(score=0 guessed=True) P2(score=3 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-ccf9c8132f74 P1(score=0 guessed=True) P2(score=3 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-ccf9c8132f74 P1(score=0 guessed=True) P2(score=4 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-ccf9c8132f74 P1(score=0 guessed=True) P2(score=4 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-4d3b5a7db19c P1(score=0 guessed=False) P2(score=4 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-4d3b5a7db19c P1(score=0 guessed=False) P2(score=4 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 5: decoy-4d3b5a7db19c ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-4d3b5a7db19c P1(score=0 guessed=True) P2(score=4 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-4d3b5a7db19c P1(score=0 guessed=True) P2(score=4 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-4d3b5a7db19c P1(score=0 guessed=True) P2(score=5 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-4d3b5a7db19c P1(score=0 guessed=True) P2(score=5 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-c0ddc9d894a5 P1(score=0 guessed=False) P2(score=5 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-c0ddc9d894a5 P1(score=0 guessed=False) P2(score=5 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 6: decoy-c0ddc9d894a5 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-c0ddc9d894a5 P1(score=0 guessed=True) P2(score=5 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-c0ddc9d894a5 P1(score=0 guessed=True) P2(score=5 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-c0ddc9d894a5 P1(score=0 guessed=True) P2(score=6 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-c0ddc9d894a5 P1(score=0 guessed=True) P2(score=6 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-c4621efad43b P1(score=0 guessed=False) P2(score=6 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-c4621efad43b P1(score=0 guessed=False) P2(score=6 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 7: decoy-c4621efad43b ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-c4621efad43b P1(score=0 guessed=True) P2(score=6 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-c4621efad43b P1(score=0 guessed=True) P2(score=6 guessed=False) deadline_ms=14999
   [PASS] one guess keeps the round open
 P2 -> guess slot=4 (the decoy)
-P1 <- phase=reveal round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=3 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=3 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P1 <- phase=reveal round=decoy-c4621efad43b P1(score=0 guessed=True) P2(score=7 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-c4621efad43b P1(score=0 guessed=True) P2(score=7 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
   [PASS] all guesses trigger reveal
   [PASS] reveal decoy_slot matches the round file
   [PASS] first correct guesser wins
@@ -102,39 +203,10 @@ P2 <- phase=reveal round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=3 
   [PASS] reveal carries the demo share card
   [PASS] reveal restores is_decoy and authors
   [PASS] reveal shows who picked which reply
-P1 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=False) P2(score=3 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=False) P2(score=3 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-0fc6888d5fd4 P1(score=0 guessed=False) P2(score=7 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-0fc6888d5fd4 P1(score=0 guessed=False) P2(score=7 guessed=False) deadline_ms=14999
   [PASS] next starts the following round
-== round 4: decoy-e9ae15e902d5 ==
-  [PASS] served round comes from the committed queue
-  [PASS] gated round is never served
-  [PASS] round carries fresh gate result
-  [PASS] guessing strips decoy fields
-  [PASS] guessing replies carry no is_decoy and no author
-  [PASS] round has exactly 5 replies
-  [PASS] guessing hides who picked what
-  [PASS] gif round serves media on all five or none
-  [PASS] guessing media urls are opaque proxy paths
-  [PASS] guessing media type and status are uniform
-  [PASS] no real media path reaches the client during guessing
-P1 -> guess slot=0 (wrong)
-P1 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=True) P2(score=3 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=True) P2(score=3 guessed=False) deadline_ms=14999
-  [PASS] one guess keeps the round open
-P2 -> guess slot=1 (the decoy)
-P1 <- phase=reveal round=decoy-e9ae15e902d5 P1(score=0 guessed=True) P2(score=4 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-e9ae15e902d5 P1(score=0 guessed=True) P2(score=4 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-  [PASS] all guesses trigger reveal
-  [PASS] reveal decoy_slot matches the round file
-  [PASS] first correct guesser wins
-  [PASS] reveal carries the rationale
-  [PASS] reveal carries the demo share card
-  [PASS] reveal restores is_decoy and authors
-  [PASS] reveal shows who picked which reply
-P1 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=False) P2(score=4 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=False) P2(score=4 guessed=False) deadline_ms=14999
-  [PASS] next starts the following round
-== round 5: decoy-4da38a122dd5 ==
+== round 8: decoy-0fc6888d5fd4 ==
   [PASS] served round comes from the committed queue
   [PASS] gated round is never served
   [PASS] round carries fresh gate result
@@ -147,12 +219,12 @@ P2 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=False) P2(score
   [PASS] guessing media type and status are uniform
   [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=1 (wrong)
-P1 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=4 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=4 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-0fc6888d5fd4 P1(score=0 guessed=True) P2(score=7 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-0fc6888d5fd4 P1(score=0 guessed=True) P2(score=7 guessed=False) deadline_ms=14999
   [PASS] one guess keeps the round open
 P2 -> guess slot=0 (the decoy)
-P1 <- phase=reveal round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=5 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=5 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P1 <- phase=reveal round=decoy-0fc6888d5fd4 P1(score=0 guessed=True) P2(score=8 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-0fc6888d5fd4 P1(score=0 guessed=True) P2(score=8 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
   [PASS] all guesses trigger reveal
   [PASS] reveal decoy_slot matches the round file
   [PASS] first correct guesser wins
@@ -160,10 +232,10 @@ P2 <- phase=reveal round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=5 
   [PASS] reveal carries the demo share card
   [PASS] reveal restores is_decoy and authors
   [PASS] reveal shows who picked which reply
-P1 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=False) P2(score=5 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=False) P2(score=5 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-dc989f30b663 P1(score=0 guessed=False) P2(score=8 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-dc989f30b663 P1(score=0 guessed=False) P2(score=8 guessed=False) deadline_ms=14999
   [PASS] next starts the following round
-== round 6: decoy-17e290ce4a4f ==
+== round 9: decoy-dc989f30b663 ==
   [PASS] served round comes from the committed queue
   [PASS] gated round is never served
   [PASS] round carries fresh gate result
@@ -171,46 +243,1554 @@ P2 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
-  [PASS] gif round serves media on all five or none
-  [PASS] guessing media urls are opaque proxy paths
-  [PASS] guessing media type and status are uniform
-  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
-P1 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=True) P2(score=5 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=True) P2(score=5 guessed=False) deadline_ms=14999
-  [PASS] one guess keeps the round open
-P2 -> guess slot=1 (the decoy)
-P1 <- phase=reveal round=decoy-17e290ce4a4f P1(score=0 guessed=True) P2(score=6 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-17e290ce4a4f P1(score=0 guessed=True) P2(score=6 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-  [PASS] all guesses trigger reveal
-  [PASS] reveal decoy_slot matches the round file
-  [PASS] first correct guesser wins
-  [PASS] reveal carries the rationale
-  [PASS] reveal carries the demo share card
-  [PASS] reveal restores is_decoy and authors
-  [PASS] reveal shows who picked which reply
-P1 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score=6 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score=6 guessed=False) deadline_ms=14999
-  [PASS] next starts the following round
-== round 7: decoy-f6ad9d10aa85 ==
-  [PASS] served round comes from the committed queue
-  [PASS] gated round is never served
-  [PASS] round carries fresh gate result
-  [PASS] guessing strips decoy fields
-  [PASS] guessing replies carry no is_decoy and no author
-  [PASS] round has exactly 5 replies
-  [PASS] guessing hides who picked what
-  [PASS] gif round serves media on all five or none
-  [PASS] guessing media urls are opaque proxy paths
-  [PASS] guessing media type and status are uniform
-  [PASS] no real media path reaches the client during guessing
-P1 -> guess slot=0 (wrong)
-P1 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=6 guessed=False) deadline_ms=14999
-P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=6 guessed=False) deadline_ms=14999
+P1 <- phase=guessing round=decoy-dc989f30b663 P1(score=0 guessed=True) P2(score=8 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-dc989f30b663 P1(score=0 guessed=True) P2(score=8 guessed=False) deadline_ms=14999
   [PASS] one guess keeps the round open
 P2 -> guess slot=3 (the decoy)
-P1 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=7 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
-P2 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=7 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P1 <- phase=reveal round=decoy-dc989f30b663 P1(score=0 guessed=True) P2(score=9 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-dc989f30b663 P1(score=0 guessed=True) P2(score=9 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-d0527aaabeab P1(score=0 guessed=False) P2(score=9 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d0527aaabeab P1(score=0 guessed=False) P2(score=9 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 10: decoy-d0527aaabeab ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-d0527aaabeab P1(score=0 guessed=True) P2(score=9 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d0527aaabeab P1(score=0 guessed=True) P2(score=9 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-d0527aaabeab P1(score=0 guessed=True) P2(score=10 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-d0527aaabeab P1(score=0 guessed=True) P2(score=10 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-347c23be342d P1(score=0 guessed=False) P2(score=10 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-347c23be342d P1(score=0 guessed=False) P2(score=10 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 11: decoy-347c23be342d ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-347c23be342d P1(score=0 guessed=True) P2(score=10 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-347c23be342d P1(score=0 guessed=True) P2(score=10 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-347c23be342d P1(score=0 guessed=True) P2(score=11 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-347c23be342d P1(score=0 guessed=True) P2(score=11 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-0a8593290eb6 P1(score=0 guessed=False) P2(score=11 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-0a8593290eb6 P1(score=0 guessed=False) P2(score=11 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 12: decoy-0a8593290eb6 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-0a8593290eb6 P1(score=0 guessed=True) P2(score=11 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-0a8593290eb6 P1(score=0 guessed=True) P2(score=11 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-0a8593290eb6 P1(score=0 guessed=True) P2(score=12 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-0a8593290eb6 P1(score=0 guessed=True) P2(score=12 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-f2d853d81ab8 P1(score=0 guessed=False) P2(score=12 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-f2d853d81ab8 P1(score=0 guessed=False) P2(score=12 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 13: decoy-f2d853d81ab8 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-f2d853d81ab8 P1(score=0 guessed=True) P2(score=12 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-f2d853d81ab8 P1(score=0 guessed=True) P2(score=12 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-f2d853d81ab8 P1(score=0 guessed=True) P2(score=13 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-f2d853d81ab8 P1(score=0 guessed=True) P2(score=13 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-dd2a795161cb P1(score=0 guessed=False) P2(score=13 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-dd2a795161cb P1(score=0 guessed=False) P2(score=13 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 14: decoy-dd2a795161cb ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-dd2a795161cb P1(score=0 guessed=True) P2(score=13 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-dd2a795161cb P1(score=0 guessed=True) P2(score=13 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-dd2a795161cb P1(score=0 guessed=True) P2(score=14 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-dd2a795161cb P1(score=0 guessed=True) P2(score=14 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-5c3d21c4d47a P1(score=0 guessed=False) P2(score=14 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-5c3d21c4d47a P1(score=0 guessed=False) P2(score=14 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 15: decoy-5c3d21c4d47a ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-5c3d21c4d47a P1(score=0 guessed=True) P2(score=14 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-5c3d21c4d47a P1(score=0 guessed=True) P2(score=14 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-5c3d21c4d47a P1(score=0 guessed=True) P2(score=15 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-5c3d21c4d47a P1(score=0 guessed=True) P2(score=15 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-2d3bbd37a1c5 P1(score=0 guessed=False) P2(score=15 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-2d3bbd37a1c5 P1(score=0 guessed=False) P2(score=15 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 16: decoy-2d3bbd37a1c5 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-2d3bbd37a1c5 P1(score=0 guessed=True) P2(score=15 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-2d3bbd37a1c5 P1(score=0 guessed=True) P2(score=15 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=1 (the decoy)
+P1 <- phase=reveal round=decoy-2d3bbd37a1c5 P1(score=0 guessed=True) P2(score=16 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-2d3bbd37a1c5 P1(score=0 guessed=True) P2(score=16 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-3a7a31f8efd2 P1(score=0 guessed=False) P2(score=16 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-3a7a31f8efd2 P1(score=0 guessed=False) P2(score=16 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 17: decoy-3a7a31f8efd2 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-3a7a31f8efd2 P1(score=0 guessed=True) P2(score=16 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-3a7a31f8efd2 P1(score=0 guessed=True) P2(score=16 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=1 (the decoy)
+P1 <- phase=reveal round=decoy-3a7a31f8efd2 P1(score=0 guessed=True) P2(score=17 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-3a7a31f8efd2 P1(score=0 guessed=True) P2(score=17 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-5cf027df6714 P1(score=0 guessed=False) P2(score=17 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-5cf027df6714 P1(score=0 guessed=False) P2(score=17 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 18: decoy-5cf027df6714 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-5cf027df6714 P1(score=0 guessed=True) P2(score=17 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-5cf027df6714 P1(score=0 guessed=True) P2(score=17 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-5cf027df6714 P1(score=0 guessed=True) P2(score=18 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-5cf027df6714 P1(score=0 guessed=True) P2(score=18 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-b56b4cea61ba P1(score=0 guessed=False) P2(score=18 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b56b4cea61ba P1(score=0 guessed=False) P2(score=18 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 19: decoy-b56b4cea61ba ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-b56b4cea61ba P1(score=0 guessed=True) P2(score=18 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b56b4cea61ba P1(score=0 guessed=True) P2(score=18 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-b56b4cea61ba P1(score=0 guessed=True) P2(score=19 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b56b4cea61ba P1(score=0 guessed=True) P2(score=19 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-7b7b4b89c347 P1(score=0 guessed=False) P2(score=19 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-7b7b4b89c347 P1(score=0 guessed=False) P2(score=19 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 20: decoy-7b7b4b89c347 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-7b7b4b89c347 P1(score=0 guessed=True) P2(score=19 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-7b7b4b89c347 P1(score=0 guessed=True) P2(score=19 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-7b7b4b89c347 P1(score=0 guessed=True) P2(score=20 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-7b7b4b89c347 P1(score=0 guessed=True) P2(score=20 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-2aa532e964d7 P1(score=0 guessed=False) P2(score=20 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-2aa532e964d7 P1(score=0 guessed=False) P2(score=20 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 21: decoy-2aa532e964d7 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-2aa532e964d7 P1(score=0 guessed=True) P2(score=20 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-2aa532e964d7 P1(score=0 guessed=True) P2(score=20 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-2aa532e964d7 P1(score=0 guessed=True) P2(score=21 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-2aa532e964d7 P1(score=0 guessed=True) P2(score=21 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-2e5ab880e793 P1(score=0 guessed=False) P2(score=21 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-2e5ab880e793 P1(score=0 guessed=False) P2(score=21 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 22: decoy-2e5ab880e793 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-2e5ab880e793 P1(score=0 guessed=True) P2(score=21 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-2e5ab880e793 P1(score=0 guessed=True) P2(score=21 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-2e5ab880e793 P1(score=0 guessed=True) P2(score=22 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-2e5ab880e793 P1(score=0 guessed=True) P2(score=22 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-77784ce65b9a P1(score=0 guessed=False) P2(score=22 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-77784ce65b9a P1(score=0 guessed=False) P2(score=22 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 23: decoy-77784ce65b9a ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-77784ce65b9a P1(score=0 guessed=True) P2(score=22 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-77784ce65b9a P1(score=0 guessed=True) P2(score=22 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-77784ce65b9a P1(score=0 guessed=True) P2(score=23 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-77784ce65b9a P1(score=0 guessed=True) P2(score=23 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-d107ba4b784f P1(score=0 guessed=False) P2(score=23 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d107ba4b784f P1(score=0 guessed=False) P2(score=23 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 24: decoy-d107ba4b784f ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-d107ba4b784f P1(score=0 guessed=True) P2(score=23 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d107ba4b784f P1(score=0 guessed=True) P2(score=23 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-d107ba4b784f P1(score=0 guessed=True) P2(score=24 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-d107ba4b784f P1(score=0 guessed=True) P2(score=24 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-edcfdfa623ec P1(score=0 guessed=False) P2(score=24 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-edcfdfa623ec P1(score=0 guessed=False) P2(score=24 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 25: decoy-edcfdfa623ec ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-edcfdfa623ec P1(score=0 guessed=True) P2(score=24 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-edcfdfa623ec P1(score=0 guessed=True) P2(score=24 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-edcfdfa623ec P1(score=0 guessed=True) P2(score=25 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-edcfdfa623ec P1(score=0 guessed=True) P2(score=25 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-4b3570496c71 P1(score=0 guessed=False) P2(score=25 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-4b3570496c71 P1(score=0 guessed=False) P2(score=25 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 26: decoy-4b3570496c71 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-4b3570496c71 P1(score=0 guessed=True) P2(score=25 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-4b3570496c71 P1(score=0 guessed=True) P2(score=25 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-4b3570496c71 P1(score=0 guessed=True) P2(score=26 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-4b3570496c71 P1(score=0 guessed=True) P2(score=26 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-72729e5ce9ac P1(score=0 guessed=False) P2(score=26 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-72729e5ce9ac P1(score=0 guessed=False) P2(score=26 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 27: decoy-72729e5ce9ac ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-72729e5ce9ac P1(score=0 guessed=True) P2(score=26 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-72729e5ce9ac P1(score=0 guessed=True) P2(score=26 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-72729e5ce9ac P1(score=0 guessed=True) P2(score=27 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-72729e5ce9ac P1(score=0 guessed=True) P2(score=27 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-c485cb03c35f P1(score=0 guessed=False) P2(score=27 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-c485cb03c35f P1(score=0 guessed=False) P2(score=27 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 28: decoy-c485cb03c35f ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-c485cb03c35f P1(score=0 guessed=True) P2(score=27 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-c485cb03c35f P1(score=0 guessed=True) P2(score=27 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-c485cb03c35f P1(score=0 guessed=True) P2(score=28 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-c485cb03c35f P1(score=0 guessed=True) P2(score=28 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-ee0f22ae2418 P1(score=0 guessed=False) P2(score=28 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-ee0f22ae2418 P1(score=0 guessed=False) P2(score=28 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 29: decoy-ee0f22ae2418 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-ee0f22ae2418 P1(score=0 guessed=True) P2(score=28 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-ee0f22ae2418 P1(score=0 guessed=True) P2(score=28 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-ee0f22ae2418 P1(score=0 guessed=True) P2(score=29 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-ee0f22ae2418 P1(score=0 guessed=True) P2(score=29 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-88f6b9efa598 P1(score=0 guessed=False) P2(score=29 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-88f6b9efa598 P1(score=0 guessed=False) P2(score=29 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 30: decoy-88f6b9efa598 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-88f6b9efa598 P1(score=0 guessed=True) P2(score=29 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-88f6b9efa598 P1(score=0 guessed=True) P2(score=29 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-88f6b9efa598 P1(score=0 guessed=True) P2(score=30 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-88f6b9efa598 P1(score=0 guessed=True) P2(score=30 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-1a0bbfe1663f P1(score=0 guessed=False) P2(score=30 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-1a0bbfe1663f P1(score=0 guessed=False) P2(score=30 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 31: decoy-1a0bbfe1663f ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-1a0bbfe1663f P1(score=0 guessed=True) P2(score=30 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-1a0bbfe1663f P1(score=0 guessed=True) P2(score=30 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-1a0bbfe1663f P1(score=0 guessed=True) P2(score=31 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-1a0bbfe1663f P1(score=0 guessed=True) P2(score=31 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-980ddff0b37b P1(score=0 guessed=False) P2(score=31 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-980ddff0b37b P1(score=0 guessed=False) P2(score=31 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 32: decoy-980ddff0b37b ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-980ddff0b37b P1(score=0 guessed=True) P2(score=31 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-980ddff0b37b P1(score=0 guessed=True) P2(score=31 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-980ddff0b37b P1(score=0 guessed=True) P2(score=32 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-980ddff0b37b P1(score=0 guessed=True) P2(score=32 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-dddc1cb8ed7c P1(score=0 guessed=False) P2(score=32 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-dddc1cb8ed7c P1(score=0 guessed=False) P2(score=32 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 33: decoy-dddc1cb8ed7c ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-dddc1cb8ed7c P1(score=0 guessed=True) P2(score=32 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-dddc1cb8ed7c P1(score=0 guessed=True) P2(score=32 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-dddc1cb8ed7c P1(score=0 guessed=True) P2(score=33 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-dddc1cb8ed7c P1(score=0 guessed=True) P2(score=33 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-67906fab936c P1(score=0 guessed=False) P2(score=33 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-67906fab936c P1(score=0 guessed=False) P2(score=33 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 34: decoy-67906fab936c ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-67906fab936c P1(score=0 guessed=True) P2(score=33 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-67906fab936c P1(score=0 guessed=True) P2(score=33 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-67906fab936c P1(score=0 guessed=True) P2(score=34 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-67906fab936c P1(score=0 guessed=True) P2(score=34 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-820960440b37 P1(score=0 guessed=False) P2(score=34 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-820960440b37 P1(score=0 guessed=False) P2(score=34 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 35: decoy-820960440b37 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-820960440b37 P1(score=0 guessed=True) P2(score=34 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-820960440b37 P1(score=0 guessed=True) P2(score=34 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-820960440b37 P1(score=0 guessed=True) P2(score=35 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-820960440b37 P1(score=0 guessed=True) P2(score=35 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-06886ba3c830 P1(score=0 guessed=False) P2(score=35 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-06886ba3c830 P1(score=0 guessed=False) P2(score=35 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 36: decoy-06886ba3c830 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-06886ba3c830 P1(score=0 guessed=True) P2(score=35 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-06886ba3c830 P1(score=0 guessed=True) P2(score=35 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-06886ba3c830 P1(score=0 guessed=True) P2(score=36 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-06886ba3c830 P1(score=0 guessed=True) P2(score=36 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-b2cf54e89b2d P1(score=0 guessed=False) P2(score=36 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b2cf54e89b2d P1(score=0 guessed=False) P2(score=36 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 37: decoy-b2cf54e89b2d ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-b2cf54e89b2d P1(score=0 guessed=True) P2(score=36 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b2cf54e89b2d P1(score=0 guessed=True) P2(score=36 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-b2cf54e89b2d P1(score=0 guessed=True) P2(score=37 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b2cf54e89b2d P1(score=0 guessed=True) P2(score=37 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-18cab2f9460c P1(score=0 guessed=False) P2(score=37 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-18cab2f9460c P1(score=0 guessed=False) P2(score=37 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 38: decoy-18cab2f9460c ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-18cab2f9460c P1(score=0 guessed=True) P2(score=37 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-18cab2f9460c P1(score=0 guessed=True) P2(score=37 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=1 (the decoy)
+P1 <- phase=reveal round=decoy-18cab2f9460c P1(score=0 guessed=True) P2(score=38 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-18cab2f9460c P1(score=0 guessed=True) P2(score=38 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-42b95f8adf54 P1(score=0 guessed=False) P2(score=38 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-42b95f8adf54 P1(score=0 guessed=False) P2(score=38 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 39: decoy-42b95f8adf54 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-42b95f8adf54 P1(score=0 guessed=True) P2(score=38 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-42b95f8adf54 P1(score=0 guessed=True) P2(score=38 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-42b95f8adf54 P1(score=0 guessed=True) P2(score=39 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-42b95f8adf54 P1(score=0 guessed=True) P2(score=39 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-991434ad9b1e P1(score=0 guessed=False) P2(score=39 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-991434ad9b1e P1(score=0 guessed=False) P2(score=39 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 40: decoy-991434ad9b1e ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-991434ad9b1e P1(score=0 guessed=True) P2(score=39 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-991434ad9b1e P1(score=0 guessed=True) P2(score=39 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-991434ad9b1e P1(score=0 guessed=True) P2(score=40 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-991434ad9b1e P1(score=0 guessed=True) P2(score=40 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-6e871e043e85 P1(score=0 guessed=False) P2(score=40 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-6e871e043e85 P1(score=0 guessed=False) P2(score=40 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 41: decoy-6e871e043e85 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-6e871e043e85 P1(score=0 guessed=True) P2(score=40 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-6e871e043e85 P1(score=0 guessed=True) P2(score=40 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-6e871e043e85 P1(score=0 guessed=True) P2(score=41 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-6e871e043e85 P1(score=0 guessed=True) P2(score=41 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-360e09c2ebff P1(score=0 guessed=False) P2(score=41 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-360e09c2ebff P1(score=0 guessed=False) P2(score=41 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 42: decoy-360e09c2ebff ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-360e09c2ebff P1(score=0 guessed=True) P2(score=41 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-360e09c2ebff P1(score=0 guessed=True) P2(score=41 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-360e09c2ebff P1(score=0 guessed=True) P2(score=42 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-360e09c2ebff P1(score=0 guessed=True) P2(score=42 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-4631caa78282 P1(score=0 guessed=False) P2(score=42 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-4631caa78282 P1(score=0 guessed=False) P2(score=42 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 43: decoy-4631caa78282 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-4631caa78282 P1(score=0 guessed=True) P2(score=42 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-4631caa78282 P1(score=0 guessed=True) P2(score=42 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-4631caa78282 P1(score=0 guessed=True) P2(score=43 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-4631caa78282 P1(score=0 guessed=True) P2(score=43 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-86ea8f74276c P1(score=0 guessed=False) P2(score=43 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-86ea8f74276c P1(score=0 guessed=False) P2(score=43 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 44: decoy-86ea8f74276c ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-86ea8f74276c P1(score=0 guessed=True) P2(score=43 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-86ea8f74276c P1(score=0 guessed=True) P2(score=43 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=1 (the decoy)
+P1 <- phase=reveal round=decoy-86ea8f74276c P1(score=0 guessed=True) P2(score=44 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-86ea8f74276c P1(score=0 guessed=True) P2(score=44 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-02aeb53c7ae9 P1(score=0 guessed=False) P2(score=44 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-02aeb53c7ae9 P1(score=0 guessed=False) P2(score=44 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 45: decoy-02aeb53c7ae9 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-02aeb53c7ae9 P1(score=0 guessed=True) P2(score=44 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-02aeb53c7ae9 P1(score=0 guessed=True) P2(score=44 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-02aeb53c7ae9 P1(score=0 guessed=True) P2(score=45 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-02aeb53c7ae9 P1(score=0 guessed=True) P2(score=45 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-0bdf62f98ff2 P1(score=0 guessed=False) P2(score=45 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-0bdf62f98ff2 P1(score=0 guessed=False) P2(score=45 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 46: decoy-0bdf62f98ff2 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-0bdf62f98ff2 P1(score=0 guessed=True) P2(score=45 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-0bdf62f98ff2 P1(score=0 guessed=True) P2(score=45 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-0bdf62f98ff2 P1(score=0 guessed=True) P2(score=46 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-0bdf62f98ff2 P1(score=0 guessed=True) P2(score=46 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-888391f0d4b5 P1(score=0 guessed=False) P2(score=46 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-888391f0d4b5 P1(score=0 guessed=False) P2(score=46 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 47: decoy-888391f0d4b5 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-888391f0d4b5 P1(score=0 guessed=True) P2(score=46 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-888391f0d4b5 P1(score=0 guessed=True) P2(score=46 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-888391f0d4b5 P1(score=0 guessed=True) P2(score=47 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-888391f0d4b5 P1(score=0 guessed=True) P2(score=47 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-6cdecd62defc P1(score=0 guessed=False) P2(score=47 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-6cdecd62defc P1(score=0 guessed=False) P2(score=47 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 48: decoy-6cdecd62defc ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-6cdecd62defc P1(score=0 guessed=True) P2(score=47 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-6cdecd62defc P1(score=0 guessed=True) P2(score=47 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-6cdecd62defc P1(score=0 guessed=True) P2(score=48 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-6cdecd62defc P1(score=0 guessed=True) P2(score=48 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-d00cc4f07ae0 P1(score=0 guessed=False) P2(score=48 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d00cc4f07ae0 P1(score=0 guessed=False) P2(score=48 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 49: decoy-d00cc4f07ae0 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-d00cc4f07ae0 P1(score=0 guessed=True) P2(score=48 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d00cc4f07ae0 P1(score=0 guessed=True) P2(score=48 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-d00cc4f07ae0 P1(score=0 guessed=True) P2(score=49 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-d00cc4f07ae0 P1(score=0 guessed=True) P2(score=49 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-d06b129053ae P1(score=0 guessed=False) P2(score=49 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d06b129053ae P1(score=0 guessed=False) P2(score=49 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 50: decoy-d06b129053ae ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-d06b129053ae P1(score=0 guessed=True) P2(score=49 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d06b129053ae P1(score=0 guessed=True) P2(score=49 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-d06b129053ae P1(score=0 guessed=True) P2(score=50 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-d06b129053ae P1(score=0 guessed=True) P2(score=50 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-d84336dd4bc4 P1(score=0 guessed=False) P2(score=50 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d84336dd4bc4 P1(score=0 guessed=False) P2(score=50 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 51: decoy-d84336dd4bc4 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-d84336dd4bc4 P1(score=0 guessed=True) P2(score=50 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-d84336dd4bc4 P1(score=0 guessed=True) P2(score=50 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-d84336dd4bc4 P1(score=0 guessed=True) P2(score=51 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-d84336dd4bc4 P1(score=0 guessed=True) P2(score=51 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-154c6192d625 P1(score=0 guessed=False) P2(score=51 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-154c6192d625 P1(score=0 guessed=False) P2(score=51 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 52: decoy-154c6192d625 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-154c6192d625 P1(score=0 guessed=True) P2(score=51 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-154c6192d625 P1(score=0 guessed=True) P2(score=51 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-154c6192d625 P1(score=0 guessed=True) P2(score=52 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-154c6192d625 P1(score=0 guessed=True) P2(score=52 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-26eb4cdd3c5c P1(score=0 guessed=False) P2(score=52 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-26eb4cdd3c5c P1(score=0 guessed=False) P2(score=52 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 53: decoy-26eb4cdd3c5c ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-26eb4cdd3c5c P1(score=0 guessed=True) P2(score=52 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-26eb4cdd3c5c P1(score=0 guessed=True) P2(score=52 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=1 (the decoy)
+P1 <- phase=reveal round=decoy-26eb4cdd3c5c P1(score=0 guessed=True) P2(score=53 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-26eb4cdd3c5c P1(score=0 guessed=True) P2(score=53 guessed=True) reveal(decoy_slot=1 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-6a9186976d57 P1(score=0 guessed=False) P2(score=53 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-6a9186976d57 P1(score=0 guessed=False) P2(score=53 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 54: decoy-6a9186976d57 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-6a9186976d57 P1(score=0 guessed=True) P2(score=53 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-6a9186976d57 P1(score=0 guessed=True) P2(score=53 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-6a9186976d57 P1(score=0 guessed=True) P2(score=54 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-6a9186976d57 P1(score=0 guessed=True) P2(score=54 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-79b7a1322422 P1(score=0 guessed=False) P2(score=54 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-79b7a1322422 P1(score=0 guessed=False) P2(score=54 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 55: decoy-79b7a1322422 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-79b7a1322422 P1(score=0 guessed=True) P2(score=54 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-79b7a1322422 P1(score=0 guessed=True) P2(score=54 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-79b7a1322422 P1(score=0 guessed=True) P2(score=55 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-79b7a1322422 P1(score=0 guessed=True) P2(score=55 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-b840a47bde46 P1(score=0 guessed=False) P2(score=55 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b840a47bde46 P1(score=0 guessed=False) P2(score=55 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 56: decoy-b840a47bde46 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-b840a47bde46 P1(score=0 guessed=True) P2(score=55 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b840a47bde46 P1(score=0 guessed=True) P2(score=55 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-b840a47bde46 P1(score=0 guessed=True) P2(score=56 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b840a47bde46 P1(score=0 guessed=True) P2(score=56 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-f8b5c75085b0 P1(score=0 guessed=False) P2(score=56 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-f8b5c75085b0 P1(score=0 guessed=False) P2(score=56 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 57: decoy-f8b5c75085b0 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-f8b5c75085b0 P1(score=0 guessed=True) P2(score=56 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-f8b5c75085b0 P1(score=0 guessed=True) P2(score=56 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=2 (the decoy)
+P1 <- phase=reveal round=decoy-f8b5c75085b0 P1(score=0 guessed=True) P2(score=57 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-f8b5c75085b0 P1(score=0 guessed=True) P2(score=57 guessed=True) reveal(decoy_slot=2 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-b6837624664f P1(score=0 guessed=False) P2(score=57 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b6837624664f P1(score=0 guessed=False) P2(score=57 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 58: decoy-b6837624664f ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-b6837624664f P1(score=0 guessed=True) P2(score=57 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b6837624664f P1(score=0 guessed=True) P2(score=57 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-b6837624664f P1(score=0 guessed=True) P2(score=58 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b6837624664f P1(score=0 guessed=True) P2(score=58 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-b4733f8707fc P1(score=0 guessed=False) P2(score=58 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b4733f8707fc P1(score=0 guessed=False) P2(score=58 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 59: decoy-b4733f8707fc ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-b4733f8707fc P1(score=0 guessed=True) P2(score=58 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b4733f8707fc P1(score=0 guessed=True) P2(score=58 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-b4733f8707fc P1(score=0 guessed=True) P2(score=59 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b4733f8707fc P1(score=0 guessed=True) P2(score=59 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-420057366da1 P1(score=0 guessed=False) P2(score=59 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-420057366da1 P1(score=0 guessed=False) P2(score=59 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 60: decoy-420057366da1 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-420057366da1 P1(score=0 guessed=True) P2(score=59 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-420057366da1 P1(score=0 guessed=True) P2(score=59 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-420057366da1 P1(score=0 guessed=True) P2(score=60 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-420057366da1 P1(score=0 guessed=True) P2(score=60 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-5a5667d291f5 P1(score=0 guessed=False) P2(score=60 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-5a5667d291f5 P1(score=0 guessed=False) P2(score=60 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 61: decoy-5a5667d291f5 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-5a5667d291f5 P1(score=0 guessed=True) P2(score=60 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-5a5667d291f5 P1(score=0 guessed=True) P2(score=60 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-5a5667d291f5 P1(score=0 guessed=True) P2(score=61 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-5a5667d291f5 P1(score=0 guessed=True) P2(score=61 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-923271fb6240 P1(score=0 guessed=False) P2(score=61 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-923271fb6240 P1(score=0 guessed=False) P2(score=61 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 62: decoy-923271fb6240 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-923271fb6240 P1(score=0 guessed=True) P2(score=61 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-923271fb6240 P1(score=0 guessed=True) P2(score=61 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-923271fb6240 P1(score=0 guessed=True) P2(score=62 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-923271fb6240 P1(score=0 guessed=True) P2(score=62 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-a9ad692ef90e P1(score=0 guessed=False) P2(score=62 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-a9ad692ef90e P1(score=0 guessed=False) P2(score=62 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 63: decoy-a9ad692ef90e ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-a9ad692ef90e P1(score=0 guessed=True) P2(score=62 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-a9ad692ef90e P1(score=0 guessed=True) P2(score=62 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=4 (the decoy)
+P1 <- phase=reveal round=decoy-a9ad692ef90e P1(score=0 guessed=True) P2(score=63 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-a9ad692ef90e P1(score=0 guessed=True) P2(score=63 guessed=True) reveal(decoy_slot=4 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-e959f33f7120 P1(score=0 guessed=False) P2(score=63 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-e959f33f7120 P1(score=0 guessed=False) P2(score=63 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 64: decoy-e959f33f7120 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-e959f33f7120 P1(score=0 guessed=True) P2(score=63 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-e959f33f7120 P1(score=0 guessed=True) P2(score=63 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-e959f33f7120 P1(score=0 guessed=True) P2(score=64 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-e959f33f7120 P1(score=0 guessed=True) P2(score=64 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-f05f530aca93 P1(score=0 guessed=False) P2(score=64 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-f05f530aca93 P1(score=0 guessed=False) P2(score=64 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 65: decoy-f05f530aca93 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+P1 -> guess slot=1 (wrong)
+P1 <- phase=guessing round=decoy-f05f530aca93 P1(score=0 guessed=True) P2(score=64 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-f05f530aca93 P1(score=0 guessed=True) P2(score=64 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=0 (the decoy)
+P1 <- phase=reveal round=decoy-f05f530aca93 P1(score=0 guessed=True) P2(score=65 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-f05f530aca93 P1(score=0 guessed=True) P2(score=65 guessed=True) reveal(decoy_slot=0 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] all guesses trigger reveal
+  [PASS] reveal decoy_slot matches the round file
+  [PASS] first correct guesser wins
+  [PASS] reveal carries the rationale
+  [PASS] reveal carries the demo share card
+  [PASS] reveal restores is_decoy and authors
+  [PASS] reveal shows who picked which reply
+P1 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=False) P2(score=65 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=False) P2(score=65 guessed=False) deadline_ms=14999
+  [PASS] next starts the following round
+== round 66: decoy-b13c9225b0d2 ==
+  [PASS] served round comes from the committed queue
+  [PASS] gated round is never served
+  [PASS] round carries fresh gate result
+  [PASS] guessing strips decoy fields
+  [PASS] guessing replies carry no is_decoy and no author
+  [PASS] round has exactly 5 replies
+  [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
+P1 -> guess slot=0 (wrong)
+P1 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=65 guessed=False) deadline_ms=14999
+P2 <- phase=guessing round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=65 guessed=False) deadline_ms=14999
+  [PASS] one guess keeps the round open
+P2 -> guess slot=3 (the decoy)
+P1 <- phase=reveal round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=66 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+P2 <- phase=reveal round=decoy-b13c9225b0d2 P1(score=0 guessed=True) P2(score=66 guessed=True) reveal(decoy_slot=3 winner=P2 card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
   [PASS] all guesses trigger reveal
   [PASS] reveal decoy_slot matches the round file
   [PASS] first correct guesser wins
@@ -223,19 +1803,25 @@ P2 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=7 
   [PASS] winner score accumulates across rounds
 == match cap: reveal at the cap goes to results, then back to lobby ==
 C1 <- phase=lobby round=- C1(score=0 guessed=False)
-C1 <- phase=guessing round=decoy-5913ef31dd6d C1(score=0 guessed=False) deadline_ms=14999
+C1 <- phase=guessing round=decoy-209820925ff6 C1(score=0 guessed=False) deadline_ms=14999
   [PASS] capped match round starts
-C1 <- phase=reveal round=decoy-5913ef31dd6d C1(score=0 guessed=True) reveal(decoy_slot=1 winner=house card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+C1 <- phase=reveal round=decoy-209820925ff6 C1(score=0 guessed=True) reveal(decoy_slot=1 winner=house card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
   [PASS] capped match reveals
   [PASS] last reveal flags match_over
-C1 <- phase=results round=decoy-5913ef31dd6d C1(score=0 guessed=True)
+C1 <- phase=results round=decoy-209820925ff6 C1(score=0 guessed=True)
   [PASS] next after the cap enters results
   [PASS] results phase carries a results payload
-C1 <- phase=guessing round=decoy-fdc7764b7ebb C1(score=0 guessed=False) deadline_ms=14999
+C1 <- phase=guessing round=decoy-9d1c8d1a83c4 C1(score=0 guessed=False) deadline_ms=14999
   [PASS] next after results starts a new match
   [PASS] new match resets score and round counter
+== multiplayer lobby refuses to start with one player ==
+A <- phase=lobby round=- A(score=0 guessed=False)
+  [PASS] multiplayer min_players is 2
+  [PASS] one player cannot start multiplayer
+A <- phase=lobby round=- A(score=0 guessed=False)
+  [PASS] next with one player stays in lobby
 == serve-time shuffle invariants (bypassed above via ARCADE_NO_SHUFFLE) ==
   [PASS] 20 shuffles keep slots a permutation and decoy_slot true
   [PASS] shuffle actually moves the decoy across slots
 
-integration: ALL CHECKS PASSED (7 rounds played, zero network egress)
+integration: ALL CHECKS PASSED (66 rounds played, zero network egress)
