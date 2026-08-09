@@ -535,6 +535,32 @@ body.has-scoreboard main {
   opacity: 0.4;
   cursor: not-allowed;
 }
+.topic-selection-status {
+  margin: 10px 0 0;
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--mut);
+}
+.topic-selection-status b {
+  color: var(--cyan);
+}
+.topic-selection-status.is-random b {
+  color: var(--mut);
+}
+.chip-theme {
+  max-width: 42vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-color: rgba(0, 229, 255, 0.35);
+  color: var(--cyan);
+}
+.chip-theme.is-random {
+  color: var(--mut);
+  border-color: var(--line);
+}
 .lobby-topic-line {
   text-align: center;
   font-size: 11px;

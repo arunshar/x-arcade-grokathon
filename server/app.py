@@ -2016,6 +2016,20 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 else:
                     await _broadcast(room)
 
+            elif t == "set_topics":
+                # Host may re-assert the theme anytime while still in lobby
+                # (recovers lost filters after reconnect / race).
+                room = ROOMS.get(room_id)
+                if room is None or joined is None or room["phase"] != "lobby":
+                    continue
+                hostish = bool(msg.get("arena") or msg.get("host"))
+                only = len(room["players"]) == 1
+                name = joined[1]
+                is_member = name in room["players"]
+                if is_member and (hostish or only):
+                    _apply_room_topics(room, msg, allow=True)
+                    await _broadcast(room)
+
             elif t == "next":
                 room = ROOMS.get(room_id)
                 if room is None or joined is None or not room["players"]:
@@ -2108,6 +2122,24 @@ async def ws_endpoint(ws: WebSocket) -> None:
                         _cancel_timer(room)
                         _cancel_auto(room)
                         ROOMS.pop(joined[0], None)
+
+
+@app.middleware("http")
+async def _no_cache_web_assets(request: Request, call_next):  # type: ignore[no-redef]
+    """Browsers were keeping stale game.js after Space deploys — theme filter
+    fixes never reached players who hard-refreshed only the HTML shell.
+    """
+    response = await call_next(request)
+    path = (request.url.path or "").lower()
+    if (
+        path == "/"
+        or path.endswith(".html")
+        or path.endswith(".js")
+        or path.endswith(".css")
+    ):
+        response.headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+    return response
 
 
 # Mounted last so /ws, /health, /token, /tts, /join-info, and /qr.png win the

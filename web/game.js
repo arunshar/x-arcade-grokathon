@@ -1591,6 +1591,11 @@ function handleState(s) {
   state = s;
   noteAutoDeadline(s);
 
+  // Keep top-bar theme chip + lobby status in sync with server filter.
+  try { updateTopicSelectionStatus(s.topic_filter); } catch (e) { /* ignore */ }
+  // Recover if host locked a theme but server still has [].
+  try { ensureThemeOnServer(s); } catch (e) { /* ignore */ }
+
   const newRoundId = s.round && s.round.round_id ? s.round.round_id : null;
   const phaseChanged = was !== null && was !== s.phase;
   const roundChanged = !!(newRoundId && wasRoundId && newRoundId !== wasRoundId);
@@ -2802,6 +2807,32 @@ function loadTopicCatalog() {
     });
 }
 
+function updateTopicSelectionStatus(serverTopics) {
+  const topics = Array.isArray(serverTopics)
+    ? serverTopics
+    : (lockedThemePayload && lockedThemePayload.topics && lockedThemePayload.topics.length
+      ? lockedThemePayload.topics
+      : selectedTopicsPayload());
+  const label = formatTopicFilterLabel(topics);
+  const isRandom = !topics || !topics.length;
+  const status = $("topicSelectionStatus");
+  if (status) {
+    status.innerHTML = isRandom
+      ? "SELECTED · <b>RANDOM MIX</b> (every theme)"
+      : ("SELECTED · <b>" + label + "</b>");
+    status.classList.toggle("is-random", isRandom);
+  }
+  const chip = $("themeChip");
+  if (chip) {
+    chip.hidden = false;
+    chip.textContent = isRandom ? "THEME · RANDOM" : ("THEME · " + label);
+    chip.classList.toggle("is-random", isRandom);
+    chip.title = isRandom
+      ? "No filter — posts from every theme"
+      : ("Only posts in: " + label);
+  }
+}
+
 function renderTopicChips() {
   const box = $("topicChips");
   if (!box) return;
@@ -2828,6 +2859,7 @@ function renderTopicChips() {
     btn.addEventListener("click", () => toggleTopicGroup(id));
     box.appendChild(btn);
   });
+  updateTopicSelectionStatus();
 }
 
 function toggleTopicGroup(id) {
@@ -2857,6 +2889,24 @@ function toggleTopicGroup(id) {
         : (base + "Filter OFF · RANDOM MIX — posts from every theme.");
     }
   } catch (e) { /* ignore */ }
+}
+
+/** If we locked a theme but the server still shows RANDOM, re-push it. */
+let themeResyncTries = 0;
+function ensureThemeOnServer(s) {
+  if (!joined || !iAmHost || !s) return;
+  if (s.phase !== "lobby") return;
+  const want = activeThemePayload();
+  const wantTopics = (want.topics || []).slice().map((t) => String(t).toLowerCase()).sort();
+  if (!wantTopics.length) return; // intentional random
+  const got = (s.topic_filter || []).map((t) => String(t).toLowerCase()).sort();
+  if (wantTopics.join(",") === got.join(",")) {
+    themeResyncTries = 0;
+    return;
+  }
+  if (themeResyncTries >= 4) return;
+  themeResyncTries += 1;
+  send(Object.assign({ t: "set_topics", room: myRoom, arena: true }, want));
 }
 
 /** Resolve chip id → member topic slugs (defaults if catalog is thin). */
@@ -2931,6 +2981,8 @@ function activeThemePayload() {
 /** Snapshot chip selection so later reconnects cannot drop the theme. */
 function lockThemeFromChips() {
   lockedThemePayload = themePayloadFields();
+  themeResyncTries = 0;
+  try { updateTopicSelectionStatus(lockedThemePayload.topics); } catch (e) { /* ignore */ }
   return lockedThemePayload;
 }
 

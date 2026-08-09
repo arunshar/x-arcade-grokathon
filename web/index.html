@@ -8,7 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <title>X ARCADE // DECOY</title>
-<link rel="stylesheet" href="style.css">
+<!-- Cache-bust static assets so Space deploys are not stuck on old game.js -->
+<link rel="stylesheet" href="style.css?v=theme4">
 </head>
 <body>
 <div id="crt" aria-hidden="true"></div>
@@ -21,6 +22,7 @@
   <div class="topbar-right">
     <span class="chip chip-safety" id="safetyChip" hidden>ARENA CLEARED BY SAFETY GATES</span>
     <span class="chip chip-demo" id="demoBadge" hidden>DEMO</span>
+    <span class="chip chip-theme" id="themeChip" hidden title="active post filter">THEME · RANDOM</span>
     <span class="chip chip-points" id="myPoints" hidden title="your points">YOU 0</span>
     <span class="chip chip-lead" id="leadChip" hidden title="current leader">LEAD —</span>
     <span class="chip chip-conn" id="connChip" title="connection">…</span>
@@ -68,14 +70,16 @@
           </div>
         </div>
         <div class="field topic-filter-field" id="topicFilterField">
-          <span>POST TOPICS</span>
+          <span>POST TOPICS (REQUIRED FOR FILTER)</span>
           <p class="mode-hint topic-filter-hint" id="topicFilterHint">
-            Tap one or more themes. <b>All 6 posts</b> stay inside that mix
-            (e.g. TECHNOLOGY alone → only tech/AI posts;
-            TECHNOLOGY + SPORTS + FOOD → only those).
-            <b>RANDOM</b> = every theme.
+            Tap theme chips below so they glow cyan. <b>All 6 posts</b> stay
+            in that mix. Multi-select OK (e.g. TECHNOLOGY + SPORTS + FOOD).
+            Leave only <b>RANDOM</b> on for every theme.
           </p>
           <div class="topic-chips" id="topicChips" role="group" aria-label="topic filters"></div>
+          <p class="topic-selection-status" id="topicSelectionStatus" aria-live="polite">
+            SELECTED · <b>RANDOM MIX</b>
+          </p>
         </div>
         <p class="mode-hint" id="createHint">Share this code (or the QR below) so others can join.</p>
         <button class="big-btn" id="createEnterBtn" type="button">ENTER ROOM</button>
@@ -185,6 +189,6 @@
 </main>
 
 
-<script src="game.js"></script>
+<script src="game.js?v=theme4"></script>
 </body>
 </html>
