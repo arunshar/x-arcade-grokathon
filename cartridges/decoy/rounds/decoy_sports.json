@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-17e290ce4a4f",
+  "round_id": "decoy-86ea8f74276c",
   "source": {
-    "post_text": "🚨 Chelsea have been linked with a surprise move for Arsenal midfielder Martín Zubimendi.\n\nNew Blues boss Xabi Alonso is reportedly keen on the World Cup winner, but Arsenal have no intention of letting him leave — despite the £75M arrival of Bruno Guimarães.\n\n(Source: Mundo Deportivo",
-    "post_author": "@DeadlineDayLive",
-    "post_url": "https://x.com/DeadlineDayLive/status/2085793093144731845",
+    "post_text": "Romero and his camp had continued talks with Arsenal today, they believe that the deal can happen. \n\nTottenham are trying their best to stop this being a possibility. \n\n#THFC",
+    "post_author": "@LilywhiteLeaks",
+    "post_url": "https://x.com/LilywhiteLeaks/status/2086239830199902508",
     "topic": "sports"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "What happened to the shin kicker??😂",
-      "author": "@TradeforGoals",
+      "text": "Probably is, I’m just speaking hypothetically. £35M is already cheap though, I can’t imagine you’d go any lower",
+      "author": "@AFC55555",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "Chelsea chasing Zubimendi after Arsenal just rebuilt that midfield is peak delusion — elite clubs don’t gift key pieces mid-project",
+      "text": "Both sides have valid points here really, Arsenal need defensive cover and Romero wants out, yet Spurs are right to protect their asset from a rival so any deal hinges on whether the valuation gap can close reasonably.",
       "author": "decoy",
       "is_decoy": true
     },
     {
       "slot": 2,
-      "text": "No chance Arsenal let him walk straight to a rival, especially with how crucial he’s been for the midfield engine.",
-      "author": "@TacticaHQ",
+      "text": "Trying their best. We literally have him tied down. Could let him rot or sue him into oblivion for breach of contract if he doesn’t anything",
+      "author": "@GK1Spurs1882",
       "is_decoy": false
     },
     {
       "slot": 3,
-      "text": "Is Chelsea mad? What’s wiry going after anyrhing Arsenal? Can’t they stand on their own?",
-      "author": "@Richinbodymind",
+      "text": "I honestly think it will come down to the difference in the bids. If there is only a difference of lets say 5-10m I can't see any scenario Spurs sanctioning it. If the difference is lets say 25-35m then maybe they would look at it as smart business.",
+      "author": "@Graham_Stewart5",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "Chelsea targeting Zubimendi? Arsenal fans just laughed and carried on with their day. 😂🔴",
-      "author": "@Obynodollar",
+      "text": "He’s already made it clear he won’t play for you again, I think you have no other choice but to sell",
+      "author": "@Ramseycentro3",
       "is_decoy": false
     }
   ],
   "decoy_slot": 1,
-  "decoy_rationale": "Uses tidy analyst framing (“mid-project”, “elite clubs don’t gift”) more than the jagged banter of the real replies.",
+  "decoy_rationale": "The reply is oddly balanced and slightly essay-like in neutrally weighing both clubs' positions without a clear partisan edge.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 948117227
+  "seed": 675084245
 }

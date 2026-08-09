@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-e9ae15e902d5",
+  "round_id": "decoy-7b7b4b89c347",
   "source": {
-    "post_text": "Ryan Hurst has shared a photo of himself partially in makeup as Kratos for the live-action ‘GOD OF WAR’ series before he was recast.",
+    "post_text": "Director Jane Schoenbrun on working with Gillian Anderson in ‘TEENAGE SEX AND DEATH AT CAMP MIASMA’.\n\n“I think she’s been very hesitant to return to genre after The X-Files, and I’m really happy that in this movie... she is bringing such deeply serious gravitas to the role.”",
     "post_author": "@DiscussingFilm",
-    "post_url": "https://x.com/DiscussingFilm/status/2086143411984208230",
+    "post_url": "https://x.com/DiscussingFilm/status/2086252499732926881",
     "topic": "movies"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "I still think this show should have done ALL of Kratos’s story, and not just part skip to the Norse trilogy \n\nLike there’s 7 games and a canonical crossover bossfight that should be covered before this",
-      "author": "@Adventuremaker7",
+      "text": "That actually makes me more interested. If Gillian Anderson was hesitant to come back to genre stuff after The X-Files and THIS is what got her, there’s probably something pretty damn good in that script.",
+      "author": "@MintedTools",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "he already had the kratos silhouette locked and they still recast him which is such a classic studio overthink move",
-      "author": "decoy",
-      "is_decoy": true
+      "text": "hesitant? more like she was waiting for the right script. finally getting her moment.",
+      "author": "@AiwithAnnie",
+      "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "Ça le faisait tellement j’ai trop le seum",
-      "author": "@hyakkimaruu__",
+      "text": "Anderson returning to genre with a serious, grounded performance sounds like a perfect creative choice.  After The X-Files, expectations will be high but this role could show just how much range she still has.",
+      "author": "@AliJerub",
       "is_decoy": false
     },
     {
       "slot": 3,
-      "text": "I'm not Grok but apparently he effed his shoulder up in a scene. But he's also a newly remade Muslim or some shit, and I think that might have something to do with it. Cheers, Drinker! Keep up the good work, Legend!",
-      "author": "@DonDrawsStuff",
+      "text": "Excited to see Gillian back in a genre role! Her talent always brings depth to characters.",
+      "author": "@wickspendd",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "why was he recast tho",
-      "author": "@Silverstar_ot",
-      "is_decoy": false
+      "text": "Her stepping back into genre with that kind of weight after years away really highlights how strong the material must be, balancing legacy expectations with something fresh.",
+      "author": "decoy",
+      "is_decoy": true
     }
   ],
-  "decoy_slot": 1,
-  "decoy_rationale": "Labels the decision a “classic studio overthink move” — tidy media-analysis framing real fans rarely package that cleanly.",
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly too polished and oddly balanced in its explanatory hedging between past legacy and new material.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 210886257
+  "seed": 124608483
 }

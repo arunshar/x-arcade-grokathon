@@ -1,0 +1,50 @@
+{
+  "round_id": "decoy-820960440b37",
+  "source": {
+    "post_text": "After the Chicxulub impact 66 million years ago, trillions of tonnes of rock vapour was launched into space before falling back to Earth at ballistic speeds, creating a global blast of heat strong enough to broil life on land https://www.newscientist.com/article/2581822-asteroid-strike-caused-global-firestorm-that-incinerated-the-dinosaurs/?utm_term=Autofeed&utm_campaign=echobox&utm_medium=social&utm_source=Twitter#Echobox=1786211111",
+    "post_author": "@newscientist",
+    "post_url": "https://x.com/newscientist/status/2086153318011716005",
+    "topic": "science"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "tasted like (roast) chicken",
+      "author": "@EricBaxter_",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "One bad day. Followed by several million years of consequences.",
+      "author": "@LukeKinsky",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "The sheer scale of the Chicxulub impact illustrates how rapidly geological and atmospheric shifts can reshape the biosphere. The process of vaporizing trillions of tonnes of rock creates a devastating feedback loop of thermal radiation.",
+      "author": "@AnisAIb6",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Oh boy. More dino junk. I do note the pterosaur is a reptile. I doubt the artist did/",
+      "author": "@JoelLeonardHam1",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Hard to wrap your head around how that much vaporized rock falling back created a heat pulse hot enough to wipe out most land life almost instantly, basically resetting the whole planet in one go.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The phrasing feels a bit too smoothly explanatory and evenly paced, like a polished summary rather than a spontaneous reaction.",
+  "safety": {
+    "screened": false,
+    "gate_codes": [
+      "G_SOURCE"
+    ]
+  },
+  "seed": 158540776
+}

@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-fdc7764b7ebb",
+  "round_id": "decoy-f2d853d81ab8",
   "source": {
-    "post_text": "Update: A family who was celebrating their 5y/o child’s birthday at Joey Tomatoes pizzeria in Point Pleasant beach was berated by the owner for asking for a knife to cut a Birthday cake after they spent $250 for food & drinks. Allegedly they called before bringing it.Who’s right?",
-    "post_author": "@Suzierizzo1",
-    "post_url": "https://x.com/Suzierizzo1/status/2086181164620931494",
+    "post_text": "In the USA, olive oil can be cut with cheaper seed oils, typically in food service, but it’s illegal to sell that blend as “100% olive oil” without disclosing it. Fraud and mislabeling can still happen overseas, so buy reputable, single origin, harvest dated EVOO, preferably produced and certified in the USA.",
+    "post_author": "@ChefGruel",
+    "post_url": "https://x.com/ChefGruel/status/2086245061797556315",
     "topic": "food"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "Most restaurants have a no outside food or drink policy but would allow for exceptions for something like a birthday cake with permission. They said they called ahead. That’s just bad business.",
-      "author": "@kingofkings0247",
+      "text": "Which brand do you use?",
+      "author": "@v4victoriously",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "@JoeyTomatoes staff behavior was abhorrent, just outright assholes ruining a birthday party .",
-      "author": "@saralynne65",
+      "text": "dude who is ‘she’ ?",
+      "author": "@angelicas40",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "The owner just “killed” her own restaurant",
-      "author": "@JimmyBenningho2",
-      "is_decoy": false
+      "text": "Yeah solid advice, sticking to harvest-dated single-origin stuff from known US producers cuts the risk quite a bit compared to random imports.",
+      "author": "decoy",
+      "is_decoy": true
     },
     {
       "slot": 3,
-      "text": "That business owner would have lost my business FOR LIFE.\nWhy would ANY business owner treat their customers like that?!\nWhen you lose 1 customer, it could be 10. Word of mouth is the best, or worst, advertising one can get.",
-      "author": "@William02216755",
+      "text": "I hate to tell you this but this is also happening in Italy.",
+      "author": "@belgi2024",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "Wild they handled a kid’s birthday like that after a $250 tab. That’s not a one-off screwup, it’s a hospitality culture problem.",
-      "author": "decoy",
-      "is_decoy": true
+      "text": "I bought a 3L tin of olive oil from Supermarket Italy for ~100$ including shipping. It has been 3 months and that thing is still mostly full",
+      "author": "@Komidor_64",
+      "is_decoy": false
     }
   ],
-  "decoy_slot": 4,
-  "decoy_rationale": "Jumps from the incident to a tidy culture diagnosis instead of the messier anger or jokes in the real replies.",
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply is a bit too polished and explanatory in its balanced risk-comparison phrasing, feeling slightly essay-like rather than purely casual.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 725101952
+  "seed": 822790728
 }

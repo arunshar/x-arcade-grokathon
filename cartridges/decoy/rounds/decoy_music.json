@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-4da38a122dd5",
+  "round_id": "decoy-edcfdfa623ec",
   "source": {
-    "post_text": "Polish prodigy Marcin Patrzalek responds to those claiming his music is fake. \n\nWatch this tutorial breakdown: One guitar, zero fakes – mastering melody, bass, and percussion all at once.",
-    "post_author": "@Rainmaker1973",
-    "post_url": "https://x.com/Rainmaker1973/status/2086110183114035484",
+    "post_text": "DJ Akademiks Says West Coast Rap Has 'Zero Motion' Despite Kendrick Lamar Success Details: https://www.complex.com/music/a/jaelaniturnerwilliams/dj-akademiks-west-coast-rap-zero-motion-kendrick-lamar?utm_medium=social&utm_source=twitter_complex&utm_campaign=ap_twitter/",
+    "post_author": "@ComplexMusic",
+    "post_url": "https://x.com/ComplexMusic/status/2086197610897907778",
     "topic": "music"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "that mix is way too full for one live guitar no cap the arrangement density alone gives away the layering",
-      "author": "decoy",
-      "is_decoy": true
+      "text": "“They’ll never get over it!” 😆😆",
+      "author": "@leonsandstorm",
+      "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "Marcin is awesome! I remember a couple of years ago I heard him and was hooked 👌🏼🙌🏼",
-      "author": "@pearpears0",
+      "text": "Ok. Good talk, then.",
+      "author": "@BogusPogus15",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "That snare hit quite a few times without his hand tho",
-      "author": "@scottwilly86",
+      "text": "You aren’t even from the west so how can you speak on the sound of the west",
+      "author": "@brumanfrmda5flo",
       "is_decoy": false
     },
     {
       "slot": 3,
-      "text": "como se nota que nunca escuchaste rumba.",
-      "author": "@darkzideral",
-      "is_decoy": false
+      "text": "Akademiks might have a point on the mainstream side but the West still has solid underground energy that just doesn't get the same national push as other coasts.",
+      "author": "decoy",
+      "is_decoy": true
     },
     {
       "slot": 4,
-      "text": "So overdubbed and phony.",
-      "author": "@Gorilla_Finger1",
+      "text": "Because I listen to Hip-Hop from the west and I saw how Drakeo evolved it.",
+      "author": "@makaveliprince",
       "is_decoy": false
     }
   ],
-  "decoy_slot": 0,
-  "decoy_rationale": "Performs slang (“no cap”) while delivering a clinical “arrangement density” tell that feels half-engineer, half-tryhard.",
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply is oddly balanced and slightly explanatory in a polished way that feels more composed than casual Twitter banter.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 765686702
+  "seed": 808029712
 }

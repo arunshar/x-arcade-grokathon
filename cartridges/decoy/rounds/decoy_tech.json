@@ -1,0 +1,50 @@
+{
+  "round_id": "decoy-154c6192d625",
+  "source": {
+    "post_text": "Genspark just released its first-ever hardware product: a tiny, credit-card-sized device that attaches magnetically to the back of your phone via MagSafe.\n\nIt quietly captures and remembers your conversations, so important information doesn’t simply disappear.",
+    "post_author": "@kimmonismus",
+    "post_url": "https://x.com/kimmonismus/status/2086090114049163270",
+    "topic": "tech"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Cool but why isn't this an app on my phone",
+      "author": "@YannickMrCrypto",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Grabbing what? It’s a paid post talk to me when you go into debt for it ;-)",
+      "author": "@CaptainSurefire",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "This is the same as plot and all the other devices just like that one, come on man",
+      "author": "@roygatx",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "The MagSafe form factor makes sense for seamless use and the security certs help, but overall it still strikes me as a solution looking for a bigger problem than forgotten convos.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "always listening but make it magsafe is nasty work",
+      "author": "@modisulak",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply is oddly balanced and slightly essay-like in weighing pros against cons.",
+  "safety": {
+    "screened": false,
+    "gate_codes": [
+      "G_SOURCE"
+    ]
+  },
+  "seed": 824078812
+}

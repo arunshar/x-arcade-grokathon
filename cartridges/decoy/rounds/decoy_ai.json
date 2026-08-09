@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-f6ad9d10aa85",
+  "round_id": "decoy-b13c9225b0d2",
   "source": {
-    "post_text": "Moving all my AI usage to Codex until Anthropic fixes this \n\nClaude is genuinely unusable",
-    "post_author": "@Jeremybtc",
-    "post_url": "https://x.com/Jeremybtc/status/2086174103225131136",
+    "post_text": "GPT-4 finished training four years ago today.",
+    "post_author": "@gdb",
+    "post_url": "https://x.com/gdb/status/2086092396023120286",
     "topic": "ai"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "It should get updated",
-      "author": "@DefiCrypto11",
+      "text": "In four years, the competitive edge shifted from who has the biggest team to who can orchestrate the best system.",
+      "author": "@PromptlyIgnore",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "gotta find some alternative",
-      "author": "@theyfwJuice",
+      "text": "finished before chatgpt launched. most of the last four years of ai discourse has been downstream of weights locked before the public knew the model existed",
+      "author": "@256_rc",
       "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "Damn okay fam",
-      "author": "@Mar_vel26",
+      "text": "4 years ago GPT-4 finished training. Since: 4o, o1, 5.x—and now we're flagging models as 'critical' cybersecurity risks. The safety conversation has gone from 'will it help' to 'will it hurt'. Exponential stakes.",
+      "author": "@ncdevshiv",
       "is_decoy": false
     },
     {
       "slot": 3,
-      "text": "Crazy how fast the quality fell off — feels less like a bad week and more like a deeper product regression nobody wants to own.",
+      "text": "Hard to believe those weights locked in so long ago still shape everything—progress feels both inevitable from scaling and oddly incremental once you look past the hype cycles.",
       "author": "decoy",
       "is_decoy": true
     },
     {
       "slot": 4,
-      "text": "They really need to work on this before they lose all their customers",
-      "author": "@youfadedwealth",
+      "text": "Four years later, still waiting for the singularity to show up.",
+      "author": "@MachineNova",
       "is_decoy": false
     }
   ],
   "decoy_slot": 3,
-  "decoy_rationale": "Stacks a clean cause-effect diagnosis (“deeper product regression”) that reads like a product postmortem, not a gut reaction.",
+  "decoy_rationale": "The reply is oddly balanced/hedged with a slightly essay-like explanatory tone that undercuts spontaneous human vibe.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 683426962
+  "seed": 641551423
 }

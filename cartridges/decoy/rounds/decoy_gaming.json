@@ -1,0 +1,50 @@
+{
+  "round_id": "decoy-5c3d21c4d47a",
+  "source": {
+    "post_text": "Jason Schreier explains why the anti-consumer concerns about the GTA 6 extended look being a timed exclusive on Netflix are overblown:\n\n“6 hours is not a lot of time in the grand scheme of things. It doesn’t really hurt anybody to have a gameplay footage available on Netflix 6 hours in advance. I mean this is all marketing, it’s not like we’re talking about a video game being made only available to some subset of players.",
+    "post_author": "@GTAVI_Countdown",
+    "post_url": "https://x.com/GTAVI_Countdown/status/2086236879041462674",
+    "topic": "gaming"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "I see both sides but six hours of early Netflix access for pure marketing footage really doesn't move the needle much. Most folks will catch the trailer whenever, so the consumer-hostile framing feels overstated compared to bigger industry issues.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "I'm still pissed they're not releasing it on PC day one",
+      "author": "@ReallyObsidious",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Brainless people are trying to",
+      "author": "@MMaRsu",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Maybe not the casual gamer that plays candy crush but they won't be Interested in GTA 6 anyway, the rest will, they don't need to watch netflix",
+      "author": "@Nippy_Kangaroo",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "It's always the ones that come with all the insults that are always the dumbest motherfuckers. \n\nYes, dipshit, I know it's marketing. That wasn't my point. \n\nEither having a 6 hour gap is a marketing move to make money and build exposure and hype for the game.",
+      "author": "@reidood",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply has an oddly balanced/hedged and slightly explanatory tone that feels too measured and polished for a casual X thread.",
+  "safety": {
+    "screened": false,
+    "gate_codes": [
+      "G_SOURCE"
+    ]
+  },
+  "seed": 235130939
+}

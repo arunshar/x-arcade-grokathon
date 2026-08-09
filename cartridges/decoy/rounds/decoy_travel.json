@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-b6837624664f",
+  "source": {
+    "post_text": "how much money do I have to make per year to go to a beach that looks like this but with 95% less people",
+    "post_author": "@mil000",
+    "post_url": "https://x.com/mil000/status/2086251990921957685",
+    "topic": "travel"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Honestly it depends more on flexibility than raw income—plenty of quieter stretches exist in the Canaries or rural Greece if you aim for shoulder season and keep expectations realistic around 50-70k.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "I should have captioned that- that was Maui, this was Kauai",
+      "author": "@airline_king",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Do you care which country?",
+      "author": "@jon3k",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "rent an island",
+      "author": "@Edybuilds",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "indonesia / thailand / philippines all have places like this you can live on less than $1k usd per month",
+      "author": "@oneandrewwang",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply is slightly too polished and hedged with balanced caveats, giving it a mildly explanatory tone rather than casual snap judgment.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 787909974
+}

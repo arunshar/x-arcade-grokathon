@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-6e871e043e85",
+  "source": {
+    "post_text": "Total solar eclipses provide a unique opportunity to study the Sun, and on Aug. 12, we'll take to the skies to learn more.\n\nNASA-funded teams will study the eclipse with a high-flying research jet and scientific balloons: https://science.nasa.gov/science-research/heliophysics/nasa-science-soars-during-august-total-solar-eclipse/?utm_source=TWITTER&utm_medium=NASA&utm_campaign=NASASocial&linkId=991121966",
+    "post_author": "@NASA",
+    "post_url": "https://x.com/NASA/status/2085745531163218083",
+    "topic": "space"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "What is the latest space mission?",
+      "author": "@VirtuLin",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Do you plan to release the footages?",
+      "author": "@Epam00",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Beautiful! A very special 12 Year Anniversary, like the 12 Months in 1 Single Year👍",
+      "author": "@Alexand6872r49",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Research jets and balloons are such elegant compromises: above much of the atmosphere, below orbital cost, and mobile enough to chase totality. Which measurement benefits most from the extra observing time—the corona, ionosphere, or something less obvious?",
+      "author": "@SmithStation1",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Those high-flying platforms sound ideal for catching the corona details that vanish so quickly from the ground. Curious how the balloon data will complement the jet runs on atmospheric effects.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory in neatly linking the platforms to specific science goals, with an oddly balanced structure.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 365598410
+}

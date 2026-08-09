@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-88f6b9efa598",
+  "source": {
+    "post_text": "In October the Pacers can package Kelly Oubre, Obi Toppin & Shep for an almost perfect salary match in a Trey Murphy trade….\n\nI like those 3 dudes a lot. But Trey is THAT good + keeps our superstar happy.",
+    "post_author": "@NbaWoody",
+    "post_url": "https://x.com/NbaWoody/status/2085950786366996876",
+    "topic": "nba"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "His paint defense is also ass bruh",
+      "author": "@DepSah_",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Aw yeah I think this the move I always said Trey was the perfect piece",
+      "author": "@AkaTonyGreen",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "That's a good comp, the funny thing is that Pascal a legit All-Star and OG proven to be a contributor on a playoff team.\n\nMurphy and the like, have proven nothing, yet Pels think they've more value.\n\nJarace + TJ are the 2 guys I have my eye on the most performance/trade wise.",
+      "author": "@CFalcon31",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "That’s so disrespectful to Nesmith smh",
+      "author": "@emotionaltrip93",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Yeah moving those three for Murphy feels like the right call overall since his two-way upside is real and it keeps Hali content long-term, even if the bench takes a temporary hit.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply is slightly too balanced and explanatory in weighing upsides against a downside, giving it a polished hedged quality.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 66379037
+}

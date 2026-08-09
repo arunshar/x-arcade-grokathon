@@ -1,48 +1,48 @@
 {
-  "round_id": "decoy-5913ef31dd6d",
+  "round_id": "decoy-d0527aaabeab",
   "source": {
-    "post_text": "🤯 Bitcoin implied volatility hits yearly LOWS.\n\nYou know what this means, right...",
-    "post_author": "@cryptorover",
-    "post_url": "https://x.com/cryptorover/status/2086159645052215533",
+    "post_text": "JUST IN: MagooStrategy has purchased another 10 Bitcoin for a price of 64,900 each.\n\n- Coldcard hack ✅ \n- Failed Clarity Act ✅ \n- Failed Contention fork ✅ \n\nPrice not dipping at all on all 3 of these in a week is bullish.",
+    "post_author": "@HodlMagoo",
+    "post_url": "https://x.com/HodlMagoo/status/2086234289058840878",
     "topic": "crypto"
   },
   "replies": [
     {
       "slot": 0,
-      "text": "cheap insurance before the next blowup\n\neveryone too comfortable rn",
-      "author": "@brita_lisa",
+      "text": "Proof: trust me, bro",
+      "author": "@eddyluxe_",
       "is_decoy": false
     },
     {
       "slot": 1,
-      "text": "Compressed vol regimes almost never last; historically you get a sharp expansion once everyone is positioned the same way.",
-      "author": "decoy",
-      "is_decoy": true
+      "text": "Any publicity is good publicity 😉",
+      "author": "@AndrewHurley66",
+      "is_decoy": false
     },
     {
       "slot": 2,
-      "text": "the honest answer is that low volatility usually precedes a significant move up or down. market sentiment hasn't changed, but the lack of price discovery might indicate a shift in investor behavior.",
-      "author": "@adelbucetta",
+      "text": "I think you’re still early. Bitcoin should be 70s already, now August closes down typically. Then Stock market hiccup around end of Q3. 50s, maybe 40s.",
+      "author": "@spoonmvn",
       "is_decoy": false
     },
     {
       "slot": 3,
-      "text": "Low volatility usually does not last forever. The question is not whether BTC moves, but which direction gets confirmed.",
-      "author": "@TokenTrailHQ",
+      "text": "Would you say bottom probably in now?",
+      "author": "@markerogan",
       "is_decoy": false
     },
     {
       "slot": 4,
-      "text": "We already feared it's coming.",
-      "author": "@gainzalgo",
-      "is_decoy": false
+      "text": "Absorbing those three hits without any real selloff does point to decent underlying demand building up.",
+      "author": "decoy",
+      "is_decoy": true
     }
   ],
-  "decoy_slot": 1,
-  "decoy_rationale": "Sounds like a textbook risk note — “historically” plus neat regime language without the messy shorthand of real traders.",
+  "decoy_slot": 4,
+  "decoy_rationale": "Slightly too polished and explanatory phrasing that feels more balanced/essay-like than the casual real replies.",
   "safety": {
     "screened": true,
     "gate_codes": []
   },
-  "seed": 882748265
+  "seed": 661654794
 }

@@ -47,7 +47,21 @@ from fixtures_core import FixtureMissError, FixtureStore
 
 ROUNDS_DIR = Path(__file__).resolve().parent / "rounds"
 ROUND_ID_SALT = "x-arcade-decoy-v1"
-DEMO_TOPICS = ["ai", "sports", "movies", "crypto", "food", "music"]
+DEMO_TOPICS = [
+    "ai",
+    "sports",
+    "movies",
+    "crypto",
+    "food",
+    "music",
+    # Extra variety beyond the original six.
+    "gaming",
+    "science",
+    "tech",
+    "space",
+    "nba",
+    "travel",
+]
 
 POST_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -275,24 +289,96 @@ TOPIC_QUERIES = {
         "food, cooking, restaurants, or recipes. Skip posts that are mainly "
         "about sports teams"
     ),
+    "gaming": (
+        "video games, a new game release, esports, or game studios. Skip crypto "
+        "and politics"
+    ),
+    "science": (
+        "science news, research findings, space science, biology, or physics from "
+        "a science-focused account. Skip pure politics"
+    ),
+    "tech": (
+        "consumer tech, gadgets, phones, software products, or startups. Skip "
+        "purely political culture-war posts"
+    ),
+    "space": (
+        "spaceflight, astronomy, NASA, rockets, or planets from a space-focused "
+        "account"
+    ),
+    "nba": (
+        "NBA basketball, a recent game, trade, or player performance. Skip "
+        "non-basketball sports"
+    ),
+    "travel": (
+        "travel, destinations, airlines, or trip photos with real discussion. "
+        "Skip pure ads with no replies"
+    ),
+    "ai": (
+        "AI products, models, or research from tech or AI accounts. Prefer a "
+        "fresh post not the same viral complaint every time"
+    ),
+    "crypto": (
+        "crypto markets, bitcoin, ethereum, or on-chain news. Prefer market or "
+        "product discussion over pure memes"
+    ),
+    "sports": (
+        "soccer or football transfer news or a big match, from a sports account. "
+        "Avoid posts with external news URLs in the body if possible"
+    ),
+    "music": (
+        "music releases, artists, concerts, or music news from a music-focused "
+        "account"
+    ),
 }
+
+
+def _existing_post_ids() -> set[str]:
+    """Post ids already committed — ask search to avoid duplicates when refreshing."""
+    ids: set[str] = set()
+    if not ROUNDS_DIR.is_dir():
+        return ids
+    for path in ROUNDS_DIR.glob("decoy_*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        pid = str((data.get("source") or {}).get("post_id") or "")
+        if not pid:
+            url = str((data.get("source") or {}).get("post_url") or "")
+            if "/status/" in url:
+                pid = url.rstrip("/").rsplit("/status/", 1)[-1].split("?")[0]
+        if pid.isdigit():
+            ids.add(pid)
+    return ids
 
 
 def _find_prompt(topic: str, broad: bool) -> str:
     topic_query = TOPIC_QUERIES.get(topic, topic)
+    avoid = _existing_post_ids()
+    avoid_clause = ""
+    if avoid:
+        sample = ", ".join(sorted(avoid)[:12])
+        avoid_clause = (
+            f" Do NOT pick any of these already-used post ids: {sample}."
+        )
     if broad:
         return (
             f"Search X for any popular post from the last 7 days related to {topic_query} "
             "with a healthy reply count, at least 5 replies. Pick one whose replies "
-            "are full sentences, not just emoji. Return the numeric post id, the "
-            "post text verbatim, the author handle, and the canonical x.com post url."
+            "are full sentences, not just emoji. Prefer a DIFFERENT thread than the "
+            "most over-quoted viral posts."
+            f"{avoid_clause} "
+            "Return the numeric post id, the post text verbatim, the author handle, "
+            "and the canonical x.com post url."
         )
     return (
         f"Search X for one engaging post from the last 48 hours about {topic_query} "
         "with a healthy reply count, at least 5 replies. Pick a post whose replies "
-        "are substantive full thoughts, not just emoji or tags. Return the numeric "
-        "post id, the post text verbatim, the author handle, and the canonical "
-        "x.com post url."
+        "are substantive full thoughts, not just emoji or tags. Prefer variety — "
+        "a fresh conversation, not the same mega-viral post everyone quotes."
+        f"{avoid_clause} "
+        "Return the numeric post id, the post text verbatim, the author handle, "
+        "and the canonical x.com post url."
     )
 
 
@@ -453,9 +539,33 @@ def _screen(round_dict: dict[str, Any]) -> dict[str, Any]:
     return {"screened": False, "gate_codes": []}
 
 
+def _soft_trim(text: str, limit: int) -> str:
+    """Trim long X copy so G_SOURCE length bounds still pass.
+
+    Prefers a sentence/word boundary; adds an ellipsis when truncated.
+    """
+    text = (text or "").strip()
+    if len(text) <= limit:
+        return text
+    cut = text[: max(1, limit - 1)]
+    for sep in (". ", "! ", "? ", "\n", "; ", ", ", " "):
+        idx = cut.rfind(sep)
+        if idx >= max(40, limit // 3):
+            # Keep terminal punctuation when we cut on .!?
+            keep_punct = sep.strip() in ".!?"
+            cut = cut[: idx + (1 if keep_punct else 0)]
+            break
+    cut = cut.rstrip(" ,;:-")
+    if cut and cut[-1] not in ".!?…":
+        cut = cut.rstrip(".") + "…"
+    return cut[:limit]
+
+
 def _assemble(
     topic: str, thread: dict[str, Any], decoy_text: str, rationale: str
 ) -> dict[str, Any]:
+    from plugins.safety.screen import MAX_POST_CHARS, MAX_REPLY_CHARS
+
     post_id = thread["post_id"]
     seed = int(hashlib.sha256(post_id.encode()).hexdigest()[:12], 16) % 1_000_000_007
     round_id = (
@@ -464,10 +574,20 @@ def _assemble(
     )
 
     entries = [
-        {"text": r["text"], "author": r["author"], "is_decoy": False}
+        {
+            "text": _soft_trim(r["text"], MAX_REPLY_CHARS),
+            "author": r["author"],
+            "is_decoy": False,
+        }
         for r in thread["replies"]
     ]
-    entries.append({"text": decoy_text, "author": "decoy", "is_decoy": True})
+    entries.append(
+        {
+            "text": _soft_trim(decoy_text, MAX_REPLY_CHARS),
+            "author": "decoy",
+            "is_decoy": True,
+        }
+    )
     # Mix seed with topic so decoy slot is not correlated across rounds that
     # happen to share similar post_id hash structure (many landed on slot 2).
     shuffle_seed = int(
@@ -490,7 +610,7 @@ def _assemble(
     round_dict = {
         "round_id": round_id,
         "source": {
-            "post_text": thread["post_text"],
+            "post_text": _soft_trim(thread["post_text"], MAX_POST_CHARS),
             "post_author": thread["post_author"],
             "post_url": thread["post_url"],
             "topic": topic,
