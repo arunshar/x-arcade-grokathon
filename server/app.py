@@ -246,6 +246,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "gif_session_salt": secrets.token_hex(4),
             # Recently served round_ids — avoid repeating the same post in a match.
             "recent_round_ids": [],
+            # Topic filter set by the room creator: [] = random/all topics.
+            "topic_filter": [],
             "arena": room_id in ARENA_ROOMS,
             "host": None,
             "auto_timer": None,
@@ -259,7 +261,105 @@ def _get_room(room_id: str) -> dict[str, Any]:
     room.setdefault("recent_gif_stems", [])
     room.setdefault("gif_session_salt", secrets.token_hex(4))
     room.setdefault("recent_round_ids", [])
+    room.setdefault("topic_filter", [])
     return room
+
+
+# Friendly groups for the create-lobby topic picker (ids must match round JSON).
+TOPIC_CATALOG: list[dict[str, Any]] = [
+    {"id": "random", "label": "RANDOM", "topics": []},
+    {"id": "ai", "label": "AI", "topics": ["ai"]},
+    {"id": "tech", "label": "TECH", "topics": ["tech", "startups"]},
+    {"id": "movies", "label": "MOVIES / TV", "topics": ["movies", "tv"]},
+    {"id": "music", "label": "MUSIC", "topics": ["music"]},
+    {"id": "sports", "label": "SPORTS", "topics": ["sports", "nba", "baseball", "soccer"]},
+    {"id": "gaming", "label": "GAMING", "topics": ["gaming"]},
+    {"id": "science", "label": "SCIENCE", "topics": ["science", "space"]},
+    {"id": "crypto", "label": "CRYPTO", "topics": ["crypto"]},
+    {"id": "food", "label": "FOOD", "topics": ["food"]},
+    {"id": "travel", "label": "TRAVEL", "topics": ["travel"]},
+    {"id": "lifestyle", "label": "LIFESTYLE", "topics": ["fitness", "cars", "books", "photography", "memes"]},
+]
+
+
+def _normalize_topic_filter(raw: Any) -> list[str]:
+    """Parse client topic filter into a sorted unique list of topic slugs.
+
+    Empty list means random (no filter). Accepts catalog group ids or raw
+    topic names from round JSON.
+    """
+    if raw is None:
+        return []
+    if isinstance(raw, str):
+        raw = [raw]
+    if not isinstance(raw, (list, tuple)):
+        return []
+    group_map = {str(g["id"]).lower(): list(g.get("topics") or []) for g in TOPIC_CATALOG}
+    known_topics: set[str] = set()
+    for g in TOPIC_CATALOG:
+        for t in g.get("topics") or []:
+            known_topics.add(str(t).lower())
+    # Also accept any topic that exists on disk.
+    try:
+        for path in decoy_queue.ROUNDS_DIR.glob("decoy_*.json"):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            t = str((data.get("source") or {}).get("topic") or "").strip().lower()
+            if t:
+                known_topics.add(t)
+    except Exception:
+        pass
+
+    out: set[str] = set()
+    for item in raw:
+        key = str(item or "").strip().lower()
+        if not key or key in ("random", "all", "*", "any"):
+            continue
+        if key in group_map:
+            for t in group_map[key]:
+                if t:
+                    out.add(str(t).lower())
+            continue
+        if key in known_topics:
+            out.add(key)
+    return sorted(out)
+
+
+def _round_topic(rnd: dict[str, Any]) -> str:
+    return str((rnd.get("source") or {}).get("topic") or "").strip().lower()
+
+
+def _list_topics_payload() -> dict[str, Any]:
+    """Catalog + live counts for the create-lobby picker."""
+    counts: dict[str, int] = {}
+    try:
+        for path in decoy_queue.ROUNDS_DIR.glob("decoy_*.json"):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not safety_screen.screen_round(data).get("screened"):
+                continue
+            t = _round_topic(data)
+            if t:
+                counts[t] = counts.get(t, 0) + 1
+    except Exception:
+        pass
+    groups = []
+    for g in TOPIC_CATALOG:
+        topics = [str(t).lower() for t in (g.get("topics") or [])]
+        n = sum(counts.get(t, 0) for t in topics) if topics else sum(counts.values())
+        groups.append(
+            {
+                "id": g["id"],
+                "label": g["label"],
+                "topics": topics,
+                "count": n,
+            }
+        )
+    return {"groups": groups, "topics": counts}
 
 
 def _round_has_ready_decoy_media(rnd: dict[str, Any]) -> bool:
@@ -299,13 +399,30 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
         in ("always_gif", "gif", "all_gif")
         or config.MODE == "live"
     )
+    topic_filter: set[str] = set()
+    if room is not None:
+        topic_filter = {
+            str(t).lower() for t in (room.get("topic_filter") or []) if t
+        }
 
     if not FORCE_FALLBACK:
         try:
             attempts = max(decoy_queue.round_count() * 2, 8)
-            # Pass 1 (optional): only rounds with certified decoy mp4.
-            # Pass 2: any screened round.
-            for require_media in ((True, False) if prefer_media else (False,)):
+            # Pass order:
+            #  1) topic match + media ready (if prefer_media)
+            #  2) topic match any
+            #  3) any screened (ignore topic if pool exhausted)
+            passes: list[tuple[bool, bool]] = []
+            if topic_filter and prefer_media:
+                passes = [(True, True), (True, False), (False, False)]
+            elif topic_filter:
+                passes = [(True, False), (False, False)]
+            elif prefer_media:
+                passes = [(False, True), (False, False)]
+            else:
+                passes = [(False, False)]
+
+            for require_topic, require_media in passes:
                 skip = set(exclude)
                 for _ in range(attempts):
                     rnd = decoy_queue.next_round(exclude_ids=skip)
@@ -313,6 +430,10 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
                     rnd["safety"] = gates
                     rid = str(rnd.get("round_id") or "")
                     if not gates["screened"]:
+                        if rid:
+                            skip.add(rid)
+                        continue
+                    if require_topic and _round_topic(rnd) not in topic_filter:
                         if rid:
                             skip.add(rid)
                         continue
@@ -525,6 +646,8 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
         "deadline_ms": _deadline_ms(room),
         "match_rounds": match_rounds,
         "rounds_played": rounds_played,
+        # Topic filter chosen at room create ([] = random mix).
+        "topic_filter": list(room.get("topic_filter") or []),
         # True on the last reveal of the match (NEXT → results, not another round).
         "match_over": room["phase"] == "results"
         or (
@@ -1127,6 +1250,12 @@ async def health() -> dict[str, Any]:
     }
 
 
+@app.get("/topics")
+async def topics() -> dict[str, Any]:
+    """Topic groups for the create-lobby filter (plus live round counts)."""
+    return _list_topics_payload()
+
+
 @app.get("/media/{room_id}/{token}/{slot_file}")
 async def media_proxy(room_id: str, token: str, slot_file: str) -> FileResponse:
     """Opaque per-round media. The URL says nothing about what it serves.
@@ -1470,6 +1599,7 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 name = (str(msg.get("name", "")).strip() or "anon")[:24]
                 room = _get_room(room_id)
                 existing = room["players"].get(name)
+                is_new_player = existing is None
                 if existing is not None:
                     # Reconnect under the same name keeps score and streak.
                     existing.ws = ws
@@ -1478,6 +1608,21 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 joined = (room_id, name)
                 STATS["joins"] += 1
                 STATS["players"].add(f"{room_id}/{name}")
+                # Room creator (first joiner, or host flag while still in lobby
+                # with no filter yet) may set the topic filter for this room.
+                if room["phase"] == "lobby":
+                    want_topics = msg.get("topics")
+                    if want_topics is None:
+                        want_topics = msg.get("topic_filter")
+                    parsed = _normalize_topic_filter(want_topics)
+                    only_player = len(room["players"]) == 1 and is_new_player
+                    host_claim = bool(msg.get("arena") or msg.get("host"))
+                    if only_player or (
+                        host_claim
+                        and not room.get("topic_filter")
+                        and want_topics is not None
+                    ):
+                        room["topic_filter"] = parsed
                 # No host. The session clock runs the room: the first player
                 # in a lobby arms the countdown, and solo play is a real game
                 # against the house. Later joiners land in whatever phase is
