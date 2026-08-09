@@ -268,12 +268,21 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
             continue
         item: dict[str, Any] = {"slot": r["slot"], "text": r.get("text") or ""}
         # Motion media is safe during guessing — every slot has it.
-        if r.get("media_url"):
-            item["media_url"] = r["media_url"]
-        if r.get("media_type"):
-            item["media_type"] = r["media_type"]
-        if r.get("media_status"):
-            item["media_status"] = r["media_status"]
+        # Sanitize: Imagine decoy is video under /decoy/*.mp4 — never a pool .gif.
+        url = r.get("media_url")
+        mtype = str(r.get("media_type") or "")
+        status = str(r.get("media_status") or "")
+        if url and mtype == "video":
+            u = str(url).lower()
+            if u.endswith(".gif") or ("/reply-gifs/" in u and "/decoy/" not in u):
+                url = None
+                status = "pending"
+        if url:
+            item["media_url"] = url
+        if mtype:
+            item["media_type"] = mtype
+        if status:
+            item["media_status"] = status
         # Never send media_source / media_engine / is_decoy / author during guessing.
         safe_replies.append(item)
     safe["replies"] = safe_replies
