@@ -2030,6 +2030,26 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 room = _get_room(room_id)
                 existing = room["players"].get(name)
                 is_new_player = existing is None
+                # Solo practice rooms are 1-seat only (vs the house). A second
+                # device must not appear on the scoreboard as an "extra player".
+                solo_room = _allows_solo(room)
+                if (
+                    solo_room
+                    and is_new_player
+                    and room["players"]
+                    and name not in room["players"]
+                ):
+                    try:
+                        await ws.send_json(
+                            {
+                                "t": "error",
+                                "detail": "solo_full",
+                                "message": "This solo room is already in use.",
+                            }
+                        )
+                    except Exception:
+                        pass
+                    continue
                 if existing is not None:
                     # Reconnect under the same name keeps score and streak.
                     existing.ws = ws

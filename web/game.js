@@ -1823,15 +1823,23 @@ function renderLiveStandings(s) {
       meta.classList.add("is-live");
     }
   }
+  const soloBoard = isSoloFriendlyRoom(s.room || myRoom) || lobbyMode === "solo";
   if (foot) {
-    const n = board.length;
-    foot.textContent = n
-      ? (n + " PLAYER" + (n === 1 ? "" : "S") + " · +1 FIRST CORRECT")
-      : "+1 FIRST CORRECT EACH ROUND";
+    if (soloBoard) {
+      foot.textContent = "SOLO · YOU VS THE HOUSE · +1 IF YOU SPOT IT";
+    } else {
+      const n = board.filter((r) => String(r.name || "").toUpperCase() !== "GLITCH").length;
+      foot.textContent = n
+        ? (n + " PLAYER" + (n === 1 ? "" : "S") + " · +1 EACH CORRECT")
+        : "+1 EACH CORRECT EACH ROUND";
+    }
   }
 
   box.innerHTML = "";
   board.forEach((row) => {
+    // Hide mock bot and never list phantom multiplayer rows in solo.
+    if (String(row.name || "").toUpperCase() === "GLITCH") return;
+    if (soloBoard && row.name !== myName) return;
     const live = playersByName[row.name] || {};
     const isMe = row.name === myName;
     const isLead = row.rank === 1 && (row.score || 0) > 0;
@@ -1946,13 +1954,17 @@ function renderLobby(s) {
     const tf = s.topic_filter || [];
     topicLine.innerHTML = "TOPICS · <b>" + formatTopicFilterLabel(tf) + "</b>";
   }
-  if (board.length === 0) {
+  const soloLobby = isSoloFriendlyRoom(s.room || myRoom) || lobbyMode === "solo";
+  const lobbyBoard = soloLobby
+    ? board.filter((p) => p.name === myName)
+    : board.filter((p) => String(p.name || "").toUpperCase() !== "GLITCH");
+  if (lobbyBoard.length === 0) {
     const li = document.createElement("li");
     li.className = "empty";
-    li.textContent = "NO PLAYERS YET";
+    li.textContent = soloLobby ? "YOU · SOLO PRACTICE" : "NO PLAYERS YET";
     ul.appendChild(li);
   }
-  for (const p of board) {
+  for (const p of lobbyBoard) {
     const li = document.createElement("li");
     if (p.rank === 1 && (p.score || 0) > 0) li.classList.add("is-leader");
     if (p.name === myName) li.classList.add("is-me");
@@ -1963,7 +1975,9 @@ function renderLobby(s) {
 
     const who = document.createElement("span");
     who.className = "who";
-    who.textContent = p.name + (p.name === myName ? " (YOU)" : "");
+    who.textContent = p.name === myName
+      ? (soloLobby ? "YOU (SOLO)" : "YOU")
+      : p.name;
 
     const pts = document.createElement("span");
     pts.className = "pts";
@@ -2346,8 +2360,18 @@ function renderOpponents(s) {
   const strip = $("oppStrip");
   strip.innerHTML = "";
   if (s.phase !== "guessing") return;
+  // Solo = you vs the house — never show a second human row.
+  if (isSoloFriendlyRoom(s.room || myRoom) || lobbyMode === "solo") {
+    const el = document.createElement("span");
+    el.className = "opp house-opp";
+    el.textContent = "VS THE HOUSE";
+    strip.appendChild(el);
+    return;
+  }
   for (const p of s.players || []) {
     if (p.name === myName) continue;
+    // Never surface the offline mock bot in live UI.
+    if (String(p.name || "").toUpperCase() === "GLITCH") continue;
     const el = document.createElement("span");
     el.className = "opp" + (p.guessed ? " locked" : "");
     const pts = typeof p.score === "number" ? p.score : 0;
@@ -3639,12 +3663,17 @@ function mockSocket(onMessage) {
           players.push({ name: m.name, score: 0, streak: 0, guessed: false });
         }
         push();
-        setTimeout(() => {
-          if (!players.find((p) => p.name === "GLITCH")) {
-            players.push({ name: "GLITCH", score: 0, streak: 0, guessed: false });
-            push();
-          }
-        }, 900);
+        // Bot only for offline multiplayer mock — never in SOLO practice.
+        const roomCode = String(m.room || myRoom || "").toUpperCase();
+        const soloMock = roomCode.indexOf("SOLO") === 0 || lobbyMode === "solo";
+        if (!soloMock) {
+          setTimeout(() => {
+            if (!players.find((p) => p.name === "GLITCH")) {
+              players.push({ name: "GLITCH", score: 0, streak: 0, guessed: false });
+              push();
+            }
+          }, 900);
+        }
       } else if (m.t === "next") {
         if (phase === "results") restartMatch();
         else if (phase === "reveal" && roundsPlayed >= MATCH_ROUNDS) enterResults();
