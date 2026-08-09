@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-209820925ff6",
+  "source": {
+    "post_text": "When you work on research (particularly on long-term research), you have to accept the fact that corporate management, who is often interested in short-term impact, may think you are wasting your time and company resources.",
+    "post_author": "@ylecun",
+    "post_url": "https://x.com/ylecun/status/2086042924316242287",
+    "topic": "ai"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "If coding models are growing 1000% YoY at $100B ARR with 80% margins AND are the reason 2 labs are accelerating ahead of everyone (data flywheel from Codex and Claude Code) then the short term goal should be coding models\n\nThis is obvious.",
+      "author": "@corleonecapital",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "The split between product timelines and deeper conceptual work feels real, though I keep wondering whether the two paths actually stay that separate once you factor in how much infrastructure and data the short-term race ends up feeding the longer bets.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "What are the few missing conceptual advances",
+      "author": "@andreastzav",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Using one discount rate for product and frontier research is the governance bug. Product teams optimize near-term evidence; conceptual bets need staged falsification milestones, not quarterly revenue proxies.",
+      "author": "@luyileo",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Jesus bro, why do you have to plug your world models in?",
+      "author": "@minotauronlucy",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "The reply is oddly balanced and mildly essay-like in its hedging, smoothing both sides without the sharper edge or casual snap of the real replies.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 50719413
+}

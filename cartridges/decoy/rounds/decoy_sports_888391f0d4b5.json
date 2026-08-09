@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-888391f0d4b5",
+  "source": {
+    "post_text": "Pep Chavarria might end up being Chelsea’s most interesting signing of the season.\n\nNeither a precocious youngster nor a well-known veteran, the 28-year-old left-back has been profiled for his ability to do a very specific job on the pitch.\n\n@liam_twomey and @ThomHarris_ explore what the Spaniard's tenacity and ball-carrying ability would bring to Stamford Bridge.",
+    "post_author": "@TheAthleticFC",
+    "post_url": "https://x.com/TheAthleticFC/status/2086014930436714872",
+    "topic": "sports"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "I actually like him",
+      "author": "@freshnot3s",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "the quiet scouting report on a 28-year-old left-back who's not a starlet or a name, just a specific tool for a specific system",
+      "author": "@TonyAlvare",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "the athletic doing more actual tactical scouting than half the clubs in europe",
+      "author": "@maikonadnet",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "He's 28? I thought he was in his early 20s🤣🤣",
+      "author": "@CFCMike21",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Solid shout, a 28yo with that specific tenacity and carry threat feels like the kind of low-profile piece that quietly upgrades the left flank.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "Slightly too polished and explanatory in neatly summarizing the fit, with a balanced tone that feels more composed than casual fan chatter.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 739810254
+}
