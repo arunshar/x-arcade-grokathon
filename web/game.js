@@ -1880,7 +1880,11 @@ function renderReplies(s) {
 
     if (isReveal) {
       card.classList.add(isDecoy ? "is-decoy" : "is-real");
-      if (myGuessSlot === reply.slot) card.classList.add("my-pick");
+      if (myGuessSlot === reply.slot) {
+        card.classList.add("my-pick");
+        // Green if you spotted the decoy; red if you picked a human.
+        card.classList.add(isDecoy ? "pick-correct" : "pick-wrong");
+      }
     } else if (myGuessSlot === reply.slot) {
       card.classList.add("locked");
     } else if (canTap) {

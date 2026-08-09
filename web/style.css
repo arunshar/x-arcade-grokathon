@@ -794,16 +794,35 @@ body.has-scoreboard main {
 
 .reply-author { font-size: 12px; color: var(--mut); letter-spacing: 1px; }
 
-/* reveal decorations — correct answer (the decoy) gets a green border */
-.card.is-decoy .card-front {
-  border-color: #22c55e;
-  border-width: 2px;
-  box-shadow: 0 0 22px rgba(34, 197, 94, 0.45), inset 0 0 18px rgba(34, 197, 94, 0.12);
+/* reveal decorations */
+.card.is-decoy .card-front,
+.card.is-real .card-front {
   cursor: default;
 }
-
-.card.is-real .card-front { cursor: default; }
 .card.is-real .reply-author { color: var(--cyan); }
+
+/* Your pick was right — green border */
+.card.my-pick.pick-correct .card-front {
+  border-color: #22c55e;
+  border-width: 2px;
+  outline: none;
+  box-shadow: 0 0 22px rgba(34, 197, 94, 0.5), inset 0 0 18px rgba(34, 197, 94, 0.14);
+}
+
+/* Your pick was wrong — red border */
+.card.my-pick.pick-wrong .card-front {
+  border-color: var(--red);
+  border-width: 2px;
+  outline: none;
+  box-shadow: 0 0 22px var(--red-glow), inset 0 0 18px rgba(255, 45, 85, 0.14);
+}
+
+/* Correct answer (decoy) when you missed it — soft green so you can still spot it */
+.card.is-decoy:not(.my-pick) .card-front {
+  border-color: #22c55e;
+  border-width: 2px;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.35), inset 0 0 12px rgba(34, 197, 94, 0.1);
+}
 
 .robot-badge {
   align-self: flex-start;
@@ -818,7 +837,11 @@ body.has-scoreboard main {
 
 .rationale { font-size: 12px; color: var(--red); border-top: 1px dashed rgba(255, 45, 85, 0.4); padding-top: 8px; }
 
-.card.my-pick .card-front { outline: 2px dashed var(--cyan); outline-offset: 3px; }
+/* Guessing-only / no outcome yet */
+.card.my-pick:not(.pick-correct):not(.pick-wrong) .card-front {
+  outline: 2px dashed var(--cyan);
+  outline-offset: 3px;
+}
 
 .pick-tag { font-size: 10px; letter-spacing: 2px; color: var(--cyan); }
 
