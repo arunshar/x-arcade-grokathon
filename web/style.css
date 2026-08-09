@@ -951,7 +951,28 @@ body.has-scoreboard main {
   box-shadow: 0 0 12px var(--red-glow);
 }
 
-.rationale { font-size: 12px; color: var(--red); border-top: 1px dashed rgba(255, 45, 85, 0.4); padding-top: 8px; }
+.rationale-wrap {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 45, 85, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  width: 100%;
+}
+.rationale-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--red);
+  opacity: 0.85;
+}
+.rationale {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #fecaca;
+  margin: 0;
+}
 
 /* Guessing-only / no outcome yet */
 .card.my-pick:not(.pick-correct):not(.pick-wrong) .card-front {

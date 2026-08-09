@@ -2403,10 +2403,16 @@ function renderReplies(s) {
     front.appendChild(author);
 
     if (isDecoy && reveal.rationale) {
+      const whyWrap = document.createElement("div");
+      whyWrap.className = "rationale-wrap";
+      const whyLab = document.createElement("span");
+      whyLab.className = "rationale-label";
+      whyLab.textContent = "THE TELL";
       const why = document.createElement("p");
       why.className = "rationale";
       why.textContent = reveal.rationale;
-      front.appendChild(why);
+      whyWrap.append(whyLab, why);
+      front.appendChild(whyWrap);
     }
     if (s.phase === "reveal") {
       // Who picked this reply. The server only exposes guess_slot at reveal,

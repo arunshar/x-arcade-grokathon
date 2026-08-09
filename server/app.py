@@ -1215,6 +1215,41 @@ async def _start_round(room: dict[str, Any]) -> None:
         asyncio.create_task(_prefetch_upcoming_decoy_media(room))
 
 
+async def _enrich_reveal_rationale(
+    room: dict[str, Any],
+    rnd: dict[str, Any],
+    avoid: list[str],
+) -> None:
+    """Swap in a livelier agent tell if still on this reveal."""
+    try:
+        from services.reveal_rationale import agent_reveal_rationale
+
+        line = await asyncio.to_thread(
+            agent_reveal_rationale, rnd, avoid=avoid
+        )
+    except Exception as exc:
+        print(f"reveal rationale agent failed: {exc}", file=sys.stderr)
+        return
+    if not line or room.get("phase") != "reveal":
+        return
+    rev = room.get("reveal")
+    if not isinstance(rev, dict):
+        return
+    # Same round still showing?
+    cur = room.get("round") or {}
+    if str(cur.get("round_id") or "") != str(rnd.get("round_id") or ""):
+        return
+    if str(rev.get("rationale") or "").strip() == line:
+        return
+    rev["rationale"] = line
+    recent = [str(x) for x in (room.get("recent_rationales") or []) if x]
+    room["recent_rationales"] = ([line] + [r for r in recent if r != line])[:12]
+    try:
+        await _broadcast(room)
+    except Exception:
+        pass
+
+
 async def _do_reveal(room: dict[str, Any]) -> None:
     # Idempotent: timer + last-guess can both fire; only score once.
     if room.get("phase") != "guessing":
@@ -1264,9 +1299,28 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     rounds_played = int(room.get("rounds_played") or 0)
     final_round = rounds_played >= match_rounds
+    # Fresh, varied "why it's the robot" — stored rationales often collapse
+    # into the same polished/balanced beat across the pool.
+    recent_rationales = [
+        str(x) for x in (room.get("recent_rationales") or []) if x
+    ]
+    try:
+        from services.reveal_rationale import craft_reveal_rationale
+
+        rationale = craft_reveal_rationale(
+            rnd,
+            avoid=recent_rationales,
+            seed_extra=f"{winner}:{rounds_played}",
+        )
+    except Exception:
+        rationale = str(rnd.get("decoy_rationale") or "").strip()
+    if not rationale:
+        rationale = str(rnd.get("decoy_rationale") or "Too smooth to be human.")
+    room.setdefault("recent_rationales", [])
+    room["recent_rationales"] = ([rationale] + recent_rationales)[:12]
     room["reveal"] = {
         "decoy_slot": decoy_slot,
-        "rationale": rnd.get("decoy_rationale", ""),
+        "rationale": rationale,
         "winner": winner,
         # Top of the crowd at every reveal. In a duel this is just both
         # players, in an arena it is the scoreboard beat on the big screen.
@@ -1305,6 +1359,9 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     # Arm the session clock: next round, or results after the last round.
     _schedule_auto(room, config.REVEAL_SECONDS)
     await _broadcast(room)
+    # Optional live punch-up of the tell (does not block the reveal paint).
+    if config.MODE == "live":
+        asyncio.create_task(_enrich_reveal_rationale(room, rnd, recent_rationales))
     if config.MODE == "live":
         # Only hit Imagine when we still need a fresh card.
         if room.get("reveal", {}).get("share_card_pending"):
