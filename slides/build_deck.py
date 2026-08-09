@@ -20,6 +20,7 @@ SLIDES = result["slides"]
 DESIGN = result["design"]
 PAL = DESIGN["palette"]
 FONTS = DESIGN["fonts"]
+TWEETS = result.get("tweets", document.get("tweets", {}))
 
 CHARTS = {
     "gates": {
@@ -36,6 +37,11 @@ CHARTS = {
     "loop": {"kind": "loop"},
     "pipeline": {"kind": "pipeline"},
     "flywheel": {"kind": "flywheel"},
+    # Tweet cards rendered natively from committed quote data, so there is no
+    # dependency on loading x.com and no login-wall screenshot risk. Quotes are
+    # verbatim public posts, with handle, date, and URL cited on the card.
+    "bier_mission": {"kind": "tweet_hero", "tweet": TWEETS.get("mission", {})},
+    "bier_receipts": {"kind": "tweet_row", "tweets": TWEETS.get("receipts", [])},
 }
 
 FIGURES = {
@@ -108,6 +114,23 @@ table.tbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px;tab
 table.tbl th,table.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--grid);vertical-align:top;line-height:1.35;overflow-wrap:anywhere}
 table.tbl thead th{font-family:var(--fm);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--inkDim)}
 table.tbl td:first-child{font-family:var(--fm);font-size:13px;color:var(--accent);width:32%}
+.tweetHero{flex:1;margin-top:14px;display:flex;align-items:center;justify-content:center;min-height:0}
+.tweetRow{flex:1;margin-top:14px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:18px;align-items:stretch;min-height:0}
+.tw{background:var(--bgAlt);border:1px solid var(--grid);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.tw.hero{max-width:760px;padding:26px 30px}
+.tw .twhead{display:flex;align-items:center;gap:11px}
+.tw .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pcrf));flex:none;
+  display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:600;color:#04070b;font-size:16px}
+.tw .who{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.tw .nm{font-family:var(--fb);font-weight:600;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:5px}
+.tw .nm .vf{color:var(--accent);font-size:14px}
+.tw .hn{font-family:var(--fm);font-size:12px;color:var(--inkDim)}
+.tw .xmark{margin-left:auto;font-family:var(--fh);font-weight:700;font-size:18px;color:var(--inkDim)}
+.tw .twtext{font-family:var(--fb);font-size:15px;line-height:1.5;color:#e3f0f7;white-space:pre-wrap;overflow-wrap:anywhere;flex:1}
+.tw.hero .twtext{font-size:18px;line-height:1.55}
+.tw .twfoot{font-family:var(--fm);font-size:11px;color:var(--inkDim);letter-spacing:.04em;border-top:1px solid var(--grid);padding-top:9px;
+  display:flex;justify-content:space-between;gap:10px;overflow-wrap:anywhere}
+.tweetRow .tw .twtext{font-size:13.5px;line-height:1.46}
 #notes{position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;background:rgba(8,11,20,.97);
   border-top:2px solid var(--accent);padding:18px 26px;z-index:60;display:none;backdrop-filter:blur(6px)}
 #notes.show{display:block}
@@ -186,9 +209,21 @@ function bars(c){
 }
 function table(c){let h='<table class="tbl"><thead><tr>'+c.head.map(x=>`<th>${esc(x)}</th>`).join('')+'</tr></thead><tbody>';
   c.rows.forEach(r=>{h+='<tr>'+r.map(x=>`<td>${esc(x)}</td>`).join('')+'</tr>';});return h+'</tbody></table>';}
+function tweetCard(t,hero){
+  const nm=esc(t.name||(t.handle||'').replace('@',''));
+  return `<div class="tw${hero?' hero':''}">
+    <div class="twhead"><div class="av">${esc((t.handle||'x').replace('@','').charAt(0).toUpperCase())}</div>
+      <div class="who"><span class="nm">${nm} <span class="vf">✓</span></span><span class="hn">${esc(t.handle||'')}</span></div>
+      <span class="xmark">𝕏</span></div>
+    <div class="twtext">${esc(t.text||'')}</div>
+    <div class="twfoot"><span>${esc(t.date||'')}</span><span>${esc(t.url||'')}</span></div></div>`;
+}
+function tweetHero(c){return `<div class="tweetHero">${tweetCard(c.tweet||{},true)}</div>`;}
+function tweetRow(c){return `<div class="tweetRow">${(c.tweets||[]).map(t=>tweetCard(t,false)).join('')}</div>`;}
 function renderChart(ref){const c=CHARTS[ref];if(!c)return'';let content='';
   if(c.kind==='table')content=table(c);else if(c.kind==='bars')content=bars(c);else if(c.kind==='loop')content=gameLoop();
   else if(c.kind==='pipeline')content=pipeline();else if(c.kind==='flywheel')content=flywheel();
+  else if(c.kind==='tweet_hero')return tweetHero(c);else if(c.kind==='tweet_row')return tweetRow(c);
   return `<div class="chartWrap">${content}</div>`;}
 function blockBody(s){return s.body?.length?`<ul class="body">${s.body.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>`:'';}
 function blockHighlights(s){return s.highlights?.length?`<div class="hl">${s.highlights.map(h=>`<div class="stat"><span class="v">${esc(h.value)}</span><span class="l">${esc(h.label)}</span></div>`).join('')}</div>`:'';}
