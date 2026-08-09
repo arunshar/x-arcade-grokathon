@@ -1,0 +1,27 @@
+server/app.py
+  s_da6f3933cdb62d::t_85d4327a8cd3e6 265-273,279-306,309,313-322
+  s_da6f3933cdb62d::t_4b48ba7e742379 464-467
+  s_da6f3933cdb62d::t_14abf161a58bee 26,323-324,809-830
+integration_check.py
+  s_da6f3933cdb62d::t_5a0189ecc1cf35 205-222
+services/reply_gifs.py
+  s_da6f3933cdb62d::t_067a0a85453e90 569-578
+artifacts/integration_trace.txt
+  s_da6f3933cdb62d::t_d2a645d3787d16 3,29-32,58-61,87-90,116-119,145-148,174-177,203-206
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "be4005718eeb15b08f2f7a60309a6e326bd5b6e0",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
