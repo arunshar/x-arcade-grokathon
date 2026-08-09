@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-0a8593290eb6",
+  "source": {
+    "post_text": "Ok question for anyone who lifts. My 17 yr old is getting a home gym set delivered this week, is there a max he should be lifting at his age? What is safe?",
+    "post_author": "@LaurenVella82",
+    "post_url": "https://x.com/LaurenVella82/status/2086238519010460138",
+    "topic": "fitness"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "No hard ceiling at 17 if his form stays clean, but build up gradually with bodyweight mastery first then add plates only when every rep feels controlled. Prioritize recovery days and solid nutrition so the gains stick without setbacks.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "When my now 19yo started at 16 - we went to the gym and he got personal trainer for 2 sessions. You want a youngish guy who will walk thru what he wants to achieve as well as eating properly. A great start to be sure! Good luck !",
+      "author": "@Loopy2023",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "the heaviest weight they have to lift is their own weight",
+      "author": "@NullHerd",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Start light, 3 sets of 10 reps. Slowly add 5kg per side work until he can do 10 reps. Rotate the days for legs, arms, chest legs, lift every SECOND day to let the muscles repair. High quality NZ Whey powder, adding creatine as he progresses. Stick at it.",
+      "author": "@JettJackso98108",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Always have good form, breathe correctly and don't hold your breath when doing heavy weights and have a spotter with the heavy stuff.",
+      "author": "@bignbald17",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "Slightly too polished and evenly hedged advice that reads a bit essay-like rather than casual gym-bro speak.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 141506964
+}

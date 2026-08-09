@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-67906fab936c",
+  "source": {
+    "post_text": "quick question for photographers, if you have $1k to invest in your photography. asides a camera what are you buying?👀",
+    "post_author": "@n0tskepp",
+    "post_url": "https://x.com/n0tskepp/status/2086167396994203933",
+    "topic": "photography"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Lenses, Editing tools",
+      "author": "@__Didi_1",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Subscriptions, external drives, laptop, anything to make work flow easier before lenses and lights",
+      "author": "@sarahthegrapher",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "One fine girl that I’ll be snapping 😪",
+      "author": "@ZIYANAYYANCRYPT",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Probably a versatile lens plus basic lighting kit, since those unlock way more creative options than gear upgrades alone.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "I might just remove that and plan another money for it.",
+      "author": "@tAk89347",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "Slightly too polished and explanatory with an oddly balanced hedge that feels essay-like rather than casual.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 572157025
+}

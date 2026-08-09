@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-d06b129053ae",
+  "source": {
+    "post_text": "you can literally build + launch a software startup for basically $20/month now..\n\nand i mean an actual product with users, database, auth, emails, analytics and payments..\n\nthe whole stack:\n\n- Claude Code = build the product ($20/mo)\n- Supabase = backend + database (free tier)\n- Cloudflare = hosting + deployment (free tier)\n- GitHub = version control (free)\n- Clerk = user login/auth (free up to 50k retained users)\n- Resend = emails (3k/month free)\n- PostHog = analytics (1M events/month free)\n- Sentry = error tracking (free tier)\n…",
+    "post_author": "@Axel_bitblaze69",
+    "post_url": "https://x.com/Axel_bitblaze69/status/2086051719780483159",
+    "topic": "startups"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Wild how cheap the full stack got, though it still comes down to whether you can pick one idea and actually finish it before the free tiers start adding up.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "the reason this is possible now is that the hard part isn't writing code or setting up infrastructure, it's finding a problem worth solving and people who care, that's what hasn't changed",
+      "author": "@adelbucetta",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "this makes my excuses look more expensive than the stack",
+      "author": "@Yaki_fomoArt",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "The expensive part now is avoiding another side project folder",
+      "author": "@GOJO_CHAIN",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "cheap infra means the moat is now distribution and focus",
+      "author": "@MacroBombastic",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "Slightly too polished and balanced with an explanatory hedge that feels more composed than the punchy real replies.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 714607012
+}

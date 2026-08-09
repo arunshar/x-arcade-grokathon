@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-b56b4cea61ba",
+  "source": {
+    "post_text": "it’s my birthday and I’m thinking about Erwin letting Hange basically get away with murder and levi reluctantly opening up about his trauma to Hange … blessed to live in a world where I can brainrot for free",
+    "post_author": "@hangestaint",
+    "post_url": "https://x.com/hangestaint/status/2086229106178560278",
+    "topic": "memes"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "happy birthday!! erwin covering for hange’s chaos while levi finally cracks open about his past to her is just such solid character stuff to brainrot over",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "i hope u get to eat hange out for ur birthday instead of eating cake",
+      "author": "@mwarpp",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "That's your sign to get those tickets and go",
+      "author": "@rkivern",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "HAPPIEST BIRTHDAY TO U BIRDY 🐦🐦💕💕 hope you have an amazing day with amazing memories 😊🌷🌷",
+      "author": "@mybitzen",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "OMG happy birthday!! 🎂💜💚 and thank you for blessing us with all the love you have for Hange 🥹",
+      "author": "@moneceles",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The phrasing 'solid character stuff' comes off a bit too polished and lightly essay-like in an otherwise casual fandom reply.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 42766115
+}

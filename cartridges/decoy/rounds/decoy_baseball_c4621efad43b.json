@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-c4621efad43b",
+  "source": {
+    "post_text": "Twins checked in on Zach Neto multiple times at trade deadline, per @nightengalejr.\n\nTalks never gained traction because asking price started with Walker Jenkins.\n\nTwins were also in talks with Blue Jays for Kevin Gausman before he was traded to the Cubs.",
+    "post_author": "@UnderdogMLB",
+    "post_url": "https://x.com/UnderdogMLB/status/2086197304357507154",
+    "topic": "baseball"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Who in the fuck do the Angels think Neto is? 🤣🤣🤣",
+      "author": "@Firefighter4547",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Classic twins asking for too much and getting nothing",
+      "author": "@moody_museui",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Walker Jenkins for Zach Neto?",
+      "author": "@PalmerGeorge68",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "The asking price for someone hitting .226 was the twins number one prospect 😂? No wonder the Angels never do shit. They have the most delusional front office in the league.",
+      "author": "@Stephenash26",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "The Angels setting the floor at Walker Jenkins for Neto explains why those talks stalled so quickly, though it does show the Twins were shopping around.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply has an oddly balanced and slightly explanatory tone that hedges between criticizing the ask and noting the Twins' activity.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 578413717
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-dc989f30b663",
+  "source": {
+    "post_text": "My brother says it never happened. Who remembers there’s a car called Datsun before it was renamed as Nissan?",
+    "post_author": "@oelma__",
+    "post_url": "https://x.com/oelma__/status/2086254130973028643",
+    "topic": "cars"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Yeah the little truck was cool.",
+      "author": "@CryptoCoachJohn",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Datson 280 z or 260 z",
+      "author": "@CrystalShip1961",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "I am not that old.\nAnd I have never heard of a 280Z.\nOr a 260Z.\nor a 240Z.\nNope.",
+      "author": "@StoicVirtues",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Yeah those old Datsuns like the 510 were pretty common and held up okay before the full switch over to the Nissan branding.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Take it from an 80s kid of  cheap parents ... it wasnt the cheapest lol",
+      "author": "@afanofgatsby",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply is slightly too explanatory and evenly balanced in its casual nostalgia, giving a mild polished summary feel rather than raw recollection.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 656510745
+}
