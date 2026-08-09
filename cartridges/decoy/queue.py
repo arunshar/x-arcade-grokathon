@@ -1,13 +1,18 @@
-"""Deterministic queue over the committed demo rounds.
+"""Diverse queue over the committed demo rounds.
 
-Rounds live as JSON files in cartridges/decoy/rounds/. next_round() cycles
-through them in sorted filename order, so every demo run sees the same
-sequence. Rounds are pre-built by round_builder.py, never fetched inline,
-because x_search latency is far too high for a request path.
+Rounds live as JSON files in cartridges/decoy/rounds/. The queue:
+
+  • Loads every ``decoy_*.json`` file (multiple per topic are fine).
+  • Serves in a **shuffled** order (not fixed filename order).
+  • Reshuffles when a full cycle completes.
+  • Can skip recently-played ``round_id``s so a match does not re-show
+    the same post/replies.
+
+Rounds are pre-built by round_builder.py, never fetched inline, because
+x_search latency is far too high for a request path.
 
 Before a round is served, ``randomize_decoy_position`` reshuffles reply order
-so the Grok decoy is not stuck on the same slot (many committed files used
-slot 2 / "REPLY 3").
+so the Grok decoy is not stuck on the same slot.
 """
 
 from __future__ import annotations
@@ -16,29 +21,63 @@ import copy
 import json
 import os
 import random
+import time
 from pathlib import Path
 from typing import Any
 
 ROUNDS_DIR = Path(__file__).resolve().parent / "rounds"
 
 _paths: list[Path] = []
-_index: int = 0
+_order: list[int] = []
+_cursor: int = 0
+_rng = random.SystemRandom()
 
 
 def _load_paths() -> list[Path]:
     global _paths
-    if not _paths:
-        _paths = sorted(p for p in ROUNDS_DIR.glob("*.json"))
-        if not _paths:
-            raise FileNotFoundError(
-                f"no round files in {ROUNDS_DIR}. Build them with round_builder.py"
-            )
+    # Re-scan when new files appear (live builder / deploy without restart).
+    found = sorted(p for p in ROUNDS_DIR.glob("decoy_*.json") if p.is_file())
+    if not found:
+        found = sorted(p for p in ROUNDS_DIR.glob("*.json") if p.is_file())
+    if not found:
+        raise FileNotFoundError(
+            f"no round files in {ROUNDS_DIR}. Build them with round_builder.py"
+        )
+    if [str(p) for p in found] != [str(p) for p in _paths]:
+        _paths = found
+        _reshuffle()
     return _paths
+
+
+def _reshuffle() -> None:
+    """New random serve order over the current path list."""
+    global _order, _cursor
+    n = len(_paths)
+    _order = list(range(n))
+    if os.environ.get("ARCADE_NO_SHUFFLE") == "1":
+        # Deterministic for check suites: sorted filename order.
+        _order = list(range(n))
+    else:
+        _rng.shuffle(_order)
+    _cursor = 0
 
 
 def round_count() -> int:
     """How many committed rounds are available."""
     return len(_load_paths())
+
+
+def list_round_ids() -> list[str]:
+    """All round_ids currently on disk (for diagnostics)."""
+    ids: list[str] = []
+    for path in _load_paths():
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            rid = str(data.get("round_id") or path.stem)
+            ids.append(rid)
+        except (OSError, json.JSONDecodeError):
+            ids.append(path.stem)
+    return ids
 
 
 def randomize_decoy_position(
@@ -83,32 +122,13 @@ def randomize_decoy_position(
     mixer.shuffle(replies)
 
     new_decoy_slot = 0
-    for i, rep in enumerate(replies):
-        rep["slot"] = i
-        is_decoy = rep is decoy_rep or (
-            rep.get("is_decoy") is True and decoy_rep.get("text") == rep.get("text")
-        )
-        # Prefer identity match after shuffle.
-        if rep is decoy_rep:
-            is_decoy = True
-        if is_decoy and rep is decoy_rep:
-            rep["is_decoy"] = True
-            if not rep.get("author") or rep.get("author") == "decoy":
-                rep["author"] = "decoy"
-            new_decoy_slot = i
-        else:
-            # Only one decoy.
-            if rep is decoy_rep:
-                rep["is_decoy"] = True
-                new_decoy_slot = i
-            else:
-                rep["is_decoy"] = False
-
     # Final pass: mark only decoy_rep as decoy.
     for i, rep in enumerate(replies):
         rep["slot"] = i
         if rep is decoy_rep:
             rep["is_decoy"] = True
+            if not rep.get("author") or rep.get("author") == "decoy":
+                rep["author"] = "decoy"
             new_decoy_slot = i
         else:
             rep["is_decoy"] = False
@@ -118,23 +138,70 @@ def randomize_decoy_position(
     return round_data
 
 
-def next_round() -> dict[str, Any]:
-    """Return the next round, cycling in sorted filename order.
-
-    Reply order is randomized so the decoy slot is not predictable.
-    """
-    global _index
-    paths = _load_paths()
-    path = paths[_index % len(paths)]
-    _index += 1
+def _read_round(path: Path) -> dict[str, Any]:
     rnd = json.loads(path.read_text(encoding="utf-8"))
-    # Deep copy so in-memory mutation never poisons a later load of the same file.
     rnd = copy.deepcopy(rnd)
     return randomize_decoy_position(rnd)
 
 
+def next_round(
+    *,
+    exclude_ids: set[str] | frozenset[str] | None = None,
+    prefer_fresh: bool = True,
+) -> dict[str, Any]:
+    """Return the next round from a shuffled cycle.
+
+    ``exclude_ids`` — skip these ``round_id``s when alternatives exist (used
+    so one match does not repeat the same post). If every round is excluded,
+    falls back to the least-recently-served option rather than failing.
+    """
+    global _cursor
+    paths = _load_paths()
+    n = len(paths)
+    if n == 0:
+        raise FileNotFoundError("empty rounds dir")
+
+    if not _order or len(_order) != n:
+        _reshuffle()
+
+    banned = {str(x) for x in (exclude_ids or ()) if x}
+    # Two passes: first honor exclusions; second ignore if pool exhausted.
+    for honor_ban in (True, False):
+        tried = 0
+        while tried < n:
+            if _cursor >= n:
+                _reshuffle()
+            idx = _order[_cursor % n]
+            _cursor += 1
+            tried += 1
+            path = paths[idx % n]
+            try:
+                rnd = _read_round(path)
+            except (OSError, json.JSONDecodeError):
+                continue
+            rid = str(rnd.get("round_id") or path.stem)
+            if honor_ban and banned and rid in banned:
+                continue
+            # Light jitter: sometimes skip to next so consecutive matches
+            # starting at the same wall-clock don't feel locked in.
+            if prefer_fresh and not banned and n > 3 and (_rng.random() < 0.08):
+                continue
+            return rnd
+
+    # Absolute last resort — first readable file.
+    for path in paths:
+        try:
+            return _read_round(path)
+        except (OSError, json.JSONDecodeError):
+            continue
+    raise FileNotFoundError("no readable round files")
+
+
 def reset() -> None:
-    """Restart the cycle from the first round."""
-    global _index, _paths
-    _index = 0
+    """Restart the cycle and force a path rescan."""
+    global _paths, _order, _cursor
     _paths = []
+    _order = []
+    _cursor = 0
+    # Touch mtime awareness
+    _ = time.time()

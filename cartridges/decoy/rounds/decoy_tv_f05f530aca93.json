@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-f05f530aca93",
+  "source": {
+    "post_text": "#HOTD Season 3 has been such a fun ride for me, with some really strong performances, great character moments, some genuinely unforgettable episodes.. like Episode 3's POV style storytelling and the brilliantly written Episode 5, which I absolutely loved. It's been an entertaining season, and now we're finally at the end of the road. \n\nThe massive Season 3 finale airs TOMORROW!! And it'll be the fourth big episode of the season, following Episodes 1, 2 and 7. 🔥",
+    "post_author": "@Targ_Loyalist",
+    "post_url": "https://x.com/Targ_Loyalist/status/2086170069843800100",
+    "topic": "tv"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Season really nailed those big character beats and the standout eps felt fresh. Hoping the finale sticks the landing without forcing any side to look weak just for drama.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "I loved it Too. So Hyped for Sunday",
+      "author": "@carlosgzz03",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Can you tell me if it’ll be a good episode for Daemon and Caraxes—will they come out of it looking good? I hope they aren't portrayed as cowards just to make the Greens look better.",
+      "author": "@kyouma_rintaro",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "How was my favourite couple did deamon and rhyenra reconcile and why was she crying",
+      "author": "@mahoragaade1",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Thank you for keeping the community positive this season !! It’s always refreshing 🩶",
+      "author": "@doveestorm",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "Slightly too polished and oddly balanced/hedged in its careful praise-plus-caveat structure, feeling more composed than casual fan chatter.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 981806522
+}

@@ -174,6 +174,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "recent_gif_stems": [],
             # Per-room entropy so the same topic does not always draw the same GIFs.
             "gif_session_salt": secrets.token_hex(4),
+            # Recently served round_ids — avoid repeating the same post in a match.
+            "recent_round_ids": [],
             "arena": room_id in ARENA_ROOMS,
             "host": None,
             "auto_timer": None,
@@ -186,26 +188,35 @@ def _get_room(room_id: str) -> dict[str, Any]:
     room.setdefault("rounds_played", 0)
     room.setdefault("recent_gif_stems", [])
     room.setdefault("gif_session_salt", secrets.token_hex(4))
+    room.setdefault("recent_round_ids", [])
     return room
 
 
-async def _next_round() -> dict[str, Any]:
+async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
     """Pull the next safety-screened round from the decoy queue.
 
-    Every round is re-screened at load time and carries the fresh gate result
-    in its safety dict. A round that fails any gate is skipped, never served
-    (fail closed, see plugins/safety/SAFETY.md). FALLBACK_ROUND stays the last
-    resort for a broken or fully gated-out queue, and it is screened the same
-    way as everything else.
+    Prefers rounds this room has not seen recently so posts/replies feel
+    fresh across a match. Every round is re-screened at load time (fail
+    closed). FALLBACK_ROUND is last resort.
     """
+    exclude: set[str] = set()
+    if room is not None:
+        exclude = {str(x) for x in (room.get("recent_round_ids") or []) if x}
+
     if not FORCE_FALLBACK:
         try:
-            for _ in range(decoy_queue.round_count()):
-                rnd = decoy_queue.next_round()
+            # Try up to 2× pool size so exclusions + failed gates still land.
+            attempts = max(decoy_queue.round_count() * 2, 8)
+            for _ in range(attempts):
+                rnd = decoy_queue.next_round(exclude_ids=exclude)
                 gates = safety_screen.screen_round(rnd)
                 rnd["safety"] = gates
                 if gates["screened"]:
                     return rnd
+                # Don't keep retrying a permanently gated round id forever.
+                rid = str(rnd.get("round_id") or "")
+                if rid:
+                    exclude.add(rid)
         except Exception:
             pass
     fallback = copy.deepcopy(FALLBACK_ROUND)
@@ -475,6 +486,8 @@ async def _start_round(room: dict[str, Any]) -> None:
         room["rounds_played"] = 0
         room["recent_gif_stems"] = []
         room["gif_session_salt"] = secrets.token_hex(4)
+        # Keep recent_round_ids across matches so restart does not re-serve
+        # the same six posts immediately.
         for p in room["players"].values():
             p.score = 0
             p.streak = 0
@@ -486,7 +499,14 @@ async def _start_round(room: dict[str, Any]) -> None:
         return
 
     room["results"] = None
-    rnd = await _next_round()
+    rnd = await _next_round(room)
+    # Track served round so the next picks stay different.
+    rid = str(rnd.get("round_id") or "")
+    if rid:
+        prev_ids = [x for x in (room.get("recent_round_ids") or []) if x != rid]
+        # Remember enough ids to cover most of the pool (cap 40).
+        keep = max(12, min(40, decoy_queue.round_count() - 1))
+        room["recent_round_ids"] = ([rid] + prev_ids)[:keep]
     # Mix text rounds (classic replies) with GIF rounds (human gifs + Imagine).
     session_index = rounds_played
     room["rounds_played"] = session_index + 1
