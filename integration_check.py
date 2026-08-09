@@ -28,6 +28,9 @@ if str(REPO_ROOT) not in sys.path:
 
 os.environ["ARCADE_MODE"] = "demo"
 os.environ["ARCADE_NO_SHUFFLE"] = "1"  # suite asserts against committed round files
+# The wrap proof plays every servable round plus one, which must exceed the
+# default 6-round match cap. The cap itself gets focused coverage below.
+os.environ["ARCADE_MATCH_ROUNDS"] = "20"
 os.environ.pop("ARCADE_FORCE_FALLBACK", None)
 
 # Any connection attempt that leaves loopback is an integration failure.
@@ -239,6 +242,33 @@ async def main() -> int:
         check(served_ids[len(servable)] == servable[0], "queue wraps back to the first round")
         p2 = next(p for p in state["players"] if p["name"] == "P2")
         check(p2["score"] == total_rounds, "winner score accumulates across rounds")
+
+    log("== match cap: reveal at the cap goes to results, then back to lobby ==")
+    config.MATCH_ROUNDS = 1
+    try:
+        async with websockets.connect(url) as c1:
+            await c1.send(json.dumps({"t": "join", "room": "CAP", "name": "C1"}))
+            state = await recv_state(c1, "C1")
+            await c1.send(json.dumps({"t": "next", "room": "CAP"}))
+            state = await recv_state(c1, "C1")
+            check(state["phase"] == "guessing", "capped match round starts")
+            await c1.send(json.dumps({"t": "guess", "room": "CAP", "slot": 0, "ms": 1}))
+            state = await recv_state(c1, "C1")
+            check(state["phase"] == "reveal", "capped match reveals")
+            check(state.get("match_over") is True, "last reveal flags match_over")
+            await c1.send(json.dumps({"t": "next", "room": "CAP"}))
+            state = await recv_state(c1, "C1")
+            check(state["phase"] == "results", "next after the cap enters results")
+            check(bool(state.get("results")), "results phase carries a results payload")
+            # next from results is PLAY AGAIN: scores reset, round 1 starts.
+            await c1.send(json.dumps({"t": "next", "room": "CAP"}))
+            state = await recv_state(c1, "C1")
+            check(state["phase"] == "guessing", "next after results starts a new match")
+            me = state["players"][0]
+            check(me["score"] == 0 and state.get("rounds_played") == 1,
+                  "new match resets score and round counter")
+    finally:
+        config.MATCH_ROUNDS = 20
 
     server.should_exit = True
     await serve_task

@@ -1,6 +1,6 @@
 answer key: 6 servable rounds, gated out: []
 == http checks ==
-GET /health -> 200 {'mode': 'demo', 'rounds_available': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'tts_voice': 'eve', 'image_model': 'grok-imagine-image', 'video_model': 'grok-imagine-video-1.5', 'gif_round_mode': 'alternate'}
+GET /health -> 200 {'mode': 'demo', 'rounds_available': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'tts_voice': 'eve', 'image_model': 'grok-imagine-image', 'video_model': 'grok-imagine-video-1.5', 'gif_round_mode': 'alternate', 'match_rounds': 20}
   [PASS] /health reports demo mode
   [PASS] /health counts screened rounds
 GET /token -> 200 keys=['demo', 'detail', 'expires_at', 'model', 'value']
@@ -193,6 +193,19 @@ P2 <- phase=reveal round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=7 
   [PASS] queue serves screened rounds in order
   [PASS] queue wraps back to the first round
   [PASS] winner score accumulates across rounds
+== match cap: reveal at the cap goes to results, then back to lobby ==
+C1 <- phase=lobby round=- C1(score=0 guessed=False)
+C1 <- phase=guessing round=decoy-5913ef31dd6d C1(score=0 guessed=False) deadline_ms=14999
+  [PASS] capped match round starts
+C1 <- phase=reveal round=decoy-5913ef31dd6d C1(score=0 guessed=True) reveal(decoy_slot=1 winner=house card=/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg)
+  [PASS] capped match reveals
+  [PASS] last reveal flags match_over
+C1 <- phase=results round=decoy-5913ef31dd6d C1(score=0 guessed=True)
+  [PASS] next after the cap enters results
+  [PASS] results phase carries a results payload
+C1 <- phase=guessing round=decoy-fdc7764b7ebb C1(score=0 guessed=False) deadline_ms=14999
+  [PASS] next after results starts a new match
+  [PASS] new match resets score and round counter
 == serve-time shuffle invariants (bypassed above via ARCADE_NO_SHUFFLE) ==
   [PASS] 20 shuffles keep slots a permutation and decoy_slot true
   [PASS] shuffle actually moves the decoy across slots
