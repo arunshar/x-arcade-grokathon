@@ -138,9 +138,20 @@ def _gif_public_url(path: Path) -> str:
     return "/static-assets/reply-gifs/" + path.name
 
 
+def _is_imagine_video_url(url: str | None) -> bool:
+    """True for decoy Imagine videos only (never human pool .gif paths)."""
+    if not url:
+        return False
+    u = str(url).split("?", 1)[0].lower()
+    if "/reply-gifs/decoy/" not in u.replace("\\", "/"):
+        return False
+    if u.rstrip("/").endswith("_probe.mp4"):
+        return config.MODE != "live"
+    return u.endswith((".mp4", ".webm", ".mov"))
+
+
 def _decoy_video_path(round_id: str) -> Path:
     return DECOY_DIR / f"{_slug(round_id)}_decoy.mp4"
-
 
 def existing_decoy_media_url_for_round(
     round_data: dict[str, Any],
@@ -153,26 +164,32 @@ def existing_decoy_media_url_for_round(
     are byte-identical to ``_probe.mp4`` are placeholders and are ignored
     (so live mode regenerates a fresh clip every round id).
     """
-    from services.imagine_agent import is_placeholder_decoy, is_real_decoy_media
+    from services.imagine_agent import (
+        is_imagine_certified,
+        is_placeholder_decoy,
+        is_real_decoy_media,
+    )
 
     rid_slug = _slug(str(round_data.get("round_id") or "round"))
-    # Only motion media from the decoy dir counts. Still round-art JPGs are
-    # not unique "gifs" and must not block Imagine video generation.
+    # ONLY Imagine video under decoy/ — never pool .gif, never uncertified files.
     candidates: list[tuple[Path, str]] = [
         (DECOY_DIR / f"{rid_slug}_decoy.mp4", "video"),
         (DECOY_DIR / f"{rid_slug}_decoy.webm", "video"),
-        (DECOY_DIR / f"{rid_slug}_decoy.gif", "gif"),
     ]
     for path, mtype in candidates:
         if not path.is_file() or path.stat().st_size < 800:
             continue
         if is_placeholder_decoy(path):
             continue
-        if mtype == "video" and not is_real_decoy_media(path):
+        if not is_real_decoy_media(path):
+            continue
+        # Live requires Imagine certification sidecar.
+        if config.MODE == "live" and not is_imagine_certified(path):
             continue
         rel = path.relative_to(REPO_ROOT / "web")
-        return "/" + str(rel).replace("\\", "/"), mtype
-    if allow_probe:
+        return "/" + str(rel).replace("\\", "/"), "video"
+    # Probe only for offline demo — and never labeled as certified Imagine.
+    if allow_probe and config.MODE != "live":
         probe = DECOY_DIR / "_probe.mp4"
         if probe.is_file() and probe.stat().st_size > 800:
             return "/static-assets/reply-gifs/decoy/_probe.mp4", "video"
@@ -517,19 +534,26 @@ def attach_reply_media(
             continue
         is_decoy = decoy is not None and slot == decoy
         if is_decoy:
-            # Clear any accidental human-pool path on the decoy slot.
+            # Decoy is Grok Imagine video ONLY — never a pool .gif path.
             rep.pop("art_url", None)
             if has_own_decoy and decoy_own:
-                url, mtype = decoy_own
-                rep["media_url"] = url
-                rep["media_type"] = mtype
-                rep["media_status"] = "ready"
-                rep["media_source"] = "imagine"
-            elif decoy_demo:
-                url, mtype = decoy_demo
-                rep["media_url"] = url
-                rep["media_type"] = mtype
-                rep["media_status"] = "ready"
+                url, _mtype = decoy_own
+                # Hard reject anything that isn't under /decoy/*.mp4|webm
+                if _is_imagine_video_url(url):
+                    rep["media_url"] = url
+                    rep["media_type"] = "video"
+                    rep["media_status"] = "ready"
+                    rep["media_source"] = "imagine"
+                else:
+                    rep["media_url"] = None
+                    rep["media_type"] = "video"
+                    rep["media_status"] = "pending"
+                    rep["media_source"] = "imagine"
+            elif decoy_demo and config.MODE != "live":
+                url, _mtype = decoy_demo
+                rep["media_url"] = url if _is_imagine_video_url(url) else None
+                rep["media_type"] = "video"
+                rep["media_status"] = "ready" if rep.get("media_url") else "none"
                 rep["media_source"] = "imagine"
             else:
                 # Live: wait for Imagine — pending with no URL (not a stock gif).
@@ -541,14 +565,14 @@ def attach_reply_media(
 
         human_total += 1
         path = human_map.get(slot)
-        if path:
+        if path and path.suffix.lower() == ".gif":
             rep["media_url"] = _gif_public_url(path)
             rep["media_type"] = "gif"
             rep["media_status"] = "ready"
             rep["media_source"] = "human"
             human_ready += 1
         else:
-            rep.setdefault("media_url", None)
+            rep["media_url"] = None
             rep["media_type"] = "gif"
             rep["media_status"] = "none"
             rep["media_source"] = "human"

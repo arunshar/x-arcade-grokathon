@@ -1499,22 +1499,66 @@ function centerRepliesInView(smooth) {
   });
 }
 
+/** True for Grok Imagine decoy videos (never human pool .gif paths). */
+function isImagineVideoUrl(url) {
+  if (!url) return false;
+  const u = String(url).split("?")[0].toLowerCase();
+  if (u.indexOf("/reply-gifs/decoy/") < 0) return false;
+  if (/_probe\.mp4$/i.test(u)) return false;
+  return /\.(mp4|webm|mov)$/i.test(u);
+}
+
+/** True for human reaction pool GIFs. */
+function isHumanPoolGifUrl(url) {
+  if (!url) return false;
+  const u = String(url).split("?")[0].toLowerCase();
+  if (u.indexOf("/reply-gifs/decoy/") >= 0) return false;
+  return /\/reply-gifs\/[^/]+\.gif$/i.test(u);
+}
+
 /**
  * Build looping media for a reply card.
- * Humans → <img gif>. Decoy Imagine → muted autoplay loop <video> (gif-like).
+ * Humans → <img gif> from pool. Decoy → Grok Imagine <video> only.
  * Never labels source during guessing (server strips media_source).
  */
 function buildReplyMedia(reply, isRevealDecoy, onReady) {
-  const url = reply && reply.media_url ? String(reply.media_url) : "";
+  let url = reply && reply.media_url ? String(reply.media_url) : "";
   const status = reply && reply.media_status
     ? String(reply.media_status)
     : (url ? "ready" : "none");
   const mtype = reply && reply.media_type ? String(reply.media_type) : "";
 
-  // Legacy art_url fallback (still images from older path).
-  const legacyUrl = !url && reply && reply.art_url ? String(reply.art_url) : "";
+  // Never show a human pool .gif on the decoy card (Imagine only).
+  if (isRevealDecoy && url && isHumanPoolGifUrl(url)) {
+    url = "";
+  }
+  // Never use legacy still art for decoy — must be Imagine video.
+  let legacyUrl = "";
+  if (!url && !isRevealDecoy && reply && reply.art_url) {
+    legacyUrl = String(reply.art_url);
+  }
   const effectiveUrl = url || legacyUrl;
   if (status === "none" && !effectiveUrl) return null;
+  // Pending Imagine generation — show wait state, not a stock gif.
+  if (!effectiveUrl && (status === "pending" || isRevealDecoy)) {
+    const frame = document.createElement("div");
+    frame.className = "reply-media";
+    const label = document.createElement("div");
+    label.className = "reply-media-label" + (isRevealDecoy ? " is-imagine" : "");
+    label.textContent = isRevealDecoy ? "GROK IMAGINE" : "GIF";
+    frame.appendChild(label);
+    const box = document.createElement("div");
+    box.className = "reply-media-frame";
+    const pending = document.createElement("div");
+    pending.className = "reply-media-pending";
+    pending.textContent = isRevealDecoy || status === "pending"
+      ? "GROK IMAGINE…"
+      : "LOADING…";
+    box.appendChild(pending);
+    frame.appendChild(box);
+    return frame;
+  }
+  if (!effectiveUrl) return null;
 
   const frame = document.createElement("div");
   frame.className = "reply-media";
@@ -1522,7 +1566,8 @@ function buildReplyMedia(reply, isRevealDecoy, onReady) {
   const label = document.createElement("div");
   label.className = "reply-media-label";
   // Only name Imagine on the revealed decoy — otherwise neutral GIF chrome.
-  if (isRevealDecoy) {
+  const treatAsImagine = isRevealDecoy || isImagineVideoUrl(effectiveUrl);
+  if (treatAsImagine) {
     label.textContent = "GROK IMAGINE";
     label.classList.add("is-imagine");
   } else {
@@ -1538,8 +1583,20 @@ function buildReplyMedia(reply, isRevealDecoy, onReady) {
   };
 
   if (effectiveUrl) {
-    const isVideo = mtype === "video"
+    // Force video element for Imagine decoy paths; img only for pool gifs.
+    const isVideo = treatAsImagine
+      || mtype === "video"
+      || isImagineVideoUrl(effectiveUrl)
       || /\.(mp4|webm|mov)(\?|$)/i.test(effectiveUrl);
+    // Refuse to render a pool gif as if it were the decoy video.
+    if (treatAsImagine && isHumanPoolGifUrl(effectiveUrl)) {
+      const pending = document.createElement("div");
+      pending.className = "reply-media-pending";
+      pending.textContent = "GROK IMAGINE…";
+      box.appendChild(pending);
+      frame.appendChild(box);
+      return frame;
+    }
     if (isVideo) {
       const vid = document.createElement("video");
       vid.className = "reply-media-el reply-media-video";

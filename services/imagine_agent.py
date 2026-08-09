@@ -647,6 +647,58 @@ def decoy_video_path(round_id: str) -> Path:
     return DECOY_DIR / f"{_slug(round_id)}_decoy.mp4"
 
 
+def decoy_meta_path(round_id: str | Path) -> Path:
+    """Sidecar proving the mp4 came from Grok Imagine (not a pool gif / probe)."""
+    if isinstance(round_id, Path):
+        return round_id.parent / (round_id.stem + ".imagine.json")
+    return DECOY_DIR / f"{_slug(str(round_id))}_decoy.imagine.json"
+
+
+def write_imagine_meta(
+    round_id: str,
+    path: Path,
+    *,
+    style_brief: str = "",
+    extra: dict[str, Any] | None = None,
+) -> None:
+    meta = {
+        "source": "grok-imagine-video",
+        "model_image": getattr(config, "MODEL_IMAGE", ""),
+        "model_video": getattr(config, "MODEL_VIDEO", ""),
+        "round_id": str(round_id),
+        "file": path.name,
+        "bytes": path.stat().st_size if path.is_file() else 0,
+        "duration": VIDEO_DURATION,
+        "style_brief": _snippet(style_brief, 200),
+        "ts": int(time.time()),
+    }
+    if extra:
+        meta.update(extra)
+    decoy_meta_path(round_id).write_text(
+        json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+
+
+def is_imagine_certified(path: Path | None) -> bool:
+    """True only if sidecar says this file was produced by Grok Imagine video."""
+    if path is None or not path.is_file():
+        return False
+    meta_path = decoy_meta_path(path)
+    if not meta_path.is_file():
+        return False
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    src = str(meta.get("source") or "").lower()
+    if "imagine" not in src and "grok" not in src:
+        return False
+    # File must still look like video, not a renamed gif.
+    if path.suffix.lower() not in (".mp4", ".webm", ".mov"):
+        return False
+    return path.stat().st_size > 800
+
+
 def _md5_file(path: Path) -> str:
     h = hashlib.md5()
     with path.open("rb") as fh:
@@ -684,8 +736,22 @@ def is_placeholder_decoy(path: Path | None) -> bool:
 
 
 def is_real_decoy_media(path: Path | None) -> bool:
-    """True when the file is a unique per-round Imagine clip (not the probe)."""
-    return path is not None and path.is_file() and not is_placeholder_decoy(path)
+    """True when the file is a unique per-round Imagine clip (not the probe).
+
+    Live play requires an ``*.imagine.json`` sidecar so we never treat a
+    leftover probe copy or random asset as Grok Imagine output.
+    """
+    if path is None or not path.is_file() or is_placeholder_decoy(path):
+        return False
+    if path.suffix.lower() not in (".mp4", ".webm", ".mov"):
+        return False
+    # Trust certified Imagine outputs always.
+    if is_imagine_certified(path):
+        return True
+    # Optional escape hatch for offline demos with pre-baked files only.
+    if os.environ.get("ARCADE_IMAGINE_TRUST_FILES", "") == "1":
+        return not is_placeholder_decoy(path)
+    return False
 
 
 def purge_placeholder_decoys() -> list[str]:
@@ -721,11 +787,20 @@ def generate_matching_decoy(
         "status": "skipped",
     }
 
-    # Reuse only a *real* unique generation — never a seeded probe clone.
-    if not force and is_real_decoy_media(out):
+    # Reuse only certified Grok Imagine video — never probe / pool / uncertified.
+    if not force and is_real_decoy_media(out) and is_imagine_certified(out):
         _stamp_decoy(round_data, out)
         result["status"] = "exists"
+        result["certified"] = True
         return result
+
+    # Uncertified leftovers (old probe copies, unknown mp4s): regenerate.
+    if out.is_file() and not is_imagine_certified(out):
+        force = True
+        print(
+            f"imagine_agent: {out.name} lacks Imagine certification — regenerating",
+            file=sys.stderr,
+        )
 
     # Drop stale probe clones so we do not keep serving the same clip.
     if out.is_file() and is_placeholder_decoy(out):
@@ -733,6 +808,12 @@ def generate_matching_decoy(
             out.unlink()
         except OSError:
             pass
+        meta = decoy_meta_path(rid)
+        if meta.is_file():
+            try:
+                meta.unlink()
+            except OSError:
+                pass
 
     if config.MODE != "live" and not force:
         # Demo: serve probe only as a shared fallback (not copied per-round).
@@ -899,8 +980,19 @@ def generate_matching_decoy(
         _mark_decoy_failed(round_data)
         return result
 
+    write_imagine_meta(
+        rid,
+        out,
+        style_brief=style_brief,
+        extra={
+            "n_human_gifs": result.get("n_human_gifs"),
+            "own_still": bool(own_still),
+            "pass": "imagine_video",
+        },
+    )
     _stamp_decoy(round_data, out, ready=True)
     result["status"] = "ready"
+    result["certified"] = True
     result["bytes"] = out.stat().st_size if out.is_file() else 0
     # Stash brief on the round for debug / reveal flair (not shown pre-reveal).
     round_data["imagine_style_brief"] = style_brief

@@ -498,13 +498,32 @@ async def _start_round(room: dict[str, Any]) -> None:
     room["deadline_at"] = asyncio.get_running_loop().time() + config.ROUND_SECONDS
     room["timer"] = asyncio.create_task(_round_timer(room))
     await _broadcast(room)
-    # Live GIF rounds only: forge a unique decoy Imagine clip in the background.
-    if (
-        config.MODE == "live"
-        and rnd.get("format") == "gif"
-        and rnd.get("decoy_media_status") != "ready"
-    ):
-        asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
+    # Live GIF rounds: always ensure Grok Imagine video (not pool gifs).
+    # Uncertified/missing decoy media → background Imagine generation.
+    if config.MODE == "live" and rnd.get("format") == "gif":
+        need_imagine = rnd.get("decoy_media_status") != "ready"
+        if not need_imagine:
+            # Double-check certification — never trust a bare mp4 without meta.
+            try:
+                from services.imagine_agent import decoy_video_path, is_imagine_certified
+
+                need_imagine = not is_imagine_certified(
+                    decoy_video_path(str(rnd.get("round_id") or ""))
+                )
+            except Exception:
+                need_imagine = True
+        if need_imagine:
+            # Mark pending so clients don't show a stale/wrong asset.
+            rnd["decoy_media_status"] = "pending"
+            for rep in rnd.get("replies") or []:
+                if isinstance(rep, dict) and rep.get("media_source") == "imagine":
+                    if not str(rep.get("media_url") or "").endswith(
+                        (".mp4", ".webm", ".mov")
+                    ) or "/decoy/" not in str(rep.get("media_url") or ""):
+                        rep["media_url"] = None
+                        rep["media_type"] = "video"
+                        rep["media_status"] = "pending"
+            asyncio.create_task(_attach_decoy_imagine_gif(room, rnd, force=True))
 
 
 async def _do_reveal(room: dict[str, Any]) -> None:
@@ -562,11 +581,8 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     await _broadcast(room)
     if config.MODE == "live":
         asyncio.create_task(_attach_live_card(room, rnd, winner))
-        if (
-            rnd.get("format") == "gif"
-            and rnd.get("decoy_media_status") != "ready"
-        ):
-            asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
+        if rnd.get("format") == "gif" and rnd.get("decoy_media_status") != "ready":
+            asyncio.create_task(_attach_decoy_imagine_gif(room, rnd, force=True))
 
 
 async def _enter_results(room: dict[str, Any]) -> None:
@@ -671,38 +687,61 @@ async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: s
         await _broadcast(room)
 
 
-async def _attach_decoy_imagine_gif(room: dict[str, Any], rnd: dict[str, Any]) -> None:
-    """Imagine agent: study human GIFs on this round → matching decoy video.
+async def _attach_decoy_imagine_gif(
+    room: dict[str, Any],
+    rnd: dict[str, Any],
+    *,
+    force: bool = False,
+) -> None:
+    """Grok Imagine video for the decoy slot only (never human pool gifs).
 
-    Uses vision style-brief + reference_images so the robot loop blends with
-    the four human reaction GIFs. Safe to broadcast during guessing once ready
-    (media_source stays stripped in _round_view). No-op for text rounds.
+    Vision-analyzes human reply GIFs for style, then generates an original
+    short mp4. No-op for text rounds.
     """
     if room.get("round") is not rnd:
         return
     if rnd.get("format") != "gif":
         return
     try:
-        # Prefer the full agent; fall back to reply_gifs wrapper.
-        from services.imagine_agent import generate_matching_decoy as _gen
-    except ImportError:
-        try:
-            from services.reply_gifs import generate_decoy_media as _gen
-        except ImportError as exc:
-            print(f"imagine agent import failed: {exc}", file=sys.stderr)
-            return
+        from services.imagine_agent import generate_matching_decoy
+    except ImportError as exc:
+        print(f"imagine agent import failed: {exc}", file=sys.stderr)
+        return
 
     try:
-        await asyncio.to_thread(_gen, rnd)
+        await asyncio.to_thread(generate_matching_decoy, rnd, force=force)
     except Exception as exc:
         rid = str(rnd.get("round_id") or "round")
-        print(f"decoy imagine gif {rid} failed: {exc}", file=sys.stderr)
+        print(f"decoy imagine video {rid} failed: {exc}", file=sys.stderr)
         rnd["decoy_media_status"] = "failed"
         return
 
+    # Ensure decoy never carries a .gif pool URL after generation.
+    decoy_slot = rnd.get("decoy_slot")
+    for rep in rnd.get("replies") or []:
+        if not isinstance(rep, dict):
+            continue
+        try:
+            if decoy_slot is not None and int(rep.get("slot")) != int(decoy_slot):
+                continue
+        except (TypeError, ValueError):
+            if not rep.get("is_decoy"):
+                continue
+        url = str(rep.get("media_url") or "")
+        if url and (
+            url.lower().endswith(".gif")
+            or ("/reply-gifs/" in url and "/decoy/" not in url)
+        ):
+            rep["media_url"] = None
+            rep["media_type"] = "video"
+            rep["media_status"] = "failed"
+            rnd["decoy_media_status"] = "failed"
+        elif url and rep.get("media_status") == "ready":
+            rep["media_type"] = "video"
+            rep["media_source"] = "imagine"
+
     if room.get("round") is rnd and room["phase"] in ("guessing", "reveal"):
         await _broadcast(room)
-
 
 @app.get("/health")
 async def health() -> dict[str, Any]:

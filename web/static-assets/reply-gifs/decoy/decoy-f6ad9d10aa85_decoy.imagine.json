@@ -1,0 +1,12 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-f6ad9d10aa85",
+  "file": "decoy-f6ad9d10aa85_decoy.mp4",
+  "bytes": 1936051,
+  "duration": 2,
+  "style_brief": "certified after vision gen",
+  "ts": 1786236448,
+  "note": "backfill"
+}
