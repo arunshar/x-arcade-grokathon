@@ -459,16 +459,21 @@ const voiceQueue = {
    */
   enqueue(job, meta) {
     const m = Object.assign({ epoch: this.epoch, phase: null, roundId: null }, meta || {});
+    // If caller stamped an older epoch, drop immediately.
+    if (typeof m.epoch === "number" && m.epoch !== this.epoch) return;
+    m.epoch = this.epoch;
     this.items.push({ run: job, meta: m });
     // Keep the lane snappy — drop oldest non-playing jobs first.
-    while (this.items.length > 4) this.items.shift();
+    while (this.items.length > 3) this.items.shift();
     this.kick();
   },
   _stale(meta) {
     if (!meta) return true;
     if (meta.epoch !== this.epoch) return true;
-    if (meta.phase && state && state.phase && meta.phase !== state.phase) return true;
-    const liveId = state && state.round && state.round.round_id;
+    if (!state) return true;
+    if (meta.phase && state.phase && meta.phase !== state.phase) return true;
+    if (state.phase === "results" && meta.phase && meta.phase !== "results") return true;
+    const liveId = state.round && state.round.round_id;
     if (meta.roundId && liveId && meta.roundId !== liveId) return true;
     return false;
   },
@@ -679,16 +684,21 @@ const commentary = {
 
   clearQueue() {
     this.dropPending = true;
-    this.gen += 1;
+    voiceQueue.bump();
+    // Keep gen in lockstep with the audio epoch so late TTS cannot speak.
+    this.gen = voiceQueue.epoch;
   },
 
-  /** Game advanced — invalidate in-flight agent calls and old speech. */
+  /** Game advanced — invalidate in-flight agent calls and old speech.
+   *  Caller should voiceQueue.bump() first; we sync gen to that epoch. */
   onAdvance(phase, roundId) {
-    this.gen += 1;
     this.dropPending = false;
+    this.gen = voiceQueue.epoch;
     this.activePhase = phase || null;
     this.activeRoundId = roundId || null;
     this.lowClockSaid = false;
+    // Don't carry lock-memory across rounds/phases.
+    if (phase !== "guessing") this.lastGuessed = {};
   },
 
   canSpeak() {
@@ -699,12 +709,39 @@ const commentary = {
     return true;
   },
 
+  /** Events allowed to speak in each phase (blocks mistimed lines). */
+  eventAllowed(event, phase) {
+    const p = phase || (state && state.phase) || "";
+    const map = {
+      lobby: { lobby_join: 1 },
+      guessing: {
+        round_start: 1,
+        player_lock: 1,
+        player_pick: 1,
+        clock_low: 1,
+      },
+      reveal: { reveal: 1 },
+      results: {},
+    };
+    const allow = map[p];
+    if (!allow) return false;
+    return !!allow[event];
+  },
+
   stillCurrent(gen, phase, roundId) {
     if (gen !== this.gen) return false;
+    if (gen !== voiceQueue.epoch) return false;
     if (this.dropPending) return false;
-    if (phase && state && state.phase && phase !== state.phase) return false;
-    const liveId = state && state.round && state.round.round_id;
+    if (!state) return false;
+    if (phase && state.phase && phase !== state.phase) return false;
+    // No speech while parked on results.
+    if (state.phase === "results") return false;
+    const liveId = state.round && state.round.round_id;
     if (roundId && liveId && roundId !== liveId) return false;
+    // Guessing lines must die once the round has a reveal payload (race).
+    if (phase === "guessing" && state.phase === "guessing" && state.reveal) {
+      return false;
+    }
     return true;
   },
 
@@ -904,10 +941,15 @@ const commentary = {
     if (this.inFlight > 2) return;
     const gen = this.gen;
     const phase = (s && s.phase) || (state && state.phase) || null;
-    const roundId = (s && s.round && s.round.round_id) || (state && state.round && state.round.round_id) || null;
+    const roundId = (s && s.round && s.round.round_id)
+      || (state && state.round && state.round.round_id)
+      || null;
+    if (!this.eventAllowed(event, phase)) return;
 
     const run = async () => {
+      // Re-check phase at fire time (delayed lobby_join / late agent).
       if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak()) return;
+      if (!this.eventAllowed(event, state && state.phase)) return;
       this.inFlight += 1;
       let got = null;
       try {
@@ -915,25 +957,44 @@ const commentary = {
       } finally {
         this.inFlight -= 1;
       }
-      if (!got || !got.line) return;
+      if (!got || !got.line) {
+        // Timed-out agent: short template only if still on the same beat.
+        if (!this.stillCurrent(gen, phase, roundId)) return;
+        if (!this.eventAllowed(event, state && state.phase)) return;
+        const fb = this.templateLine(event, s || state, extra || {});
+        if (!fb) return;
+        const lowFb = fb.toLowerCase();
+        if (this.recentLines.some((r) => r.toLowerCase() === lowFb)) return;
+        voiceQueue.enqueue(async () => {
+          if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+          if (!this.eventAllowed(event, state && state.phase)) return;
+          await speakWithGrok(fb);
+          this.rememberLine(fb);
+        }, voiceMeta({ phase: phase, roundId: roundId, epoch: gen }));
+        return;
+      }
       // Only speak if we are still on this moment.
       if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      if (!this.eventAllowed(event, state && state.phase)) return;
       const line = got.line;
       // Skip near-duplicates of something we just said.
       const low = line.toLowerCase();
       if (this.recentLines.some((r) => r.toLowerCase() === low)) return;
       voiceQueue.enqueue(async () => {
         if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+        if (!this.eventAllowed(event, state && state.phase)) return;
         await speakWithGrok(line);
         this.rememberLine(line);
-      }, voiceMeta({ phase: phase, roundId: roundId }));
+      }, voiceMeta({ phase: phase, roundId: roundId, epoch: gen }));
     };
 
     // Always async — round path never awaits this.
     const delay = opts.delayMs || 0;
     if (delay > 0) {
       setTimeout(() => {
-        if (this.stillCurrent(gen, phase, roundId)) run();
+        if (!this.stillCurrent(gen, phase, roundId)) return;
+        if (!this.eventAllowed(event, state && state.phase)) return;
+        run();
       }, delay);
     } else {
       Promise.resolve().then(run);
@@ -943,11 +1004,22 @@ const commentary = {
   /** Local player clicked a reply card — cut openers; mp3 path unchanged. */
   onLocalPick(slot, s) {
     if (!this.canSpeak()) return;
-    const replyNo = (typeof slot === "number") ? slot + 1 : null;
     const snap = s || state;
+    if (!snap || snap.phase !== "guessing") return;
+    // If everyone is about to reveal, skip pick chatter — reveal line wins.
+    const players = snap.players || [];
+    const allIn = players.length > 0 && players.every((p) => p.guessed || p.name === myName);
+    if (allIn && players.length > 1) {
+      // Still cut openers so the lock feels snappy; don't start a pick line.
+      voiceQueue.bump();
+      this.gen = voiceQueue.epoch;
+      return;
+    }
+    const replyNo = (typeof slot === "number") ? slot + 1 : null;
     // Cut leftover hype so the click feels instant; don't block on agent.
     voiceQueue.bump();
     this.gen = voiceQueue.epoch;
+    this.lastGuessed[myName] = true;
     // Async agent color only — if reveal arrives first, stillCurrent drops it.
     this.comment("player_pick", snap, {
       picker: myName,
@@ -957,19 +1029,21 @@ const commentary = {
   },
 
   onState(s, was) {
-    if (!this.canSpeak()) return;
+    if (!this.canSpeak() || !s) return;
     const board = getStandings(s);
     const players = s.players || [];
     const leader = board[0] && (board[0].score || 0) > 0 ? board[0].name : null;
 
     if (s.phase === "lobby") {
       const n = players.length;
-      if (n > this.lastLobbyCount && n >= 1 && joined) {
-        this.comment("lobby_join", s, null, { delayMs: 200 });
+      // Only announce when count rises while we stay in lobby (not on re-entry).
+      if (was === "lobby" && n > this.lastLobbyCount && n >= 1 && joined) {
+        this.comment("lobby_join", s, null, { delayMs: 150 });
       }
       this.lastLobbyCount = n;
       this.lastGuessed = {};
       this.lowClockSaid = false;
+      return;
     }
 
     if (s.phase === "guessing" && was !== "guessing") {
@@ -978,44 +1052,57 @@ const commentary = {
     }
 
     if (s.phase === "guessing") {
-      for (const p of players) {
-        if (p.guessed && !this.lastGuessed[p.name]) {
-          this.lastGuessed[p.name] = true;
-          // Local pick already spoke via onLocalPick — only call out opponents.
-          if (p.name !== myName) {
-            this.comment("player_lock", s, { just_locked: [p.name], picker: p.name });
+      const allGuessed = players.length > 0 && players.every((p) => p.guessed);
+      // No lock spam in the last beat before reveal.
+      if (!allGuessed) {
+        for (const p of players) {
+          if (p.guessed && !this.lastGuessed[p.name]) {
+            this.lastGuessed[p.name] = true;
+            // Local pick already spoke via onLocalPick — only call out opponents.
+            if (p.name !== myName) {
+              this.comment("player_lock", s, { just_locked: [p.name], picker: p.name });
+            }
           }
         }
       }
       const left = typeof s.deadline_ms === "number" ? s.deadline_ms : null;
-      if (left !== null && left <= 10000 && left > 0 && !this.lowClockSaid) {
+      if (
+        !allGuessed
+        && left !== null
+        && left <= 10000
+        && left > 800
+        && !this.lowClockSaid
+      ) {
         this.lowClockSaid = true;
         this.comment("clock_low", s);
       }
     }
 
     if (s.phase === "reveal" && was !== "reveal") {
+      // handleState already bumped the queue for the phase change + win/lose
+      // stinger. Do NOT bump again here or we cut the stinger. Sync gen only.
+      this.gen = voiceQueue.epoch;
       const w = s.reveal && s.reveal.winner;
       const mySlot = myGuessSlot;
       const decoy = s.reveal && typeof s.reveal.decoy_slot === "number" ? s.reveal.decoy_slot : null;
       const correct = (w && w === myName) || (decoy !== null && mySlot === decoy);
-      // One reveal line after outcome stinger (same queue, same epoch).
+      // One reveal line after outcome stinger (same epoch).
       this.comment("reveal", s, {
         winner: w || "house",
         pick_reply: (typeof mySlot === "number") ? mySlot + 1 : null,
         picker: myName,
         correct: correct,
-      });
+      }, { delayMs: 550 });
       this.lastLeader = leader;
     }
 
-    if (s.phase !== "lobby") this.lastLobbyCount = players.length;
-  },
+    if (s.phase === "results") {
+      // Silence agent color on the results screen (mp3 stinger only).
+      this.lastGuessed = {};
+      this.lowClockSaid = false;
+    }
 
-  afterHostStinger(s) {
-    if (!s || !this.canSpeak()) return;
-    if (state && state.phase !== "guessing") return;
-    this.comment("round_start", s);
+    if (s.phase !== "lobby") this.lastLobbyCount = players.length;
   },
 
   /**
@@ -1024,9 +1111,11 @@ const commentary = {
    */
   openRound(s) {
     if (!this.canSpeak() || !s) return;
+    if (s.phase !== "guessing") return;
     const gen = this.gen;
     const phase = "guessing";
     const roundId = s.round && s.round.round_id ? s.round.round_id : null;
+    if (!roundId) return;
     const fallback = this.templateLine("round_start", s, {});
 
     // Always have a unique fallback ready on the queue so audio isn't silent
@@ -1035,6 +1124,7 @@ const commentary = {
     const speakOnce = async (line, source) => {
       if (spoken) return;
       if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      if (!this.eventAllowed("round_start", state && state.phase)) return;
       const text = String(line || "").trim();
       if (!text) return;
       const low = text.toLowerCase();
@@ -1055,27 +1145,19 @@ const commentary = {
       // Wait briefly for agent; if too slow, use rotated template.
       const raced = await Promise.race([
         agentPromise.then((got) => ({ t: "agent", got: got })),
-        new Promise((resolve) => setTimeout(() => resolve({ t: "timeout" }), 900)),
+        new Promise((resolve) => setTimeout(() => resolve({ t: "timeout" }), 700)),
       ]);
       if (!this.stillCurrent(gen, phase, roundId) || muted) return;
+      if (state && state.phase !== "guessing") return;
       if (raced.t === "agent" && raced.got && raced.got.line) {
         const src = raced.got.source ? String(raced.got.source) : "";
-        // Prefer real agent lines; fallbacks are already rotated templates.
         await speakOnce(raced.got.line, src || "agent");
         return;
       }
-      // Agent still running: use template now; ignore late agent (spoken gate).
+      // Agent still running: use template now; drop late agent entirely
+      // (late openers during locks/reveal are the main "wrong time" bug).
       await speakOnce(fallback, "fallback_rotate");
-      agentPromise.then((got) => {
-        // Late agent — only queue if still same round and line is fresh.
-        if (spoken) return;
-        if (!got || !got.line) return;
-        if (!this.stillCurrent(gen, phase, roundId)) return;
-        voiceQueue.enqueue(async () => {
-          await speakOnce(got.line, got.source || "agent_late");
-        }, voiceMeta({ phase: phase, roundId: roundId }));
-      }).catch(() => {});
-    }, voiceMeta({ phase: phase, roundId: roundId }));
+    }, voiceMeta({ phase: phase, roundId: roundId, epoch: gen }));
   },
 };
 
@@ -1183,6 +1265,7 @@ function handleState(s) {
   } else {
     stopTimer();
   }
+  // Hard stingers first (phase transitions only), then commentary.onState.
   if (s.phase === "guessing" && was !== "guessing") {
     unlockAudio();
     // Session welcome once. After that, skip the same host_round.mp3 every time —
@@ -1198,13 +1281,8 @@ function handleState(s) {
     unlockAudio();
     const winner = s.reveal && s.reveal.winner;
     const outcome = (!winner || winner === "house") ? "lose" : "win";
-    // Keep win/lose mp3 as hard sting; skip repeating reveal mp3 on solo.
-    // Varied roast comes from the agent after (async).
-    if (isSoloFriendlyRoom(myRoom)) {
-      playHost(outcome);
-    } else {
-      playHost(outcome);
-    }
+    // Hard outcome sting only — agent reveal line comes from onState (delayed).
+    playHost(outcome);
     requestAnimationFrame(() => {
       const panel = $("revealPanel");
       if (panel && !panel.hidden && panel.scrollIntoView) {
@@ -1215,6 +1293,7 @@ function handleState(s) {
   }
   if (s.phase === "results" && was !== "results") {
     unlockAudio();
+    // One sting on match end only — no agent color (avoids talking over scores).
     try { playHost("win"); } catch (e) { /* ignore */ }
     requestAnimationFrame(() => {
       const panel = $("screen-results");
