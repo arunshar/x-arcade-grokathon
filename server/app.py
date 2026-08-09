@@ -71,8 +71,8 @@ FALLBACK_ROUND: dict[str, Any] = {
         {
             "slot": 2,
             "text": (
-                "Honestly, it depends on the context. Every tool has strengths, "
-                "and the best engineers know when to reach for each one."
+                "It really depends on context — every tool has tradeoffs, and "
+                "strong engineers just pick the right abstraction for the job."
             ),
             "author": "decoy",
             "is_decoy": True,
@@ -92,8 +92,8 @@ FALLBACK_ROUND: dict[str, Any] = {
     ],
     "decoy_slot": 2,
     "decoy_rationale": (
-        "Hedges on every side and commits to nothing. Real replies pick a "
-        "favorite and defend it."
+        "Hedges into a tidy mini-essay about tradeoffs and abstractions — "
+        "real replies just pick a tool and plant a flag."
     ),
     "safety": {"screened": True, "gate_codes": []},
     "seed": 424242,

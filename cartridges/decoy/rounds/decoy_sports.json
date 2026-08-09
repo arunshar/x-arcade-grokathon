@@ -15,7 +15,7 @@
     },
     {
       "slot": 1,
-      "text": "Chelsea want Zubimendi now? Absolute clowns thinking arsenal will just hand him over 😂",
+      "text": "Chelsea chasing Zubimendi after Arsenal just rebuilt that midfield is peak delusion — elite clubs don’t gift key pieces mid-project",
       "author": "decoy",
       "is_decoy": true
     },
@@ -39,7 +39,7 @@
     }
   ],
   "decoy_slot": 1,
-  "decoy_rationale": "The phrase “absolute clowns” feels slightly too generic and polished as banter, lacking the specific quirky typos or abrupt slang shifts seen in the real replies.",
+  "decoy_rationale": "Uses tidy analyst framing (“mid-project”, “elite clubs don’t gift”) more than the jagged banter of the real replies.",
   "safety": {
     "screened": true,
     "gate_codes": []

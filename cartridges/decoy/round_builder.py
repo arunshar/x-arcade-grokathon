@@ -101,13 +101,16 @@ DECOY_SCHEMA: dict[str, Any] = {
 }
 
 WRITER_SYSTEM = (
-    "You write one fake reply that must hide among real replies to a real X post. "
-    "Match the register of the thread exactly: typical reply length, tone, "
-    "capitalization, punctuation habits, typo level, and slang. Stay on topic and "
-    "plausible on its own. Do not copy phrases from the real replies. Never hint "
-    "that you are an AI. Also write a one sentence rationale naming the subtle "
-    "tell that makes your reply artificial. Players see the rationale only after "
-    "the reveal."
+    "You write one fake reply that must sit among real replies to a real X post. "
+    "Stay on topic and plausible. Match length roughly. Do not copy phrases from "
+    "the real replies. Never say you are an AI. "
+    "Leave a LIGHT, fair tell so sharp players can catch you: a bit too polished, "
+    "slightly essay-like or explanatory, oddly balanced/hedged, generic hype, or "
+    "slang that feels performed rather than lived-in. Do NOT make it cartoonish "
+    "(no 'As an AI', no corporate press-release walls of text, no perfect grammar "
+    "essay). Aim for ~60–70% human-passing, not 95%. "
+    "Also write one sentence rationale naming the tell. Players see it only after "
+    "reveal."
 )
 
 

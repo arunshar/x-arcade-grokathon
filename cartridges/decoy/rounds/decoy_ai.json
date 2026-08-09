@@ -27,7 +27,7 @@
     },
     {
       "slot": 3,
-      "text": "insane how bad its gotten",
+      "text": "Crazy how fast the quality fell off — feels less like a bad week and more like a deeper product regression nobody wants to own.",
       "author": "decoy",
       "is_decoy": true
     },
@@ -39,7 +39,7 @@
     }
   ],
   "decoy_slot": 3,
-  "decoy_rationale": "The missing apostrophe in 'its' plus a polished observational tone feels constructed rather than spontaneous like the others.",
+  "decoy_rationale": "Stacks a clean cause-effect diagnosis (“deeper product regression”) that reads like a product postmortem, not a gut reaction.",
   "safety": {
     "screened": true,
     "gate_codes": []

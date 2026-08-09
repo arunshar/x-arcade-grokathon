@@ -33,13 +33,13 @@
     },
     {
       "slot": 4,
-      "text": "Unbelievable that theyd treat a family like that on their kids birthday after dropping $250. That place just lost a ton of potential customers.",
+      "text": "Wild they handled a kid’s birthday like that after a $250 tab. That’s not a one-off screwup, it’s a hospitality culture problem.",
       "author": "decoy",
       "is_decoy": true
     }
   ],
   "decoy_slot": 4,
-  "decoy_rationale": "The missing apostrophes in 'theyd' and 'kids' combined with otherwise polished outrage make the casualness feel calculated rather than natural.",
+  "decoy_rationale": "Jumps from the incident to a tidy culture diagnosis instead of the messier anger or jokes in the real replies.",
   "safety": {
     "screened": true,
     "gate_codes": []

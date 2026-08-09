@@ -15,7 +15,7 @@
     },
     {
       "slot": 1,
-      "text": "these vol levels never hold, something always breaks soon after",
+      "text": "Compressed vol regimes almost never last; historically you get a sharp expansion once everyone is positioned the same way.",
       "author": "decoy",
       "is_decoy": true
     },
@@ -39,7 +39,7 @@
     }
   ],
   "decoy_slot": 1,
-  "decoy_rationale": "The phrasing stays cleanly parallel and risk-neutral without any of the slight emotional shading or shorthand fragments that mark the real replies.",
+  "decoy_rationale": "Sounds like a textbook risk note — “historically” plus neat regime language without the messy shorthand of real traders.",
   "safety": {
     "screened": true,
     "gate_codes": []
