@@ -332,6 +332,77 @@ def _normalize_topic_filter(raw: Any) -> list[str]:
     return sorted(out)
 
 
+def _topics_from_client_msg(msg: dict[str, Any]) -> list[str] | None:
+    """Extract topic filter from a client message, or None if not provided.
+
+    Accepts ``topics``, ``topic_filter``, and/or ``topic_groups`` (chip ids).
+    An explicit empty list means RANDOM and is distinct from omitted.
+    """
+    if not isinstance(msg, dict):
+        return None
+    has = False
+    combined: list[Any] = []
+    for key in ("topics", "topic_filter", "topic_groups"):
+        if key not in msg:
+            continue
+        has = True
+        val = msg.get(key)
+        if val is None:
+            continue
+        if isinstance(val, str):
+            combined.append(val)
+        elif isinstance(val, (list, tuple)):
+            combined.extend(val)
+    if not has:
+        return None
+    return _normalize_topic_filter(combined)
+
+
+def _apply_room_topics(
+    room: dict[str, Any],
+    msg: dict[str, Any],
+    *,
+    allow: bool,
+) -> None:
+    """Set room topic_filter from client msg when the sender may choose it."""
+    if not allow:
+        return
+    parsed = _topics_from_client_msg(msg)
+    if parsed is None:
+        return
+    room["topic_filter"] = parsed
+
+
+def _load_rounds_matching_topics(topic_filter: set[str]) -> list[dict[str, Any]]:
+    """All screened on-disk rounds whose source.topic is in the filter."""
+    if not topic_filter:
+        return []
+    out: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    try:
+        paths = sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json"))
+    except OSError:
+        return []
+    for path in paths:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        topic = _round_topic(data)
+        if topic not in topic_filter:
+            continue
+        if not safety_screen.screen_round(data).get("screened"):
+            continue
+        rid = str(data.get("round_id") or path.stem)
+        if rid in seen:
+            continue
+        seen.add(rid)
+        out.append(data)
+    return out
+
+
 def _round_topic(rnd: dict[str, Any]) -> str:
     return decoy_themes.round_topic_of(rnd)
 
@@ -485,9 +556,9 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
     rounds that already have certified decoy media so the Space does not
     deal text-only rounds while most of the pool lacks prebaked video.
 
-    Themed rooms pick **only** from an index of matching topic tags (never
-    sample the full queue and hope). Off-theme fallback is forbidden when a
-    filter is set — recycle on-theme posts instead.
+    Themed rooms pick **only** from rounds tagged with the chosen topics.
+    Off-theme FALLBACK is forbidden when a filter is set — recycle on-theme
+    posts instead of leaking a tech stub into a sports room.
     """
     exclude: set[str] = set()
     if room is not None:
@@ -503,14 +574,26 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
     topic_filter: set[str] = set()
     if room is not None:
         topic_filter = {
-            str(t).lower() for t in (room.get("topic_filter") or []) if t
+            str(t).lower().strip()
+            for t in (room.get("topic_filter") or [])
+            if str(t or "").strip()
         }
+
+    def _accept(picked: dict[str, Any] | None) -> dict[str, Any] | None:
+        """Reject anything outside the room theme (defense in depth)."""
+        if picked is None:
+            return None
+        if not topic_filter:
+            return picked
+        if _round_topic(picked) not in topic_filter:
+            return None
+        return picked
 
     if not FORCE_FALLBACK:
         try:
             by_topic = _refresh_theme_pool()
             if topic_filter:
-                # Direct index — guaranteed on-tag, on-theme posts only.
+                # 1) Theme-fit index (strong keyword hits preferred).
                 candidates: list[dict[str, Any]] = []
                 seen_ids: set[str] = set()
                 for t in topic_filter:
@@ -521,24 +604,40 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
                         if rid:
                             seen_ids.add(rid)
                         candidates.append(rnd)
-                # Prefer score-2 (clear keyword hit); allow score-1 if needed.
                 strong = [
                     r for r in candidates if decoy_themes.round_theme_score(r) >= 2
                 ]
                 pick_pool = strong if strong else candidates
-                picked = _pick_from_candidates(
-                    pick_pool, exclude=exclude, prefer_media=prefer_media
+                picked = _accept(
+                    _pick_from_candidates(
+                        pick_pool, exclude=exclude, prefer_media=prefer_media
+                    )
                 )
                 if picked is not None:
                     return picked
-                # Last resort inside theme: ignore media preference, allow recent.
-                picked = _pick_from_candidates(
-                    candidates, exclude=set(), prefer_media=False
+                picked = _accept(
+                    _pick_from_candidates(
+                        candidates, exclude=set(), prefer_media=False
+                    )
                 )
                 if picked is not None:
                     return picked
-                # Do NOT fall through to global FALLBACK (wrong theme).
-                # Build a tiny themed stub only if the pool is empty on disk.
+
+                # 2) Disk scan by tag only (ignore soft theme_fit demotion).
+                disk = _load_rounds_matching_topics(topic_filter)
+                picked = _accept(
+                    _pick_from_candidates(
+                        disk, exclude=exclude, prefer_media=prefer_media
+                    )
+                )
+                if picked is not None:
+                    return picked
+                picked = _accept(
+                    _pick_from_candidates(disk, exclude=set(), prefer_media=False)
+                )
+                if picked is not None:
+                    return picked
+                # Stay inside theme — never fall through to global FALLBACK.
             else:
                 # Random mix — still skip quarantined / off-tag junk.
                 all_rows: list[dict[str, Any]] = list(
@@ -568,31 +667,41 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
                             skip.add(rid)
                         continue
                     if prefer_media and not _round_has_ready_decoy_media(rnd):
-                        # keep looking but don't permanently burn the id
                         continue
                     return rnd
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"_next_round theme pick failed: {exc}", file=sys.stderr)
 
-    # Global fallback only for unthemed rooms (or total pool failure).
+    # Themed room with empty pool: still refuse off-theme FALLBACK.
     if topic_filter:
-        # Synthesize nothing off-theme — retry any on-disk themed file raw.
-        try:
-            for path in sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json")):
-                try:
-                    data = json.loads(path.read_text(encoding="utf-8"))
-                except (OSError, json.JSONDecodeError):
-                    continue
-                if _round_topic(data) not in topic_filter:
-                    continue
-                if not safety_screen.screen_round(data).get("screened"):
-                    continue
-                out = copy.deepcopy(data)
-                decoy_queue.randomize_decoy_position(out)
-                out["safety"] = safety_screen.screen_round(out)
-                return out
-        except Exception:
-            pass
+        disk = _load_rounds_matching_topics(topic_filter)
+        if disk:
+            picked = _accept(
+                _pick_from_candidates(disk, exclude=set(), prefer_media=False)
+            )
+            if picked is not None:
+                return picked
+            # Absolute last themed copy.
+            out = copy.deepcopy(disk[0])
+            decoy_queue.randomize_decoy_position(out)
+            out["safety"] = safety_screen.screen_round(out)
+            return out
+        # No on-disk posts for this theme — themed stub (not tech FALLBACK).
+        theme_label = ",".join(sorted(topic_filter)[:3]) or "theme"
+        stub = copy.deepcopy(FALLBACK_ROUND)
+        stub["round_id"] = "decoy-theme-empty"
+        stub["source"] = {
+            "post_text": (
+                f"Theme pool for {theme_label} is empty right now. "
+                "Try RANDOM or another theme — or wait for a refill."
+            ),
+            "post_author": "@arcade",
+            "post_url": "https://x.com",
+            "topic": sorted(topic_filter)[0],
+        }
+        decoy_queue.randomize_decoy_position(stub)
+        stub["safety"] = safety_screen.screen_round(stub)
+        return stub
 
     fallback = copy.deepcopy(FALLBACK_ROUND)
     decoy_queue.randomize_decoy_position(fallback)
@@ -1815,21 +1924,14 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 joined = (room_id, name)
                 STATS["joins"] += 1
                 STATS["players"].add(f"{room_id}/{name}")
-                # Room creator (first joiner, or host flag while still in lobby
-                # with no filter yet) may set the topic filter for this room.
+                # Room creator / host sets the theme while still in lobby.
+                # First joiner always may set it; host flag may set/replace it.
                 if room["phase"] == "lobby":
-                    want_topics = msg.get("topics")
-                    if want_topics is None:
-                        want_topics = msg.get("topic_filter")
-                    parsed = _normalize_topic_filter(want_topics)
                     only_player = len(room["players"]) == 1 and is_new_player
                     host_claim = bool(msg.get("arena") or msg.get("host"))
-                    if only_player or (
-                        host_claim
-                        and not room.get("topic_filter")
-                        and want_topics is not None
-                    ):
-                        room["topic_filter"] = parsed
+                    _apply_room_topics(
+                        room, msg, allow=bool(only_player or host_claim)
+                    )
                 # No host. The session clock runs the room: the first player
                 # in a lobby arms the countdown, and solo play is a real game
                 # against the house. Later joiners land in whatever phase is
@@ -1886,7 +1988,16 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 match_rounds = int(
                     room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6
                 )
+                # Re-apply theme on START so solo/create cannot lose the chip
+                # selection if join raced ahead of the payload.
                 if phase == "lobby":
+                    hostish = bool(msg.get("arena") or msg.get("host"))
+                    is_creator = joined[1] in room["players"] and (
+                        hostish
+                        or len(room["players"]) == 1
+                        or not room.get("topic_filter")
+                    )
+                    _apply_room_topics(room, msg, allow=is_creator)
                     if not _enough_players_to_start(room):
                         # Keep waiting — do not start a 1-player multiplayer match.
                         if room["auto_timer"] is None and room["players"]:
@@ -1901,12 +2012,24 @@ async def ws_endpoint(ws: WebSocket) -> None:
                         await _start_round(room)
                 elif phase == "results":
                     # PLAY AGAIN from results.
+                    _apply_room_topics(
+                        room,
+                        msg,
+                        allow=bool(msg.get("arena") or msg.get("host"))
+                        or len(room["players"]) == 1,
+                    )
                     await _restart_match(room)
 
             elif t == "restart":
                 room = ROOMS.get(room_id)
                 if room is None or joined is None or not room["players"]:
                     continue
+                _apply_room_topics(
+                    room,
+                    msg,
+                    allow=bool(msg.get("arena") or msg.get("host"))
+                    or len(room["players"]) == 1,
+                )
                 await _restart_match(room)
 
             elif t == "home":

@@ -390,7 +390,12 @@ function speakBrowser(text) {
 const voiceBus = {
   el: null,
   url: null,
+  /** Bumps on every stop/play so a late fetch cannot start a second clip. */
+  playGen: 0,
+  speaking: false,
   stop() {
+    this.playGen += 1;
+    this.speaking = false;
     try {
       if (this.el) {
         this.el.onended = null;
@@ -418,18 +423,36 @@ const voiceBus = {
       try { p.reject(new Error("cancelled")); } catch (e) { /* ignore */ }
     }
   },
+  /** True while this playGen is still the active one (not stopped/superseded). */
+  isCurrent(gen) {
+    return typeof gen === "number" && gen === this.playGen;
+  },
   playUrl(url) {
     return new Promise((resolve, reject) => {
+      // stop() advances playGen — capture the id for THIS play only.
       this.stop();
+      const gen = this.playGen;
+      this.speaking = true;
       this.url = url;
       if (!this.el) this.el = new Audio();
       const a = this.el;
-      a.onended = () => resolve();
-      a.onerror = () => reject(new Error("audio element failed"));
+      const finish = (err) => {
+        if (this.playGen !== gen) {
+          resolve();
+          return;
+        }
+        this.speaking = false;
+        if (err) reject(err);
+        else resolve();
+      };
+      a.onended = () => finish(null);
+      a.onerror = () => finish(new Error("audio element failed"));
       a.src = url;
       a.preload = "auto";
       const p = a.play();
-      if (p && p.catch) p.catch(reject);
+      if (p && p.catch) {
+        p.catch((err) => finish(err || new Error("play failed")));
+      }
     });
   },
 };
@@ -438,6 +461,7 @@ const voiceBus = {
  * Serial voice queue with epoch cancel.
  * When the game moves on (new round / phase), bump() hard-cuts audio and
  * drops every pending job from the old moment so lines never lag behind.
+ * Only one job runs at a time — Grok Voice never overlaps itself.
  */
 const voiceQueue = {
   items: [],
@@ -453,9 +477,13 @@ const voiceQueue = {
   clear() {
     this.bump();
   },
+  /** True if this epoch is still the live one (jobs re-check before play). */
+  isLive(epoch) {
+    return typeof epoch === "number" && epoch === this.epoch;
+  },
   /**
    * @param {() => Promise<void>|void} job
-   * @param {{ phase?: string, roundId?: string|null, priority?: number }} [meta]
+   * @param {{ phase?: string, roundId?: string|null, priority?: number, epoch?: number }} [meta]
    */
   enqueue(job, meta) {
     const m = Object.assign({ epoch: this.epoch, phase: null, roundId: null }, meta || {});
@@ -463,8 +491,8 @@ const voiceQueue = {
     if (typeof m.epoch === "number" && m.epoch !== this.epoch) return;
     m.epoch = this.epoch;
     this.items.push({ run: job, meta: m });
-    // Keep the lane snappy — drop oldest non-playing jobs first.
-    while (this.items.length > 3) this.items.shift();
+    // One line ahead max — backlog is what makes voice feel late/stacked.
+    while (this.items.length > 2) this.items.shift();
     this.kick();
   },
   _stale(meta) {
@@ -494,12 +522,12 @@ const voiceQueue = {
       })
       .catch(() => {})
       .then(() => {
-        this.running = false;
-        // If epoch moved mid-clip, don't chain old work.
-        if (ep !== this.epoch) {
-          this.items = this.items.filter((i) => i.meta.epoch === this.epoch);
+        // Only the job that owns the current run flag may clear it. If bump()
+        // already reset running mid-flight, do not stomp a newer job's kick.
+        if (ep === this.epoch) {
+          this.running = false;
+          this.kick();
         }
-        this.kick();
       });
   },
 };
@@ -553,13 +581,14 @@ function looksLikePromptEcho(text) {
 }
 
 /**
- * Grok Voice TTS via our server (POST /tts → Eve mp3).
- * Works whenever ARCADE_MODE=live + XAI_API_KEY, no realtime socket required.
+ * Fetch Grok TTS bytes → object URL. Does not play. Caller must revoke.
+ * Returns null when muted / empty / failed.
  */
-function speakGrokTts(text) {
+function fetchGrokTtsUrl(text) {
   return (async () => {
     const line = sanitizeHostLine(text);
-    if (!line) return;
+    if (!line || muted) return null;
+    if (arcadeMode !== "live" || MOCK) return null;
     const r = await fetch("/tts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -570,12 +599,39 @@ function speakGrokTts(text) {
       throw new Error("grok tts " + r.status + " " + detail.slice(0, 120));
     }
     const blob = await r.blob();
-    const url = URL.createObjectURL(blob);
-    // voiceBus.playUrl takes ownership of stop/revoke on next play; revoke after.
+    return URL.createObjectURL(blob);
+  })();
+}
+
+/**
+ * Grok Voice TTS via our server (POST /tts → Eve mp3).
+ * Works whenever ARCADE_MODE=live + XAI_API_KEY, no realtime socket required.
+ * Re-checks voiceQueue epoch after the network hop so a late reply never plays
+ * over the next round's line.
+ */
+function speakGrokTts(text, opts) {
+  return (async () => {
+    opts = opts || {};
+    const epoch = typeof opts.epoch === "number" ? opts.epoch : voiceQueue.epoch;
+    const line = sanitizeHostLine(text);
+    if (!line) return;
+    if (!voiceQueue.isLive(epoch) || muted) return;
+    let url = null;
+    try {
+      url = await fetchGrokTtsUrl(line);
+    } catch (e) {
+      throw e;
+    }
+    // Stale after fetch — drop silently (round already moved on).
+    if (!url || !voiceQueue.isLive(epoch) || muted) {
+      if (url) {
+        try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ }
+      }
+      return;
+    }
     try {
       await voiceBus.playUrl(url);
     } finally {
-      // playUrl already revoked on next stop; if ended cleanly, revoke now.
       try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ }
       if (voiceBus.url === url) voiceBus.url = null;
     }
@@ -583,25 +639,36 @@ function speakGrokTts(text) {
 }
 
 /** Prefer Grok Voice TTS (stable) then realtime, then browser. Never overlaps. */
-async function speakWithGrok(text) {
+async function speakWithGrok(text, opts) {
+  opts = opts || {};
+  const epoch = typeof opts.epoch === "number" ? opts.epoch : voiceQueue.epoch;
   const line = sanitizeHostLine(text);
   if (!line || muted) return;
+  if (!voiceQueue.isLive(epoch)) return;
   // Prefer /tts — one clip at a time on voiceBus. Realtime is easy to stack.
   if (arcadeMode === "live" && !MOCK) {
     try {
-      await speakGrokTts(line);
+      await speakGrokTts(line, { epoch: epoch });
       return "tts";
     } catch (e) { /* try realtime */ }
+    if (!voiceQueue.isLive(epoch) || muted) return;
     if (!liveVoice.disabled) {
       try {
         const ok = await warmLiveVoice();
+        if (!voiceQueue.isLive(epoch) || muted) return;
         if (ok) {
+          // Hard-cut any prior realtime audio before starting a new line.
+          voiceBus.stop();
+          if (!voiceQueue.isLive(epoch) || muted) return;
           await speakLiveText(line);
           return "realtime";
         }
       } catch (e2) { /* browser */ }
     }
   }
+  if (!voiceQueue.isLive(epoch) || muted) return;
+  voiceBus.stop();
+  if (!voiceQueue.isLive(epoch) || muted) return;
   await speakBrowser(line);
   return "browser";
 }
@@ -618,29 +685,35 @@ function playMp3Cue(name) {
       resolve();
       return;
     }
-    // Fresh Audio(src) each time — cloneNode of <audio> often fails silently.
+    // Route through voiceBus so mp3 + Grok TTS share one channel (no overlap).
     const clip = new Audio(url);
     clip.preload = "auto";
     let done = false;
     const finish = () => {
       if (done) return;
       done = true;
+      voiceBus.speaking = false;
       resolve();
     };
+    // stop() advances playGen; this clip owns the bus until end/error/bump.
+    voiceBus.stop();
+    const gen = voiceBus.playGen;
+    voiceBus.speaking = true;
+    voiceBus.el = clip;
     clip.onended = finish;
     clip.onerror = finish;
-    // Safety: never hang the voice queue if ended event is missed.
-    const watchdog = setTimeout(finish, 12000);
+    const watchdog = setTimeout(finish, 8000);
     const clearWd = () => clearTimeout(watchdog);
     clip.addEventListener("ended", clearWd, { once: true });
     clip.addEventListener("error", clearWd, { once: true });
-
-    voiceBus.stop();
-    voiceBus.el = clip;
+    // If bump() already moved on, don't start.
+    if (voiceBus.playGen !== gen) {
+      finish();
+      return;
+    }
     const p = clip.play();
     if (p && p.then) {
       p.then(() => { /* playing */ }).catch(() => {
-        // Autoplay still blocked — resolve so queue continues; user can click again.
         finish();
       });
     }
@@ -1732,9 +1805,18 @@ function renderGame(s) {
   }
 
   const topic = src.topic || "";
-  $("postTopic").textContent = topic
-    ? (topic + " · " + (fmt === "gif" ? "GIF ROUND" : "TEXT ROUND"))
-    : (fmt === "gif" ? "GIF ROUND" : "TEXT ROUND");
+  const themeLabel = formatTopicFilterLabel(s.topic_filter || []);
+  const roundKind = fmt === "gif" ? "GIF ROUND" : "TEXT ROUND";
+  // Show room theme + post tag so players can see the filter is stuck.
+  if (themeLabel && themeLabel !== "RANDOM MIX") {
+    $("postTopic").textContent = themeLabel
+      + (topic ? " · " + String(topic).toUpperCase() : "")
+      + " · " + roundKind;
+  } else {
+    $("postTopic").textContent = topic
+      ? (String(topic).toUpperCase() + " · " + roundKind)
+      : roundKind;
+  }
   $("postText").textContent = src.post_text || "";
   $("timerWrap").style.visibility = s.phase === "guessing" ? "visible" : "hidden";
   const postCard = $("postCard");
@@ -2319,7 +2401,12 @@ function sendRestart() {
   roundNo = 0;
   lastRoundId = null;
   myGuessSlot = null;
-  send({ t: "restart", room: myRoom });
+  const payload = { t: "restart", room: myRoom };
+  if (iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)) {
+    payload.arena = true;
+    Object.assign(payload, themePayloadFields());
+  }
+  send(payload);
 }
 
 // ---------- timer (display only, server enforces the real deadline) ----------
@@ -2482,28 +2569,61 @@ function toggleTopicGroup(id) {
   renderTopicChips();
 }
 
-/** Expand selected group ids → topic slugs for the join payload. */
+/** Resolve chip id → member topic slugs (defaults if catalog is thin). */
+function topicsForGroupId(id) {
+  id = String(id || "").toLowerCase();
+  id = LEGACY_TOPIC_GROUP_MAP[id] || id;
+  if (!id || id === "random") return [];
+  const groups = (topicCatalog && topicCatalog.groups) || DEFAULT_TOPIC_GROUPS;
+  const defaults = DEFAULT_TOPIC_GROUPS;
+  let g = null;
+  for (let i = 0; i < groups.length; i++) {
+    if (String(groups[i].id || "").toLowerCase() === id) {
+      g = groups[i];
+      break;
+    }
+  }
+  let topics = (g && Array.isArray(g.topics) && g.topics.length) ? g.topics.slice() : null;
+  if (!topics) {
+    for (let i = 0; i < defaults.length; i++) {
+      if (String(defaults[i].id || "").toLowerCase() === id) {
+        topics = (defaults[i].topics || []).slice();
+        break;
+      }
+    }
+  }
+  // Still nothing — send the chip id so the server can expand group ids.
+  if (!topics || !topics.length) topics = [id];
+  return topics.map((t) => String(t || "").toLowerCase()).filter(Boolean);
+}
+
+/** Expand selected group ids → topic slugs for the join/start payload. */
 function selectedTopicsPayload() {
   if (!selectedTopicGroups.length) return [];
-  const groups = (topicCatalog && topicCatalog.groups) || DEFAULT_TOPIC_GROUPS;
-  const byId = {};
-  groups.forEach((g) => { byId[String(g.id || "").toLowerCase()] = g; });
-  // legacy entertainment → movies_tv members if server still lists it
-  byId.entertainment = byId.entertainment || byId.movies_tv || {
-    topics: ["movies", "tv"],
-  };
   const out = [];
   const seen = {};
   selectedTopicGroups.forEach((id) => {
-    id = LEGACY_TOPIC_GROUP_MAP[id] || id;
-    const g = byId[id];
-    const topics = (g && g.topics) || [id];
-    topics.forEach((t) => {
-      const k = String(t || "").toLowerCase();
-      if (k && !seen[k]) { seen[k] = true; out.push(k); }
+    topicsForGroupId(id).forEach((k) => {
+      if (k && !seen[k]) {
+        seen[k] = true;
+        out.push(k);
+      }
     });
   });
   return out;
+}
+
+/** Full theme payload: slugs + chip ids (server expands either). */
+function themePayloadFields() {
+  const topics = selectedTopicsPayload();
+  const groups = selectedTopicGroups
+    .map((id) => LEGACY_TOPIC_GROUP_MAP[String(id || "").toLowerCase()] || String(id || "").toLowerCase())
+    .filter((id) => id && id !== "random");
+  return {
+    topics: topics,
+    topic_groups: groups,
+    topic_filter: topics,
+  };
 }
 
 function formatTopicFilterLabel(topics) {
@@ -2666,8 +2786,8 @@ function doJoin(opts) {
   // arena:true marks creator/host. topics: filter X posts for this room
   // (empty = random mix). Only applied for the creator on the server.
   const payload = { t: "join", room: myRoom, name: myName, arena: iAmHost };
-  if (iAmHost) {
-    payload.topics = selectedTopicsPayload();
+  if (iAmHost || solo || lobbyMode === "solo") {
+    Object.assign(payload, themePayloadFields());
   }
   send(payload);
 
@@ -2797,7 +2917,13 @@ function sendNext() {
   try { unlockAudio(); } catch (e) { /* ignore */ }
   // Player moved on — cut leftover reveal/hype immediately.
   try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
-  send({ t: "next", room: myRoom });
+  const payload = { t: "next", room: myRoom };
+  // Re-assert theme on START so the server never deals a random mix by mistake.
+  if (iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)) {
+    payload.arena = true;
+    Object.assign(payload, themePayloadFields());
+  }
+  send(payload);
 }
 $("startBtn").addEventListener("click", withAudioUnlock(() => {
   if (lobbyMode === "solo" && !joined) {
