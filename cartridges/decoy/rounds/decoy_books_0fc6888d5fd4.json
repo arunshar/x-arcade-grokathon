@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-0fc6888d5fd4",
+  "source": {
+    "post_text": "What do you think readers expect from your genre? #writingq #WritingCommunity",
+    "post_author": "@SusanSavageLee1",
+    "post_url": "https://x.com/SusanSavageLee1/status/2086160299267117384",
+    "topic": "books"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "In romance they mostly want the emotional payoff and chemistry, though I try weaving in enough realism so the happily-ever-after still feels earned rather than automatic.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Same. I don't know how to do it any other way.",
+      "author": "@epchapman1986",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Social commentary while I peel back while certain activities are expectations rather than options.",
+      "author": "@JoeyWingster",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "A little bit of humor, repetition, silliness, and quirkiness.",
+      "author": "@author_alex",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "I don't stick to one genre and even the individual books are what you might call genre hybrids. I have no desire to cater to convention or expectations.",
+      "author": "@generatemagic",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory with its balanced hedge between genre wants and personal approach.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 313851641
+}
