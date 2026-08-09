@@ -134,6 +134,25 @@ async def http_get(path: str) -> tuple[int, bytes, str]:
 async def main() -> int:
     key, servable, gated = load_answer_key()
     log(f"answer key: {len(servable)} servable rounds, gated out: {gated}")
+
+    # Serve-order truth is the server's theme pool, not the file listing: the
+    # theme layer quarantines off-tag rounds (which must then never serve) and
+    # orders by topic bucket. The pool must stay a subset of screened rounds.
+    from server.app import _refresh_theme_pool, _theme_pool_cache
+
+    by_topic = _refresh_theme_pool()
+    pool = [str(r.get("round_id")) for r in (_theme_pool_cache.get("all") or [])]
+    if not pool:
+        pool = [str(r.get("round_id")) for rows in by_topic.values() for r in rows]
+    if not set(pool) <= set(servable):
+        leaked = sorted(set(pool) - set(servable))
+        log(f"FATAL: theme pool contains unscreened rounds: {leaked}")
+        return 1
+    quarantined = sorted(set(servable) - set(pool))
+    log(f"theme pool: {len(pool)} rounds; quarantined off-tag: {quarantined}")
+    screened_total = len(servable)  # /health counts screened files, not the pool
+    servable = pool
+
     # Match cap must fit the full wrap proof (every servable + 1).
     config.MATCH_ROUNDS = max(int(getattr(config, "MATCH_ROUNDS", 6) or 6), len(servable) + 5)
     log(f"match cap for wrap proof: {config.MATCH_ROUNDS}")
@@ -153,7 +172,7 @@ async def main() -> int:
     health = json.loads(body)
     log(f"GET /health -> {status} {health}")
     check(status == 200 and health["mode"] == "demo", "/health reports demo mode")
-    check(health["rounds_available"] == len(servable), "/health counts screened rounds")
+    check(health["rounds_available"] == screened_total, "/health counts screened rounds")
 
     status, body, _ = await http_get("/token")
     token = json.loads(body)
@@ -260,8 +279,18 @@ async def main() -> int:
                 await recv_state(p2, "P2")
                 check(state["phase"] == "guessing", "next starts the following round")
 
-        check(served_ids[: len(servable)] == servable, "queue serves screened rounds in order")
-        check(served_ids[len(servable)] == servable[0], "queue wraps back to the first round")
+        # Score-tiered picking retired the sorted-order walk and wraparound.
+        # What serving promises now: a bounded recent window (mirrors the
+        # server's keep formula) with no repeat inside it, only theme-pool
+        # rounds ever serve, and the walk never stalls.
+        window = max(12, min(40, len(key) - 1))
+        no_repeat = all(
+            len(set(served_ids[i : i + window])) == min(window, len(served_ids) - i)
+            for i in range(len(served_ids))
+        )
+        check(no_repeat, f"no repeats inside the {window}-round recent window")
+        check(set(served_ids) <= set(servable), "walk serves only theme-pool rounds")
+        check(len(served_ids) == total_rounds, "walk never stalls")
         p2 = next(p for p in state["players"] if p["name"] == "P2")
         check(p2["score"] == total_rounds, "winner score accumulates across rounds")
 

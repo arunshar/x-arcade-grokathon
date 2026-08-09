@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Arcade auto-presenter</title>
+<style>
+  :root {
+    --bg: #04070B; --panel: #0B141E; --cyan: #22D3EE; --red: #FF2D55;
+    --green: #4ADE80; --amber: #FBBF24; --grid: #16303E;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); color: #E6EDF3;
+    font-family: "Inter", -apple-system, sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0 0 6px 0; display: flex;
+    align-items: center; justify-content: center; }
+  #box { position: relative; width: 100%; height: 100%;
+    max-width: calc((100vh - 6px) * 16 / 9); max-height: calc(100vw * 9 / 16); }
+  #box iframe { position: absolute; inset: 0; width: 100%; height: 100%;
+    border: 0; background: var(--bg); opacity: 0; transition: opacity .18s; }
+  #stage iframe.live { opacity: 1; }
+  #bar { position: fixed; left: 0; bottom: 0; height: 6px; width: 0;
+    background: var(--cyan); transition: width .5s linear; }
+  #overlay { position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 22px;
+    background: var(--bg); z-index: 10; }
+  #overlay.hidden { display: none; }
+  h1 { font-size: 28px; letter-spacing: .04em; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: 12px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+  .hint { max-width: 560px; text-align: center; color: #9FB0C0;
+    font-size: 14px; line-height: 1.6; }
+  button { font: 600 16px/1 "Inter", sans-serif; letter-spacing: .06em;
+    padding: 16px 42px; border-radius: 8px; cursor: pointer;
+    border: 1px solid var(--grid); background: var(--panel); color: #E6EDF3; }
+  button:hover { border-color: var(--cyan); }
+  #recBtn { border-color: var(--red); color: var(--red); }
+  #count { font: 700 120px/1 "JetBrains Mono", monospace; color: var(--cyan); }
+  #warn { color: var(--amber); font-size: 13px; max-width: 560px;
+    text-align: center; display: none; }
+  #doneBox { display: none; flex-direction: column; gap: 14px;
+    align-items: center; }
+  code { font-family: "JetBrains Mono", monospace; font-size: 12px;
+    background: var(--panel); border: 1px solid var(--grid);
+    padding: 8px 12px; border-radius: 6px; user-select: all; }
+  #recDot { position: fixed; top: 14px; right: 16px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--red); display: none; z-index: 5;
+    animation: blink 1.2s infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="box">
+    <iframe id="fA" title="slide"></iframe>
+    <iframe id="fB" title="slide"></iframe>
+  </div>
+</div>
+<div id="bar"></div>
+<div id="recDot"></div>
+
+<div id="overlay">
+  <div class="mono">X ARCADE / DECOY</div>
+  <h1>Auto-presenter</h1>
+  <div id="menu" style="display:flex; flex-direction:column; gap:16px; align-items:center;">
+    <button id="playBtn">PRESENT (no recording)</button>
+    <button id="recBtn">RECORD &rarr; downloads X_Arcade_demo.webm</button>
+    <p class="hint">Recording: in the Chrome picker choose <b>This Tab</b> and
+      switch on <b>Also share tab audio</b>, or the video will be silent.
+      12 slides, narration runs about 3 minutes 23 seconds.</p>
+    <p id="warn"></p>
+  </div>
+  <div id="count" style="display:none;">3</div>
+  <div id="doneBox">
+    <div class="mono">DONE</div>
+    <p class="hint">X_Arcade_demo.webm downloaded. It uploads to YouTube as-is.
+      To convert to mp4:</p>
+    <code>ffmpeg -i X_Arcade_demo.webm -c:v libx264 -c:a aac X_Arcade_demo.mp4</code>
+    <button onclick="location.reload()">RUN AGAIN</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+// Auto-presenter: plays narration/slideNN.mp3 per slide of the portable deck,
+// advancing when each clip ends. RECORD captures this tab (video + tab audio)
+// with MediaRecorder and downloads a webm. ?test=1 seeks every clip near its
+// end so a full run takes ~25s for verification.
+const SLIDES = 12;
+const DECK = "X_Arcade_deck_portable.html";
+const TEST = new URLSearchParams(location.search).has("test");
+const TOTAL_S = 203 + 3 * SLIDES; // narration + settle gaps, progress bar only
+
+const frames = [document.getElementById("fA"), document.getElementById("fB")];
+const overlay = document.getElementById("overlay");
+const menu = document.getElementById("menu");
+const count = document.getElementById("count");
+const doneBox = document.getElementById("doneBox");
+const warn = document.getElementById("warn");
+const bar = document.getElementById("bar");
+const recDot = document.getElementById("recDot");
+
+let front = 0;           // which iframe is visible
+let recorder = null;
+let recChunks = [];
+let recStream = null;
+let started = 0;
+
+const deckUrl = n => `${DECK}?clean=1&b=${n}#${n}`;
+const clipUrl = n => `narration/slide${String(n).padStart(2, "0")}.mp3`;
+
+function loadFrame(el, n) {
+  return new Promise(res => {
+    el.onload = () => {
+      // Same-origin: hide the deck's touch nav and rotate hint so they can
+      // never appear in a recording, whatever the window size.
+      try {
+        const style = el.contentDocument.createElement("style");
+        style.textContent = ".navbtn, #rotateHint, [id^=rh] { display: none !important; }";
+        el.contentDocument.head.appendChild(style);
+      } catch (e) { console.warn("style inject skipped:", e); }
+      setTimeout(res, 250); // fonts are inline, small settle
+    };
+    el.src = deckUrl(n);
+  });
+}
+
+function playClip(n) {
+  return new Promise((res, rej) => {
+    const a = new Audio(clipUrl(n));
+    a.preload = "auto";
+    a.onended = res;
+    a.onerror = () => rej(new Error("audio failed: " + clipUrl(n)));
+    let launched = false;
+    const go = () => {
+      // Once only: the TEST seek re-fires canplaythrough, and a second go()
+      // would reset currentTime forever and the clip would never end.
+      if (launched) return;
+      launched = true;
+      if (TEST && a.duration > 2) a.currentTime = a.duration - 1.2;
+      a.play().catch(rej);
+    };
+    if (a.readyState >= 3) go();
+    else a.addEventListener("canplaythrough", go, { once: true });
+  });
+}
+
+function tickBar() {
+  const t = (Date.now() - started) / 1000;
+  bar.style.width = Math.min(100, 100 * t / TOTAL_S) + "%";
+}
+
+async function present() {
+  started = Date.now();
+  const barTimer = setInterval(tickBar, 500);
+  await loadFrame(frames[front], 1);
+  frames[front].classList.add("live");
+  for (let n = 1; n <= SLIDES; n++) {
+    // Preload the next slide in the hidden iframe while this clip plays.
+    const preload = n < SLIDES ? loadFrame(frames[1 - front], n + 1) : null;
+    try { await playClip(n); }
+    catch (e) { console.error(e); await new Promise(r => setTimeout(r, TEST ? 800 : 4000)); }
+    if (preload) {
+      await preload;
+      frames[1 - front].classList.add("live");
+      frames[front].classList.remove("live");
+      front = 1 - front;
+    }
+  }
+  clearInterval(barTimer);
+  bar.style.width = "100%";
+}
+
+async function countdown() {
+  menu.style.display = "none";
+  count.style.display = "block";
+  for (const c of ["3", "2", "1"]) {
+    count.textContent = c;
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  count.style.display = "none";
+  overlay.classList.add("hidden");
+}
+
+document.getElementById("playBtn").onclick = async () => {
+  await countdown();
+  await present();
+  overlay.classList.remove("hidden");
+  doneBox.style.display = "flex";
+  doneBox.querySelector(".hint").textContent = "Presentation finished.";
+};
+
+document.getElementById("recBtn").onclick = async () => {
+  try {
+    recStream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: 30 },
+      audio: true,
+      preferCurrentTab: true,
+      selfBrowserSurface: "include",
+    });
+  } catch (e) {
+    warn.style.display = "block";
+    warn.textContent = "Screen capture was cancelled. Press RECORD and pick This Tab.";
+    return;
+  }
+  if (recStream.getAudioTracks().length === 0) {
+    warn.style.display = "block";
+    warn.textContent = "No tab audio in the capture. Stop, press RECORD again, " +
+      "choose This Tab and enable Also share tab audio.";
+    recStream.getTracks().forEach(t => t.stop());
+    return;
+  }
+  const mime = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]
+    .find(m => MediaRecorder.isTypeSupported(m)) || "";
+  recorder = new MediaRecorder(recStream, { mimeType: mime, videoBitsPerSecond: 6_000_000 });
+  recChunks = [];
+  recorder.ondataavailable = e => e.data.size && recChunks.push(e.data);
+  recorder.start(1000);
+  recDot.style.display = "block";
+
+  await countdown();
+  await present();
+  await new Promise(r => setTimeout(r, 2000)); // 2s tail after slide 12
+
+  recorder.stop();
+  await new Promise(r => recorder.onstop = r);
+  recStream.getTracks().forEach(t => t.stop());
+  recDot.style.display = "none";
+
+  const blob = new Blob(recChunks, { type: "video/webm" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "X_Arcade_demo.webm";
+  a.click();
+  overlay.classList.remove("hidden");
+  doneBox.style.display = "flex";
+  console.log("recorded bytes:", blob.size);
+};
+</script>
+</body>
+</html>

@@ -37,7 +37,13 @@ from cartridges.decoy import themes as decoy_themes
 from plugins.safety import screen as safety_screen
 
 _theme_pool_cache: dict[str, Any] = {"mtime": 0.0, "by_topic": {}, "all": []}
-_theme_rng = random.SystemRandom()
+# Seeded under ARCADE_NO_SHUFFLE so the suites replay serving decisions;
+# real deployments keep SystemRandom.
+_theme_rng: random.Random = (
+    random.Random(0)
+    if os.environ.get("ARCADE_NO_SHUFFLE") == "1"
+    else random.SystemRandom()
+)
 
 # Internal knob, not part of the contract. When set to 1 the server skips the
 # round queue and always serves FALLBACK_ROUND. selfcheck.py sets it so the
