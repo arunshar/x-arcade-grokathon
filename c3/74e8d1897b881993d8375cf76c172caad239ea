@@ -1,0 +1,20 @@
+server/app.py
+  s_da6f3933cdb62d::t_0d71a89fac7ed4 121-132
+  s_da6f3933cdb62d::t_acb808632c10b2 721-766
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "c374e8d1897b881993d8375cf76c172caad239ea",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
