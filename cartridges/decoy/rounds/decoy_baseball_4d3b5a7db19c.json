@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-4d3b5a7db19c",
+  "source": {
+    "post_text": "Right now, who do you think won this trade?",
+    "post_author": "@MLBNetwork",
+    "post_url": "https://x.com/MLBNetwork/status/2086152712580715003",
+    "topic": "baseball"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Adley Rutschmann will be healthy for the first time ever  for the Red Sox but will go on IL and you will stink",
+      "author": "@LTSports80",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "The Orioles “Won” the trade. As Breslow said he didn’t make the trade to win it. He made the trade to make the Big League Club better.",
+      "author": "@redsoxfan1534",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "The ones right now….. ones playing right now",
+      "author": "@SC_10_",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Honestly right now the O's look better off since their side already has production while Adley's health is still a question mark, though the Sox did shore up the present.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Wait Basallo is horrendous? Or do you mean because he’s injured so the current spot holder is horrendous. I’d take Basallo over Adley for the next 8 years all day, if I had to choose. 21 vs 28 and same production.",
+      "author": "@HarrisHowland",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too balanced and explanatory, hedging both sides in a polished mini-summary rather than raw fan hot take.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 28179742
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-26eb4cdd3c5c",
+  "source": {
+    "post_text": "Galaxy Fam 👀\n\nIf you could ask Samsung engineers ONE question...\n\nWhat would it be?\n\nMe: What's stopping you from fully optimizing One UI and making it consistently smooth?\n\nYour question? 👇",
+    "post_author": "@tarunvats33",
+    "post_url": "https://x.com/tarunvats33/status/2086132546765787436",
+    "topic": "tech"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Not about smooth experience i have already that but I want App lock",
+      "author": "@khande63268",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "What technical barriers keep stopping a deeper overhaul of the notification shade so it feels less cluttered and more intuitive day to day?",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "Why can't you emulate Apple with regards to timely updates and impartial treatment of previously released devices, not just copying hyped features that they introduced.",
+      "author": "@mynameisromeojr",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "I think that Samsung should give a new try at developing their own proprietary OS. Maybe a more optimized version of Bada with One UI design",
+      "author": "@itsintheocean",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "@SamsungJPN、\nSamsung , Please ensure that security patch updates are distributed properly every month in 🇯🇵Japanese version as well...  :(",
+      "author": "@Snapdragon888_",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "The wording is slightly too polished and explanatory in how it frames the desired change.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 920426163
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-d00cc4f07ae0",
+  "source": {
+    "post_text": "I launched my new SaaS https://elvixai.com/ 9 days ago! 🥳\n\n- $299 revenue 💰\n- 30 paying customers 📈\n- 2,384 visitors 📊\n\nHere’s my step-by-step marketing strategy 👇",
+    "post_author": "@HsanC_",
+    "post_url": "https://x.com/HsanC_/status/2086107364596289583",
+    "topic": "startups"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Nice work hitting those numbers so fast after launch. The visitor-to-customer ratio looks efficient already and suggests the offer is landing well.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "30 paying customers in 9 days, solid launch.",
+      "author": "@aiseomastery",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "congrats man, 30 paying users in 9 days is not normal. the video breakdown is smart btw, most founders just drop a link and pray. curious if the 30 paying customers come from X or somewhere else?",
+      "author": "@shivamcodin9",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Very amazing! Love to see it :)",
+      "author": "@DanielSmidstrup",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Congrats , how did you approach the GTM ?",
+      "author": "@giress69",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "Slightly too polished and explanatory with an oddly balanced analytical tone that feels more composed than casual.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 113894408
+}

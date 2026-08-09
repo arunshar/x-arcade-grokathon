@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-360e09c2ebff",
+  "source": {
+    "post_text": "Stunning from 118 million light-years away!\n\nThe galaxy NGC 1015 is classified as a barred spiral galaxy. A central bar of stars stretches across the core, surrounded by tightly wound arms: https://science.nasa.gov/asset/hubble/ngc-3972-and-ngc-1015/?utm_source=TWITTER&utm_medium=NASAHubble&utm_campaign=NASASocial&linkId=990143570",
+    "post_author": "@NASAHubble",
+    "post_url": "https://x.com/NASAHubble/status/2085093987199676764",
+    "topic": "space"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "The universe is always filled with breathtaking wonders.",
+      "author": "@8Dmac2",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Light left this galaxy as dinosaurs roamed the earth. It is both awesome and depressing",
+      "author": "@KiarKini",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Like a whirlpool in his eyes. I love this sinking.",
+      "author": "@WUDY_313",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "The way those spiral arms wind tightly around the bar makes the whole structure feel almost engineered, yet it's pure cosmic chance from so far out.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "I thought it interesting you used the word \"barred\".\nThere is a reason under the *heavens. \nMy eyes \" thank you\" for such a beautiful sight.",
+      "author": "@Mich95371218",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "Slightly too polished and explanatory in balancing structure vs chance, with a hedged observational tone that feels essay-like rather than raw.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 148152851
+}

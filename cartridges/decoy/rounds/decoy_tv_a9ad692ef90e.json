@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-a9ad692ef90e",
+  "source": {
+    "post_text": "This latest X-Men 97’ episode was fantastic \n\nCan’t wait for the season finale",
+    "post_author": "@djodjeee_",
+    "post_url": "https://x.com/djodjeee_/status/2086275471549816839",
+    "topic": "tv"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "A man of culture",
+      "author": "@CyclpsWsRght",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Animated television has been fucking great lately",
+      "author": "@Torbnkwt",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Do you feel underwhelmed with the season? I personally haven’t but have seen people on here say that",
+      "author": "@FictionloverME",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Apparently the Season finale is insane",
+      "author": "@Jwrasslintakes",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "The buildup across these episodes has been really solid heading into the finale.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "Slightly too polished and explanatory in neatly summarizing the season arc.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 976535656
+}

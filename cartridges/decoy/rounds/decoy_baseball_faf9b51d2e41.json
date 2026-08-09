@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-faf9b51d2e41",
+  "source": {
+    "post_text": "Mike Clevinger Granted Release By Pirates https://www.mlbtraderumors.com/2026/08/mike-clevinger-granted-release-by-pirates.html?utm_source=twitter",
+    "post_author": "@mlbtraderumors",
+    "post_url": "https://x.com/mlbtraderumors/status/2086259273999188442",
+    "topic": "baseball"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Cherington is dumping all his favorites, guys that beat women.",
+      "author": "@nutting_hostage",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Good character dude at least?",
+      "author": "@bilzisdaddy",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Release was probably overdue given the recent form and baggage.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "He’s still in the league?",
+      "author": "@mavrickace",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Punished Lake Bachar",
+      "author": "@GamingAngelGabe",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The phrasing is slightly too polished and hedged-explanatory rather than pure casual snark.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 813736906
+}

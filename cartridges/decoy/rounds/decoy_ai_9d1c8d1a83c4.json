@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-9d1c8d1a83c4",
+  "source": {
+    "post_text": "Introducing Muse Code (beta), a terminal coding agent built for long-horizon software engineering, powered by our new Muse Spark 1.2 model.\n\nMuse Code plans, implements, and validates complex, multi-file changes across large repositories with persistent sub-agents that solve difficult problems faster, more accurately, and with less intervention.\n\n🧵👇",
+    "post_author": "@AIatMeta",
+    "post_url": "https://x.com/AIatMeta/status/2085084709277565213",
+    "topic": "ai"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "The persistent sub-agents + append-only event log design looks like a real step forward for long-running agent reliability. Curious how well it handles mid-task recovery on messy real-world repos.",
+      "author": "@freesouleth",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "the thing nobody says out loud: sub-agents that persist are just procrastination with extra steps.",
+      "author": "@hass_avocado_",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Congrats! I'm cheering for you Meta.",
+      "author": "@zook_data",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Persistent sub-agents for multi-file work could cut down on context loss quite a bit, though success still hinges on how cleanly they hand off state without drifting. Worth watching how Muse Spark 1.2 performs once people throw real messy repos at it.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Long-horizon coding is less about writing more code and more about keeping a clean state. The activity log, resumability and ability to explain why a file changed may matter as much as benchmark scores. A fast agent that forgets its plan is still expensive.",
+      "author": "@eyitayo4u2",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply is oddly balanced and slightly explanatory in a hedged way that feels more composed than casual.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 565006201
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-1a0bbfe1663f",
+  "source": {
+    "post_text": "Anthony Davis says every team inside the NBA bubble met to decide whether to shut it down, but once LeBron James said the Lakers were staying, no other vote mattered\n\n“We actually had a meeting, and guys was like, ‘What y’all want to do? Want to shut this shit down?’ And everybody was looking at LeBron. We all in the room. CJ McCollum's hosting the meeting, and they like, ‘What y’all want to do?’”\n\n“You got every team in this room, and once they said, ‘All right, everybody vote.",
+    "post_author": "@cptdankkk",
+    "post_url": "https://x.com/cptdankkk/status/2086248994112516377",
+    "topic": "nba"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Crazy how one guy's call just locked it in for the whole league like that, pure influence on display even if it sidelined the actual vote process.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "The king effect",
+      "author": "@heyyamyyk",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "@Leke47 I’ve always told you - yours mans was at the top when it came to the decision. I rest my case.",
+      "author": "@TheeBenjee",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "the funniest part is they tried to run a vote and accidentally held a LeBron referendum",
+      "author": "@Kaffchad",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "this is actually funny in hindsight \n\nlebron decided for everyone and they all just went with it",
+      "author": "@klimonchain",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "Slightly too polished and explanatory with an oddly balanced hedge on influence versus sidelining the vote.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 942389196
+}

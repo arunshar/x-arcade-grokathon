@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-b2e10ac0ebf5",
+  "source": {
+    "post_text": "Good morning Everyone.\n\nCanopy raised $8.5M.\n\nThat’s a big milestone for the team.\n\nThe round includes names such as Arrington Capital, Borderless, Fenbushi Capital, KR1, SNZ, CodeCraft Group, and others.\n\nBut the bigger story is what Canopy is building.\n\nAI is accelerating software development, but launching blockchain infrastructure remains complicated and expensive.\n\n@CNPYNetwork is working to simplify that process by making it easier to launch production-ready appchains with less technical overhead.\n\n…",
+    "post_author": "@uzzal274",
+    "post_url": "https://x.com/uzzal274/status/2086286825807876452",
+    "topic": "startups"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Canopy is making it easier for builders to launch their own chains",
+      "author": "@jackrider69",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "This round gives them solid runway to keep refining how teams spin up custom appchains with way less overhead.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "That funding supports a longer term infrastructure thesis not a flashy launch",
+      "author": "@Cpulok",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Another step toward the bigger picture.",
+      "author": "@Musty_hasheedu",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "CNPY unites chains with shared governance and local autonomy",
+      "author": "@Brittney0009",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "Slightly too polished and explanatory phrasing that neatly restates the post's thesis instead of reacting casually.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 159350402
+}

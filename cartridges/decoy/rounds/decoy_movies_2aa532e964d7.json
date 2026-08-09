@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-2aa532e964d7",
+  "source": {
+    "post_text": "“Spider-Man: Brand New Day” showed no signs of slowing down as it entered its second weekend in cinemas.\n\n“Brand New Day” added $43 million at the North American box office on Friday. By Sunday, the Marvel-Sony tentpole should swing to $143 million, pushing its domestic haul to $653 million through weekend two.",
+    "post_author": "@Variety",
+    "post_url": "https://x.com/Variety/status/2086120118569021815",
+    "topic": "movies"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "this movie is absolutely crushing it and proving the spider man formula still works wonders",
+      "author": "@100xMart",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "this is the most cardio i've seen all week and it's fictional",
+      "author": "@Clinton_Fremont",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "This fucking bot under every post smh",
+      "author": "@Rob3008",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "these numbers show the franchise still knows how to pull crowds with solid second-week momentum",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "spider-man really out here doing uber for office workers",
+      "author": "@n_sophia92",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "Slightly too polished and explanatory in how it neatly summarizes the success rather than reacting casually.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 703180380
+}

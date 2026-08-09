@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-dddc1cb8ed7c",
+  "source": {
+    "post_text": "🚨TRUE or FALSE:\n\nThe Nuggets would've made the NBA Finals with Wemby instead of Jokic.🤔",
+    "post_author": "@PlayersChoice_",
+    "post_url": "https://x.com/PlayersChoice_/status/2086191081679458503",
+    "topic": "nba"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "False. Jokic's vision creates advantages Wemby couldn't replicate yet, even if the rim protection jumps a tier.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "If the nuggets would just stop sucking ass they’d easily make the finals",
+      "author": "@palmlnb",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Jokic sucked in this series. They would have done better at the minimum",
+      "author": "@balltalkerman",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "False.\n\nBecause they’d have lost to the Spurs with Jokic, who would’ve won it all.",
+      "author": "@HumanDerek",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "What does that have to do with the price of tea in china?",
+      "author": "@julianpatrickR",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory with its balanced trade-off structure.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 525142548
+}

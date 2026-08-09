@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-42b95f8adf54",
+  "source": {
+    "post_text": "🚨 Manchester City have made contact with Alexis Mac Allister’s representatives to explore a potential move for the Liverpool midfielder.\n\nMac Allister is on City’s shortlist of midfield targets should Rodri leave the Etihad this summer.\n\n(Source: @MattThielen)",
+    "post_author": "@DeadlineDayLive",
+    "post_url": "https://x.com/DeadlineDayLive/status/2086212859134923148",
+    "topic": "soccer"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Today's star man: Bryan Mbeumo! ✨",
+      "author": "@NinomaxMUFC",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Why does this account spread so much fake news?",
+      "author": "@NathanLeeUK",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Are there well at all",
+      "author": "@FelixOk81921006",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "£250m transfer fee, if he wants a move to another PL club. (Which I doubt)\n\nShouldn't be selling a good player to a rival.",
+      "author": "@craigaucott",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Hard to see Liverpool letting him go to City even if Rodri exits, though the fit under Pep could work if the fee was ridiculous.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly too balanced and explanatory in calmly weighing both clubs' angles rather than raw fan reaction.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 423745993
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-c0ddc9d894a5",
+  "source": {
+    "post_text": "Uh so how many K’s does Walter Johnson actually have because I’m seeing 3508, 3509 and the MLB account is saying 3515",
+    "post_author": "@BaseballWRLD_",
+    "post_url": "https://x.com/BaseballWRLD_/status/2086246038071853065",
+    "topic": "baseball"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Official stat keeper for MLB @EliasSports has him at 3515 so that’s what I’ll go with… But overall record keeping has some discrepancies from that time.",
+      "author": "@JaysInUSA",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Official MLB stats were going off 3515",
+      "author": "@JRDundas",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "For the 3508 vs 3509, Johnson's page on the MLB website contradicts itself.",
+      "author": "@beluga56788601",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Historical strikeout tallies from that era often differ by a few depending on the source, so landing on the MLB/Elias figure of 3515 feels like the most reliable option overall.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "5714 is nuts",
+      "author": "@SolomonSibley",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply is slightly too polished and explanatory with an oddly balanced hedge that feels more essay-like than casual.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 390870778
+}

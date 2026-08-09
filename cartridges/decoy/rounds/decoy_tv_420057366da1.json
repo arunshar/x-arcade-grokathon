@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-420057366da1",
+  "source": {
+    "post_text": "Just finished @netflix SafedSagar. The first attempt to put the IAF’s Kargil story on a mainstream screen, and it is superb. It deserves cult classic status like Border. Yet it left me uneasy coz it risks repeating one of Border’s most consequential mistakes. Let me explain.\n\nWhat makes SafedSagar exceptional is the extraordinary attention to historical detail. The names of officers, air bases, briefing rooms, charts, uniforms, vehicles, signboards and operational settings are deeply rooted in the reality of 1999.",
+    "post_author": "@AnchitGupta9",
+    "post_url": "https://x.com/AnchitGupta9/status/2086073050106302572",
+    "topic": "tv"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Really solid take on the balance it strikes. The operational stuff lands well for a general audience and the human side of squadron life feels authentic, though yeah the heavy focus on one unit could quietly rewrite how people remember the wider IAF effort.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Yea absolutely engrossing \n\nGood aspects of Airwarfare unknown of Kargil war",
+      "author": "@ektaaraj567",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Undoubtedly, but that is precisely the concern. How do you ensure that?",
+      "author": "@mahesharmusings",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Yours was the review I was looking forward to, @AnchitGupta9 This is a six-episode series that is well produced in every creative & technical aspect of motion picture production. An absolute delight!",
+      "author": "@varunpraka5h",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Mig21 is 1948 french aircraft 2nd generation mirage 2000 not capable of bombing , We should upgrade our weapons for a tough war situation.",
+      "author": "@Manpreet79Singh",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and evenly balanced in its praise-plus-caveat structure, reading more explanatory than a casual scroll-by comment.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 938323701
+}

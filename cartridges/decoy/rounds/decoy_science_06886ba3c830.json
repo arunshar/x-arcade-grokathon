@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-06886ba3c830",
+  "source": {
+    "post_text": "A tiny fly larva living in one of Africa's deepest lakes has evolved air-filled organs strong enough to withstand pressures found more than 200 meters underwater, according to a new Science study.\n\nThe findings challenge a long-standing explanation for why insects have never colonized the open ocean.",
+    "post_author": "@ScienceMagazine",
+    "post_url": "https://x.com/ScienceMagazine/status/2086159323965571075",
+    "topic": "science"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "an air pocket not imploding at 200m is absurd engineering tbh. materials science taking another L to a bug",
+      "author": "@nRanger9056",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Call Jeff goldblume we need another Fly movie",
+      "author": "@constantskeptik",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Insects did colonize the ocean - they’re called arthropods",
+      "author": "@veldtbooks",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "So we're talking deep-sea bugs now? Imagine what else is hanging out in those lakes that we haven't spotted yet.",
+      "author": "@JulianUnlocked",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Pretty wild adaptation with those pressure-proof air organs, though it only partly undercuts the old theory since freshwater lakes differ from the open ocean in key ways.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly too balanced and explanatory, hedging with a comparative caveat in an essay-like manner uncommon in casual replies.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 935293396
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-923271fb6240",
+  "source": {
+    "post_text": "Literally EVERYTHING I wanted from her arc is coming to fruition tomorrow. \n\nLove this shot so much, Orwyle's face kills me lmao, he's NOT into this.",
+    "post_author": "@Hornsounderr",
+    "post_url": "https://x.com/Hornsounderr/status/2086269123558793347",
+    "topic": "tv"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "\"Of course the peasants would try to steal this necklace first and completely ignore this meticulously craft fur collar gadfdsjfkfjadkfjdfa\" *strangling sounds*",
+      "author": "@Randellena",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "GIVE HIM MELATONIN RIGHT NOW",
+      "author": "@doveestorm",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "They literally told her ass not to have a coronation because the people are broke and there's a famine going on. Once more Rhaenyra is creating problems for herself and is self-sabotaging. So desperate for validation and legitimacy that she's fucking herself over",
+      "author": "@NeneMonster2K18",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Orwyle's expression in that shot is pure gold, totally checked out while her big moment finally lands after all the buildup.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Rhaenyra…the armour…I can’t",
+      "author": "@WhiteDeerSims",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The phrasing is slightly too polished and neatly explanatory about the arc payoff, feeling more composed than casual fandom chatter.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 692747721
+}

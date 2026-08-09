@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-991434ad9b1e",
+  "source": {
+    "post_text": "🚨 EXCLUSIVE: Arsenal are making major decisions behind the scenes as Mikel Arteta looks to trim his squad before the Premier League season gets underway.\n\nAccording to the latest reports, several players could still leave the Emirates before the transfer window closes:\n\n🔴 Gabriel Jesus\n🔴 Fabio Vieira\n🔴 Reiss Nelson\n🔴 Ethan Nwaneri\n🔴 Kepa Arrizabalaga\n\nThe situation is different for each player, with Arsenal carefully assessing their futures as Arteta looks to build a squad capable of competing at the highest level.\n\n…",
+    "post_author": "@Aishagunners",
+    "post_url": "https://x.com/Aishagunners/status/2086163592693391805",
+    "topic": "soccer"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Arteta Want to trim his squad, hopefully they league he won didn't enter his head fa",
+      "author": "@RomzyUnited",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "We don't need to sell him 😢",
+      "author": "@Henrylalas2",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Sell them all",
+      "author": "@Afcbeast10",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "sales\n\nNwaneri\nVieira\nTrossard\nMartineli\nJesus\nGyokeres\n\nHope is Yildiz or Barcola alongside Osimhen or Alvarez an if doable Kounde as cover for Timber",
+      "author": "@NickPowch1995",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Keep Nwaneri for sure given the upside, but Jesus Vieira Nelson and Kepa should probably all move on to free minutes and wages.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply is oddly balanced and slightly explanatory in a measured way that feels more polished than typical fan hot takes.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 826738251
+}

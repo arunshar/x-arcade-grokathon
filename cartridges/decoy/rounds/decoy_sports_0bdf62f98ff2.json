@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-0bdf62f98ff2",
+  "source": {
+    "post_text": "Mo Salah has officially signed as a Trabzonspor player 🇹🇷",
+    "post_author": "@brfootball",
+    "post_url": "https://x.com/brfootball/status/2085342917565034622",
+    "topic": "sports"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Surprising switch for Salah but Trabzonspor gets a proven goal threat whose experience could steady their attack if the fit clicks right away.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "King Mo landing in Trabzonspor 🇹🇷🔥 Absolute legend move, those goals are coming! 👑⚽",
+      "author": "@ragurammon",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "@Trabzonspor @MoSalah ♥️💙🧿🔥",
+      "author": "@aycibinus_",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Salah will add value",
+      "author": "@wanjdavg4",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "What do you actually know about Trabzonspor and its history? That kind of disrespect says enough.",
+      "author": "@YandiKaradeniz",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and oddly hedged/explanatory rather than raw fan energy.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 950980397
+}

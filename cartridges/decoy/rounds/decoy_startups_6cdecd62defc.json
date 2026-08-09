@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-6cdecd62defc",
+  "source": {
+    "post_text": "Founders raising a seed round get a lot of advice about check size and almost none about what happens after it clears.\n\nCovey exists to close that gap. Four pieces, Development Studio for product engineering, Advise for the calls before a board meeting not after, Extended Team for execution most seed stage companies can’t hire for yet, Capital aligned with all three instead of sitting apart from them.\n\nA check with no execution behind it is just a very bad gamble.\n\n…",
+    "post_author": "@CoveyNetwork",
+    "post_url": "https://x.com/CoveyNetwork/status/2086105354362888211",
+    "topic": "startups"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Strategy and execution are close, but execution wins for me",
+      "author": "@Ieatlarps",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "A cheque solves the runway problem. It doesn't automatically solve the “who's actually doing the work?” problem.",
+      "author": "@SmithWillers",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Strategy is easy to talk about. Execution is where seed teams usually get stretched",
+      "author": "@Luismc19Luis",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Execution head count easily imo",
+      "author": "@BigCee734",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Execution headcount edges it out for me—capital buys time and strategy sets direction, but without the people to actually ship you're just burning runway in circles.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory by neatly contrasting the other options before landing on its pick, rather than a raw one-liner gut take.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 393571454
+}

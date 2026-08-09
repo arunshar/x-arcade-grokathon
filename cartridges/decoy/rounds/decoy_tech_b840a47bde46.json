@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-b840a47bde46",
+  "source": {
+    "post_text": "People open apps for 2 reasons:\n\n(1) Perform useful actions\n(2) Consume entertaining content\n\nNo consumer in the history of time has ever opened an app to experience a microinteraction",
+    "post_author": "@raffichill",
+    "post_url": "https://x.com/raffichill/status/2086080192850620700",
+    "topic": "tech"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "😂😂 except the guy from the take my money meme",
+      "author": "@imranscripts",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Well,  like, favorite, reactions, they all have something in common, right?",
+      "author": "@mironcatalin",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "true, but I think delight and micro interactions are like free surface area to get people to share / talk about your product \n\nit should meet either 1) or 2) first though",
+      "author": "@r1thv1ka",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "microinteractions can be part of what makes a good app sticky, especially for the first 15 minutes of exploring an app",
+      "author": "@puravmanot",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Fair point overall, though I'd argue microinteractions quietly support those two goals by making actions feel smoother and content more engaging without users ever seeking them out directly.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly too balanced and explanatory in one neat sentence, hedging like a mini-essay rather than a quick casual take.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 497724982
+}

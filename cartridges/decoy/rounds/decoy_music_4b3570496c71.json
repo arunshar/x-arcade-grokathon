@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-4b3570496c71",
+  "source": {
+    "post_text": "‘All Eyes on Shiest’ by Pooh Shiesty is the #1 album on US Apple Music.",
+    "post_author": "@PopCrave",
+    "post_url": "https://x.com/PopCrave/status/2086248126940131683",
+    "topic": "music"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "This is shocking",
+      "author": "@Ozoon_CA",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "stop making up people",
+      "author": "@noellewes123",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Everybody album or song goes number 1 on Apple Music when it first comes out. 🫠😭😭 LITERALLY",
+      "author": "@marizzzzyy",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Seeing it hit number one so fast just shows his core fans never left and the trap sound still moves numbers.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Pure art raw i think he is the real definition of gangster rap he deserves jail for this masterpiece",
+      "author": "@LifeChanges4me",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory in neatly tying the chart success to fan loyalty.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 625215541
+}

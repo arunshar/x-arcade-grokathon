@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-5a5667d291f5",
+  "source": {
+    "post_text": "‘THE AMAZING DIGITAL CIRCUS’ series finale has passed 82 million views on YouTube in its first 50 days.\n\nWould you watch specials?",
+    "post_author": "@TheCartoonBase",
+    "post_url": "https://x.com/TheCartoonBase/status/2086265150881804484",
+    "topic": "tv"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "I WOULD WATCH ANYTHING OFFICIAL TADC RELATED",
+      "author": "@zulwey",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Absolutely positively I hope some of them will feature Jax because I really like him or her now",
+      "author": "@CatherineD7605",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "I WANT GANGLE SPECIALSSSSS PLEASEEEEEEEEE 😭😭😭😭😭😭😭😭",
+      "author": "@AquaKnife1225",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "I not even gonna answer that question lol. \n\nOFC!!! 😭",
+      "author": "@JashawnGriffith",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Yes I'd definitely watch any specials they put out, the show's world is so unique it deserves more exploration.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "The reply feels slightly essay-like and explanatory with its polished justification about the world's uniqueness.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 467579707
+}

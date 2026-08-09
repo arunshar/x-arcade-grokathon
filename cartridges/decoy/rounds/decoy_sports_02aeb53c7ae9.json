@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-02aeb53c7ae9",
+  "source": {
+    "post_text": "Barcelona captain Ronald Araujo is due to fly to Liverpool on Sunday to complete a move to the Premier League club.\n\nThe 27-year-old Uruguay international centre-back is expected to join on a season-long loan deal that also includes Liverpool having a €55million option to buy him.\n\n@adjones_journo, @greggevans40 and @Laia_Cervello analyse why the deal makes sense for both Liverpool and Barcelona ⤵️",
+    "post_author": "@TheAthleticFC",
+    "post_url": "https://x.com/TheAthleticFC/status/2086175163586859156",
+    "topic": "sports"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "11m saved in wages. We're helping them snatch Rodri from City",
+      "author": "@CCaldwe77",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "27 year old Captain of Barcelona. But no one knows him. No one knows what he does. Welcome to Scouse.",
+      "author": "@EmTrevor",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Solid defensive reinforcement on loan with that buy option built in, works well for Liverpool's squad depth and eases Barca's wage bill at the same time.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "Welcome to Liverpool FC 💪😍",
+      "author": "@ObsaIbrahimYNW",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Welcome to #LFC Araujo 🙌🏿",
+      "author": "@officialabnerns",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply is oddly balanced and mildly explanatory about mutual benefits, reading more like a polished summary than raw fan chatter.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 702694335
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-6a9186976d57",
+  "source": {
+    "post_text": "a woman had apple's ultimate security feature turned on\n\nher iphone was stolen\nshe thought she was safe\n\nby morning, $62,000 was drained from her bank account\n\nhere's the fatal flaw in apple's \"stolen device protection\" that nobody talks about",
+    "post_author": "@jaxoncoder",
+    "post_url": "https://x.com/jaxoncoder/status/2086266327505969161",
+    "topic": "tech"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "This is honestly terrifying. I had no idea the default setting left such a big gap near home. Just checked mine and switched it to Always - thank you for the clear heads-up.",
+      "author": "@walkercoder",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "We are seeing this specific shoulder-surfing tactic increasing rapidly in urban environments. The fact that the 'Home' parameter bypasses the 1-hour delay is something the general public desperately needs to know.",
+      "author": "@Nishan_011",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "The financial damage outlined here illustrates why physical security and digital security are deeply intertwined. Relying on GPS coordinates to bypass a security delay is an inherently flawed design.",
+      "author": "@Numan_A12",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "This kind of design gap around familiar locations really undermines the whole point of the delay feature. Anyone linking large accounts to their phone should review the always setting carefully to avoid a similar overnight loss.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "I am officially adding this specific configuration check to our corporate BYOD (Bring Your Own Device) security policy today. The distinction between 'ON' and 'Always' is simply too critical to overlook.",
+      "author": "@AkterBrist39045",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory, like a balanced summary rather than a raw personal reaction.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 532220236
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-9eab3f8730d2",
+  "source": {
+    "post_text": "Melissa Barrera reveals she is about to launch her production company.\n\n(https://podcasts.apple.com/us/podcast/melissa-barreras-big-year-from-broadway-to-hollywood/id79681317?i=1000780409156",
+    "post_author": "@FilmUpdates",
+    "post_url": "https://x.com/FilmUpdates/status/2086163026881732895",
+    "topic": "movies"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "rooting for her",
+      "author": "@luckylllo",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "This a GREAT move.  I’m excited for her.  She’s really smart and I think she can tap into both US and the Latin market like others can’t.",
+      "author": "@JRGhaddar",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Anti-semitic voices are finding success with an audience of hateful leftists.  Maybe Hasan Piker will back her?",
+      "author": "@Scotty_Free",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Smart move launching her own shingle now, she can finally shape projects around the kinds of roles and stories that actually matter to her instead of waiting on others.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Mother for a reason",
+      "author": "@Sovann_Jahlee",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "Slightly essay-like phrasing that over-explains the benefit in a neatly balanced way rather than sounding offhand.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 774045002
+}

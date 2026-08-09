@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-802d55b90fd0",
+  "source": {
+    "post_text": "some people build startups\n\n@a1lon9 built a website called pumpfun where people launch memecoins\n\nsomehow it generated $83M in fees in the last 30 days\n\nsilicon valley might be overthinking this whole startup thing 😭",
+    "post_author": "@RickLFG",
+    "post_url": "https://x.com/RickLFG/status/2086060532931363318",
+    "topic": "startups"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "pumpfun printing like the fed",
+      "author": "@ken_w3b3",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "👆 Sometimes the tool makes the difference.",
+      "author": "@PocketIQ",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "crazy how just enabling memecoin launches prints that kind of cash while traditional startups grind on decks and mvps. maybe the real edge is riding pure hype cycles instead of inventing problems, though the volatility cuts both ways.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "Silicon Valley writes pitch decks. Crypto ships and finds out.",
+      "author": "@THChumor",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "the honest answer is that building something that makes money isn't just about solving a real problem, but also about finding a way to extract value from people's desires. pumpfun tapped into the memecoin hype, and now it's making more than most startups in their first year",
+      "author": "@adelbucetta",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The hedging clause about volatility plus the slightly explanatory framing make it feel oddly balanced and polished rather than raw.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 797765000
+}

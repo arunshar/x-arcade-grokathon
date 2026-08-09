@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-72729e5ce9ac",
+  "source": {
+    "post_text": "grunge music went mainstream in America and Massive Attack release their seminal debut Album 🔥\n\nwhat are your top 3 Albums from 1991? ▶️",
+    "post_author": "@XMartinsMusicX",
+    "post_url": "https://x.com/XMartinsMusicX/status/2086184421497921597",
+    "topic": "music"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Blue Lines, Nevermind and Screamadelica for me - they offer a perfect balance of the year's big shifts in sound.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Nirvana\nMBV\nPrimal Scream",
+      "author": "@abacabr53958585",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Laughingstock \nAchtung Baby\nLoveless",
+      "author": "@NewWaveDeepCuts",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Lotta good music here but Nevermind changed music.",
+      "author": "@DukeCarter13",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Right. But Achtung Baby is a masterpiece. I would pick AB, Nevermind and then whatever",
+      "author": "@stephane_dissel",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The phrasing is oddly balanced and slightly essay-like in explaining the 'perfect balance' rather than just naming favorites casually.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 11562166
+}

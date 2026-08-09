@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-f8b5c75085b0",
+  "source": {
+    "post_text": "I present you: \n\niPhone 18 Pro Fold ❤️\n\nOkay this one's pretty good, I uploaded a clip of my voice, and a few pics, and this came out, it's getting close to passable!\n\nLive on Photo AI now 😊",
+    "post_author": "@levelsio",
+    "post_url": "https://x.com/levelsio/status/2086228804423323721",
+    "topic": "tech"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "This reminds me of all the fake videos 10 years ago with wild speculation of what the next iPhone was going to be.",
+      "author": "@North_Range",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "The gap between “cool demo” and “actually usable” is closing fast—voice + pics as input is the right direction.",
+      "author": "@henryhndev",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "The way it stitched the voice sample into that foldable mockup feels almost ready for real product leaks, though the hinge animation still gives it away a little if you look close.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "It doesn’t have a label. - EU AI Act. 😅",
+      "author": "@InfosecMinion",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Impressive\n\nBut still not better than this wholesome and relatable review.\n\nModels are really good in short bursts for cut scene, but to make a whole 30 min review.\n\nYou're better off doing the real thing.",
+      "author": "@dherealmark",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply is oddly balanced with mild praise plus a hedged nitpick, giving it a slightly too-polished explanatory tone.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 356125258
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-18cab2f9460c",
+  "source": {
+    "post_text": "🚨 Manchester United, Chelsea and Tottenham have all registered interest in Brentford striker Igor Thiago through intermediaries, while Bayern Munich are also closely monitoring the 25-year-old.\n\nBrentford have no intention of entertaining offers for Thiago this summer and consider him a key part of their project. The Brazilian, who scored 22 goals last season, is also fully committed to staying at the club.\n\n(Source: @TEAMtalk)",
+    "post_author": "@DeadlineDayLive",
+    "post_url": "https://x.com/DeadlineDayLive/status/2086220157136064973",
+    "topic": "soccer"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "i'm just here trying to figure out how brentford keep finding these guys",
+      "author": "@JoanElruso",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Seeing the big clubs circle after 22 goals is no shock, yet Brentford holding the line feels like the right call for both sides right now.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "Big clubs are already circling Igor Thiago after his 22 goal season but Brentford look determined to keep their key striker for now.",
+      "author": "@Nasified7",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Prediction. He won't do as well this season",
+      "author": "@JiminyJamDawg",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Joke of the century \n.. Not needed at Chelsea",
+      "author": "@LEVERAGERS",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "The reply feels oddly balanced and lightly explanatory in evenly weighing interest against retention.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 741832886
+}

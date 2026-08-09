@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-e959f33f7120",
+  "source": {
+    "post_text": "Cape Fear finale on Apple TV was absolutely terrible, what a god awful way to go\n\nJavier Bardem, Amy Adams and Patrick Wilson on one show and they somehow give us an absolute dud",
+    "post_author": "@big_business_",
+    "post_url": "https://x.com/big_business_/status/2083559906511118719",
+    "topic": "tv"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Yeah the finale just completely wasted that stacked cast, felt oddly rushed and empty after all the buildup.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Show should’ve been done in 6 episodes",
+      "author": "@The_Medic22",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "I wanted to break my tv gang. So much hype and potential to dropping a turd.",
+      "author": "@bismilaahboys",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "The movie itself was equally cartoonish but they didn’t need to keep all that",
+      "author": "@DL2onX",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Started watching it today💔",
+      "author": "@jupit3rmadeit",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory with its balanced summary of cast waste plus pacing critique.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 579405124
+}

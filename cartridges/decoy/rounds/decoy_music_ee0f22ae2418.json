@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-ee0f22ae2418",
+  "source": {
+    "post_text": "Drake has a message to rappers 👀\n\n“These guys are dropping albums, like hello and goodbye, and careful with that reply cause the pen isn’t dry”",
+    "post_author": "@ComplexMusic",
+    "post_url": "https://x.com/ComplexMusic/status/2086268034298130441",
+    "topic": "music"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Drake basically telling these quick-drop artists to watch their mouths since his pen stays ready and the bars hit different.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "He’s really doing what covid did",
+      "author": "@philliefan215",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "lol you don’t need to be ovo basic research 😂 reed smith law firm.",
+      "author": "@KeemWillams",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "(No text content)",
+      "author": "@UniversallyCAPE",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "3 pack of trash. Pen’s desert dry, dickhead",
+      "author": "@MisterGoodShit",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The phrasing is slightly too explanatory and evenly balanced, giving a polished feel rather than raw snark.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 518372450
+}

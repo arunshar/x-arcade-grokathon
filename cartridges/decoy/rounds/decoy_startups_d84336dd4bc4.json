@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-d84336dd4bc4",
+  "source": {
+    "post_text": "Philip Johnston (@PhilipJohnston) is the co-founder and CEO of @Starcloud_, the company building data centers in space. \n\nIn November 2025, Starcloud launched an Nvidia H100 GPU into orbit and trained the first large language model in space. They've since raised $200 million, hit a billion-dollar valuation just 17 months after YC demo day and filed with the FCC to deploy 88,000 more satellites.",
+    "post_author": "@ycombinator",
+    "post_url": "https://x.com/ycombinator/status/2085003603727794419",
+    "topic": "startups"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "I hope extensive and long-term planning goes into this. Don't just put these damn things into space and not have control over them. What could go wrong? Does anybody remember Skylab?",
+      "author": "@CareerstudentRb",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "@PhilipJohnston and @Starcloud_ are amazing! One company to watch for the foreseeable future!",
+      "author": "@JDaley",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Orbital compute sidesteps terrestrial power bottlenecks pretty cleanly once solar and radiative cooling are factored in, though radiation tolerance and downlink latency still look like the tougher engineering problems to crack at scale.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "We already run huge parts of modern civilization on space infrastructure. The debate isn’t “space or no space.” It’s which workloads actually make sense to move there.",
+      "author": "@QuantumTumbler",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "I disagree. They are for surveillance and digital ID and are therefore not for our benefit and not required.",
+      "author": "@4nnB3nn3tt",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "Slightly too polished and evenly hedged in weighing benefits against challenges, giving it a mini-essay tone rather than raw tweet energy.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 960059799
+}

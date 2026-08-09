@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-5cf027df6714",
+  "source": {
+    "post_text": "regardless of ALL the negativity i’m still really excited for gta 6 🤷‍♀️",
+    "post_author": "@s1nicki",
+    "post_url": "https://x.com/s1nicki/status/2086266872249598374",
+    "topic": "gaming"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "It’s okay Nicki, after some listening to the song I don’t really like it either but the Song for the Box Art reveal was pretty nice",
+      "author": "@IIVEXXII_",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Yeah a bunch of stupid marketing choices doesn't affect the actual game. I can roll my eyes at the netflix stuff and the disk bullshit but their games quality speaks for itself. A lot of insanely talented people have put a ton of work into making it.",
+      "author": "@crunchyBx",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "I’m still looking forward to it but every announcement Rockstar makes about this dampens my anticipation for it more",
+      "author": "@Indominuss23",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Yeah the online noise is nonstop but I’m still genuinely hyped for GTA 6, Rockstar’s open-world formula just hits different every time.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Same I am also excited even with everything that has been happening this few pasts months.",
+      "author": "@horrormask94",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The phrasing is a bit too polished and oddly balanced with a mild explanatory tone rather than raw casual slang.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 923853729
+}

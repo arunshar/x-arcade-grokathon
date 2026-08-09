@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-ccf9c8132f74",
+  "source": {
+    "post_text": "If you think I’m wrong about this, tell me, would you ever seek out a novel written entirely by an ai model?",
+    "post_author": "@pvncher",
+    "post_url": "https://x.com/pvncher/status/2086229183986827302",
+    "topic": "ai"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Can we extrapolate that to app dev as well? Everyone can vibe code anything… but there are a lot of decisions etc…",
+      "author": "@jcurtis",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "not today's models, maybe tomorrow's, and they've got to have a least a little human influence to them.",
+      "author": "@joehewitt",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "I'd try one if the story grabbed me hard enough, though pure AI output might lack that messy human spark that makes novels stick.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "Definitely, assuming they get good enough",
+      "author": "@saykrikan",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "If the novel is good, why not?",
+      "author": "@LifeLineLogics",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply feels slightly too balanced and explanatory in hedging between interest and reservation, with a polished phrasing uncommon in casual tweets.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 617864347
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-77784ce65b9a",
+  "source": {
+    "post_text": "The STAR WARS (1977) teaser trailer played before KING KONG, months before the film’s release.\n\nThe effects were unfinished, the score wasn’t by John Williams & the entire teaser had a noticeably darker tone than the audiences eventually fell in love with.https://t.co/2w4OwRA0xY",
+    "post_author": "@TheCinesthetic",
+    "post_url": "https://x.com/TheCinesthetic/status/2086253879294063074",
+    "topic": "movies"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Ah yes, the movie that inspired Starcrash.",
+      "author": "@JimmyRu68291223",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Vi el original cuando era niño.",
+      "author": "@SoyGeorgeBeto",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "This is amazing. They didn’t even have the branding down.\nDespite working at Lucasfilm - I’ve never seen this trailer.\nThanks for sharing.",
+      "author": "@jasonrmsmith",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Amazing. We barely had computers back then.",
+      "author": "@RelaxingNews",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Fascinating how that unfinished FX and non-Williams score gave the teaser such a brooding edge before the brighter final version took over.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "Slightly too polished and explanatory in neatly contrasting the teaser's tone with the finished film.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 211814799
+}

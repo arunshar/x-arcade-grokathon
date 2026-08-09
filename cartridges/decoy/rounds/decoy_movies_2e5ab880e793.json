@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-2e5ab880e793",
+  "source": {
+    "post_text": "What movies blew you away with their excellent cinematography?",
+    "post_author": "@TheCinesthetic",
+    "post_url": "https://x.com/TheCinesthetic/status/2086287098974200182",
+    "topic": "movies"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Blade Runner 2049. Every frame looks like a painting.",
+      "author": "@Litlenstrik",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "May sound dumb but Devil Wears Prada 2 hahah\nEvery scene seemed like a perfect photo shot to me 😂😂",
+      "author": "@a_concordia",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "1917. The long-take battlefield framing and muted color palette pulled you straight into the chaos in a way few war films manage.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "Paris, Texas ( 1984 ) Directed by Wim Wenders",
+      "author": "@SolidMeshal",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "There Will Be Blood",
+      "author": "@theBulldogFred",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply is slightly too polished and explanatory, neatly summarizing technique instead of the punchier casual vibe of the real replies.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 423358189
+}

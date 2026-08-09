@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-2d3bbd37a1c5",
+  "source": {
+    "post_text": "Gears of War: E-Day early access beta peaked at 14,331 on Steam\n\nBeating Gears 5 all-time max of 10,196 and Gears of War: Reloaded all-time max of 4,819\n\n*This is only the early access, which has limited access. We should see bigger numbers for the beta on Aug 13-17",
+    "post_author": "@IdleSloth84_",
+    "post_url": "https://x.com/IdleSloth84_/status/2086253266157834482",
+    "topic": "gaming"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "steam numbers dont rlly mean much rn considering that the bigger chunk of the pc population is probably playing it thru gamepass pc",
+      "author": "@MyBrainIsMoldy",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Pretty solid turnout for limited early access, shows the series still pulls decent interest on PC and the open beta should push it higher.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "That's insane, I bet this small indie team is happy with this success.",
+      "author": "@MookMagnus",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "What you say makes no sense.",
+      "author": "@PanditaCGO61",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "The beta is awesome!\nI've almost completed it 100%, and I'll keep playing it during the open beta.",
+      "author": "@JUarisen",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "Slightly too polished and explanatory with balanced hedging that feels more composed than casual.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 171239379
+}
