@@ -192,25 +192,26 @@ async def main() -> int:
     url = f"ws://{HOST}:{PORT}/ws"
     served_ids: list[str] = []
     async with websockets.connect(url) as p1, websockets.connect(url) as p2:
-        log("== join x2, session clock armed, skip the wait ==")
+        log("== join x2, multiplayer waits for START (no lobby countdown) ==")
         await p1.send(json.dumps({"t": "join", "room": ROOM, "name": "P1"}))
         state = await recv_state(p1, "P1")
         check(state["phase"] == "lobby" and len(state["players"]) == 1, "first join lands in lobby")
-        # Multiplayer lobbies wait for an explicit START (no auto-start
-        # countdown); only solo rooms keep the short lobby clock.
+        # Multiplayer lobbies wait for explicit START (no auto-start countdown);
+        # only solo rooms keep the short lobby clock.
         check(state.get("auto_ms") is None, "multiplayer lobby has no auto-start countdown")
 
         await p2.send(json.dumps({"t": "join", "room": ROOM, "name": "P2"}))
         state = await recv_state(p1, "P1")
         await recv_state(p2, "P2")
-        check(state["phase"] == "lobby", "second join waits for the clock, no auto-start")
+        check(state["phase"] == "lobby", "second join stays in lobby until START")
+        check(state.get("can_start") is True, "two players can start multiplayer")
+        check(state.get("auto_ms") is None, "still no lobby countdown with two players")
 
-        # Any joined player may skip the countdown. The clock would fire on
-        # its own; the check skips it to stay fast and deterministic.
+        # Host (or any joined player) starts via next — no session clock in lobby.
         await p2.send(json.dumps({"t": "next", "room": ROOM}))
         state = await recv_state(p1, "P1")
         await recv_state(p2, "P2")
-        check(state["phase"] == "guessing", "any player skips the wait into guessing")
+        check(state["phase"] == "guessing", "START / next enters guessing")
 
         # Play one full cycle plus one round so the queue is proven to wrap.
         total_rounds = len(servable) + 1
