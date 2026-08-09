@@ -848,31 +848,18 @@ Replay verifies the shape, the format version, the surface, the request, the req
 the stored field and the filename stem, and the response hash. The mechanics, the guards, and the
 failure modes are the subject of the fixture chapter.
 
-The payoff is verifiable here. Running `build_round(topic, live=False)` for all six topics with
-`ARCADE_RECORD`, `ARCADE_MODE`, and `ARCADE_REUSE_FIXTURES` unset, and comparing each returned dict to
-its committed file:
+Offline replay used to reproduce the committed files byte for byte, and for most of build day it
+did, surviving one broken-import episode and one slot-diversification pass, each time restored by
+regenerating the files from fixtures. It ended on purpose. The decoy texts were hand-tuned after the
+final pull to be a bit easier to spot, and the writer prompt changed with them, so the recorded
+`decoy_write` fixtures no longer match the request hash and `build_round(topic, live=False)` stops on
+a fixture miss.
 
-```
-ai       replay==committed: True
-crypto   replay==committed: True
-food     replay==committed: True
-movies   replay==committed: True
-music    replay==committed: True
-sports   replay==committed: True
-
-ALL MATCH: True
-```
-
-Every key reproduces: `round_id`, `seed`, `decoy_slot`, every reply text, every author, the rationale,
-and the `safety` block. The whole three-call live pipeline is reconstructible offline from committed
-bytes, and that run touches no network.
-
-This was briefly untrue. Before commit `7a4e012` the builder's safety import was broken, so it stamped
-every round it wrote with `{"screened": false, "gate_codes": []}`, and those stamps went into the
-committed files. Fixing the import meant a replay computed the real gate result while the committed
-files still held the placeholder, so `safety` was the one key that diverged. The round files were
-regenerated so their stamps match what the corrected screener returns. Only the `safety` block changed
-in that regeneration. No post text, reply, author, seed, or slot was touched.
+The current truth, stated plainly: the six round files are curated game content. The source posts,
+real replies, ids, seeds, and slot assignments are verbatim from the recorded pulls. The decoy texts
+are edited. The server never replays the builder, it serves the committed files and re-screens them at
+load, so none of this affects play. It only affects what you may claim: say "pulled live, then
+hand-tuned for playability," never "rebuilds byte for byte offline."
 
 ### Traps, in the order you are likely to hit them
 
@@ -4204,7 +4191,7 @@ narrower one.
 | Source posts and the four real replies | **Real, pulled live, then frozen** | Pulled from X through `x_search` at build time and committed as JSON. At demo time they are read off disk, not fetched. The repo docs carry no build date, so do not state one. |
 | The imposter reply in each round | **Real Grok output, generated once** | Written by `grok-4.5` through `/chat/completions` at build time, committed. Not generated during play. |
 | The decoy rationale shown at reveal | **Real, model self-reported** | The model was asked to name its own tell. That text is committed with the round. |
-| Round ids, seeds, and slot order | **Real and deterministic** | Pure functions of the source post id. Replaying all six from fixtures offline, with no network, reproduces the committed files exactly, `safety` block included. |
+| Round ids, seeds, and slot order | **Real, curated after the pull** | Ids and seeds are pure functions of the source post id. The source posts and real replies are verbatim from recorded threads, but the decoy texts were hand-tuned afterward to be easier to spot, so offline replay no longer reproduces the committed files and stops on a fixture miss. Do not claim byte-for-byte rebuild. |
 | The grounding guard on search calls | **Real, and it fired** | The `food` topic has two committed post fixtures. The ungrounded one was recorded and then discarded by `_made_tool_calls`. |
 | The five safety gates | **Real, running on every serve** | `screen_round` re-runs at load time on every round, including the hardcoded fallback. Fail closed, no override. |
 | The `G_SLURS` denylist | **Illustrative placeholder** | Six mild insults. The comment in the code says a real deployment swaps in a maintained wordlist behind the same gate code. Passing `G_SLURS` is not evidence of moderation. |

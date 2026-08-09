@@ -41,5 +41,10 @@ Rebuild any topic with:
 ARCADE_MODE=live ARCADE_RECORD=1 python3 cartridges/decoy/round_builder.py --live --topic ai
 ```
 
-The matching API fixtures live under `fixtures/api/`, so `build_round(topic, live=False)`
-reproduces every committed round offline, byte for byte.
+The API fixtures for the original pulls live under `fixtures/api/`, but offline replay no
+longer reproduces these files, and that is deliberate. The decoy texts were hand-tuned
+after the pull to be a bit easier to spot, and the writer prompt changed with them, so
+`build_round(topic, live=False)` now stops on a fixture miss. Treat these six files as
+curated game content: pulled live, then edited. The source posts and real replies are
+still verbatim from the recorded threads. Do not claim byte-for-byte offline rebuild
+anywhere, including on stage.
