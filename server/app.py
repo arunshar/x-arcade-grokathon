@@ -370,7 +370,9 @@ def _apply_room_topics(
     """Set room topic_filter from client msg when the sender may choose it.
 
     Omitted topic keys leave the existing filter alone (reconnect-safe).
-    An explicit empty list means RANDOM. A non-empty list always replaces.
+    A non-empty list always replaces. An empty list only clears to RANDOM
+    when the client sets ``clear_topics`` / ``topics_random`` — otherwise a
+    reconnect with empty topics must not wipe a multiplayer host's filter.
     """
     if not allow:
         return
@@ -378,6 +380,17 @@ def _apply_room_topics(
     if parsed is None:
         return
     prev = [str(t).lower() for t in (room.get("topic_filter") or []) if t]
+    explicit_random = bool(
+        msg.get("clear_topics") or msg.get("topics_random") or msg.get("random_topics")
+    )
+    if not parsed and prev and not explicit_random:
+        # Keep the existing theme (common: host WS reconnect mid-lobby).
+        print(
+            f"room {room.get('room_id')}: keep topic_filter {prev} "
+            f"(ignored empty payload without clear_topics)",
+            file=sys.stderr,
+        )
+        return
     room["topic_filter"] = parsed
     if parsed != prev:
         print(

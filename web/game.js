@@ -1517,7 +1517,7 @@ function flushWsOutbox() {
   }
 }
 
-/** Host join payload — always includes frozen theme so reconnects keep filter. */
+/** Host join payload — includes theme when we know it; never wipe server filter. */
 function buildJoinPayload() {
   const payload = {
     t: "join",
@@ -1526,9 +1526,36 @@ function buildJoinPayload() {
     arena: !!(iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)),
   };
   if (payload.arena) {
-    Object.assign(payload, activeThemePayload());
+    const theme = activeThemePayload();
+    const topics = theme.topics || [];
+    if (topics.length) {
+      // Non-empty filter — always re-assert.
+      Object.assign(payload, theme);
+    } else if (theme._explicitRandom) {
+      // Host deliberately chose RANDOM.
+      Object.assign(payload, theme);
+      payload.clear_topics = true;
+      payload.topics_random = true;
+    }
+    // else: omit topic keys so a reconnect cannot clear a set filter.
   }
   return payload;
+}
+
+/** Push theme to server (multiplayer host, lobby only). */
+function pushThemeToServer() {
+  if (!joined || !myRoom) return;
+  if (!(iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom))) return;
+  const theme = activeThemePayload();
+  const msg = Object.assign(
+    { t: "set_topics", room: myRoom, arena: true },
+    theme
+  );
+  if (theme._explicitRandom || !(theme.topics || []).length) {
+    msg.clear_topics = true;
+    msg.topics_random = true;
+  }
+  send(msg);
 }
 
 function handleRaw(text) {
@@ -1595,6 +1622,11 @@ function handleState(s) {
   try { updateTopicSelectionStatus(s.topic_filter); } catch (e) { /* ignore */ }
   // Recover if host locked a theme but server still has [].
   try { ensureThemeOnServer(s); } catch (e) { /* ignore */ }
+  // Multiplayer host: chips stay on in lobby; lock once the match is live.
+  if (iAmHost && lobbyMode === "create") {
+    if (s.phase === "lobby") setTopicChipsEnabled(true);
+    else setTopicChipsEnabled(false);
+  }
 
   const newRoundId = s.round && s.round.round_id ? s.round.round_id : null;
   const phaseChanged = was !== null && was !== s.phase;
@@ -2869,13 +2901,20 @@ function renderTopicChips() {
 }
 
 function toggleTopicGroup(id) {
-  if (joined) return;
+  // Multiplayer host may change themes in lobby after enter; solo locks earlier.
+  const mpHostLobby = joined && iAmHost && lobbyMode === "create"
+    && state && state.phase === "lobby";
+  if (joined && !mpHostLobby) return;
   id = String(id || "").toLowerCase();
   id = LEGACY_TOPIC_GROUP_MAP[id] || id;
   if (!id || id === "random") {
     selectedTopicGroups = [];
     lockedThemePayload = null;
     renderTopicChips();
+    if (mpHostLobby) {
+      lockThemeFromChips();
+      pushThemeToServer();
+    }
     return;
   }
   const idx = selectedTopicGroups.indexOf(id);
@@ -2889,12 +2928,19 @@ function toggleTopicGroup(id) {
     if ($("createHint") && (lobbyMode === "solo" || lobbyMode === "create")) {
       const base = lobbyMode === "solo"
         ? "Practice alone. "
-        : "Share the code (or QR) after you enter. ";
+        : (joined
+          ? "Waiting for players. "
+          : "Share the code (or QR) after you enter. ");
       $("createHint").textContent = selectedTopicGroups.length
         ? (base + "Filter ON · " + label + " — all 6 posts stay in this mix.")
         : (base + "Filter OFF · RANDOM MIX — posts from every theme.");
     }
   } catch (e) { /* ignore */ }
+  // Multiplayer host: push live so auto-start / guest lobby see the filter.
+  if (mpHostLobby) {
+    lockThemeFromChips();
+    pushThemeToServer();
+  }
 }
 
 /** If we locked a theme but the server still shows RANDOM, re-push it. */
@@ -2979,17 +3025,31 @@ function activeThemePayload() {
       topics: (lockedThemePayload.topics || []).slice(),
       topic_groups: (lockedThemePayload.topic_groups || []).slice(),
       topic_filter: (lockedThemePayload.topic_filter || lockedThemePayload.topics || []).slice(),
+      _explicitRandom: !!lockedThemePayload._explicitRandom,
     };
   }
-  return themePayloadFields();
+  const live = themePayloadFields();
+  live._explicitRandom = !(live.topics || []).length;
+  return live;
 }
 
 /** Snapshot chip selection so later reconnects cannot drop the theme. */
 function lockThemeFromChips() {
   lockedThemePayload = themePayloadFields();
+  // Remember intentional RANDOM so reconnect can clear; empty without this
+  // flag means "don't send topics" (keep server filter).
+  lockedThemePayload._explicitRandom = !(lockedThemePayload.topics || []).length;
   themeResyncTries = 0;
   try { updateTopicSelectionStatus(lockedThemePayload.topics); } catch (e) { /* ignore */ }
   return lockedThemePayload;
+}
+
+function setTopicChipsEnabled(on) {
+  const chipBox = $("topicChips");
+  if (!chipBox) return;
+  chipBox.querySelectorAll("button").forEach((b) => {
+    b.disabled = !on;
+  });
 }
 
 function formatTopicFilterLabel(topics) {
@@ -3145,18 +3205,25 @@ function doJoin(opts) {
   if ($("modeSoloBtn")) $("modeSoloBtn").disabled = true;
   if ($("modeMockBtn")) $("modeMockBtn").disabled = true;
   if ($("backToModeBtn")) $("backToModeBtn").hidden = true;
-  // Freeze theme NOW (before chips lock / catalog race) so reconnect keeps it.
+  // Freeze theme NOW so reconnect keeps it.
   if (iAmHost || solo || lobbyMode === "solo") {
     lockThemeFromChips();
   }
-  // Lock topic chips after enter.
-  const chipBox = $("topicChips");
-  if (chipBox) {
-    chipBox.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+
+  // Solo: lock chips immediately. Multiplayer host: keep chips editable until
+  // START so themes can be set while friends join (was the main MP bug).
+  if (solo || isSoloFriendlyRoom(myRoom) || !iAmHost) {
+    setTopicChipsEnabled(false);
+  } else {
+    setTopicChipsEnabled(true);
   }
 
-  // Join (queued if WS not open yet) — always carries locked theme for host.
+  // Join (queued if WS not open yet) — carries locked theme for host.
   send(buildJoinPayload());
+  // Belt-and-suspenders: also push set_topics right after join.
+  if (iAmHost || solo || lobbyMode === "solo") {
+    setTimeout(() => { try { pushThemeToServer(); } catch (e) { /* ignore */ } }, 50);
+  }
 
   const themeLabel = formatTopicFilterLabel(
     (lockedThemePayload && lockedThemePayload.topics) || selectedTopicsPayload()
@@ -3180,6 +3247,10 @@ function doJoin(opts) {
     $("startBtn").hidden = false;
     $("startBtn").disabled = false;
     $("waitLine").hidden = true;
+    if ($("createHint")) {
+      $("createHint").textContent =
+        "Waiting for players. Confirm themes (chips stay editable), then START. Filter: " + themeLabel + ".";
+    }
     setConn("ROOM " + myRoom + " · " + themeLabel + " · TAP START");
   } else {
     $("startBtn").hidden = true;
@@ -3291,10 +3362,21 @@ function sendNext() {
   // Player moved on — cut leftover reveal/hype immediately.
   try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
   const payload = { t: "next", room: myRoom };
-  // Re-assert frozen theme on START so the server never deals a random mix.
+  // Re-assert theme on START so multiplayer never deals a random mix.
   if (iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)) {
+    // Re-read chips if host is still in lobby (multiplayer editable chips).
+    if (!state || state.phase === "lobby") {
+      lockThemeFromChips();
+      pushThemeToServer();
+      setTopicChipsEnabled(false);
+    }
     payload.arena = true;
-    Object.assign(payload, activeThemePayload());
+    const theme = activeThemePayload();
+    Object.assign(payload, theme);
+    if (theme._explicitRandom || !(theme.topics || []).length) {
+      payload.clear_topics = true;
+      payload.topics_random = true;
+    }
   }
   send(payload);
 }
