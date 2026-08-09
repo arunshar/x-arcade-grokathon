@@ -983,13 +983,9 @@ def generate_matching_decoy(
             print(f"imagine_agent: t2v retry failed: {exc2}", file=sys.stderr)
             result["status"] = "failed"
             result["error"] = f"{err} | retry: {exc2}"
-            probe = DECOY_DIR / "_probe.mp4"
-            if probe.is_file():
-                _stamp_decoy(round_data, probe, ready=False)
-                result["status"] = "failed_probe_fallback"
-                result["path"] = str(probe)
-            else:
-                _mark_decoy_failed(round_data)
+            # Never promote _probe.mp4 as the decoy reply — leave pending/failed
+            # so the UI shows "GROK IMAGINE…" instead of a stock clip.
+            _mark_decoy_failed(round_data)
             return result
     url = (done.get("video") or {}).get("url") or done.get("url")
     if not url:
@@ -1042,19 +1038,60 @@ def _stamp_decoy(
     decoy = _decoy_slot(round_data)
     if decoy is None or not path.is_file():
         return
+    # Hard refuse: human pool GIFs and the shared probe never become "the reply".
+    if path.suffix.lower() == ".gif" or path.name.endswith(".gif"):
+        print(f"imagine_agent: refusing to stamp gif on decoy: {path}", file=sys.stderr)
+        return
+    if is_placeholder_decoy(path):
+        print(
+            f"imagine_agent: refusing probe/placeholder stamp on decoy: {path.name}",
+            file=sys.stderr,
+        )
+        # Keep slot pending so live can still call Grok Imagine.
+        for rep in round_data.get("replies") or []:
+            if not isinstance(rep, dict):
+                continue
+            try:
+                if int(rep.get("slot")) != decoy:
+                    continue
+            except (TypeError, ValueError):
+                continue
+            rep["media_url"] = None
+            rep["media_type"] = "video"
+            rep["media_status"] = "pending"
+            rep["media_source"] = "imagine"
+            rep["media_engine"] = f"{config.MODEL_IMAGE}+{config.MODEL_VIDEO}"
+            break
+        round_data["decoy_media_status"] = "pending"
+        round_data["format"] = "gif"
+        return
+
     rel = path.relative_to(REPO_ROOT / "web")
     url = "/" + str(rel).replace("\\", "/")
-    mtype = "video" if path.suffix.lower() in (".mp4", ".webm") else "gif"
+    # Never stamp a human pool path onto the decoy.
+    if "/reply-gifs/" in url.replace("\\", "/") and "/decoy/" not in url.replace("\\", "/"):
+        print(f"imagine_agent: refusing to stamp pool path on decoy: {url}", file=sys.stderr)
+        return
+    if path.suffix.lower() not in (".mp4", ".webm", ".mov"):
+        print(f"imagine_agent: refusing non-video decoy media: {path}", file=sys.stderr)
+        return
+
+    require = bool(getattr(config, "IMAGINE_DECOY_REQUIRED", True))
+    certified = is_imagine_certified(path)
     is_real = is_real_decoy_media(path)
     if ready is None:
-        ready = is_real or config.MODE != "live"
-    # Never stamp a human pool .gif onto the decoy.
-    if url.lower().endswith(".gif") and "/decoy/" not in url.replace("\\", "/"):
-        print(f"imagine_agent: refusing to stamp pool gif on decoy: {url}", file=sys.stderr)
-        return
-    if ready and path.suffix.lower() not in (".mp4", ".webm", ".mov"):
-        print(f"imagine_agent: refusing non-video decoy media: {path}", file=sys.stderr)
+        if require:
+            ready = certified and is_real
+        else:
+            ready = is_real or (config.MODE != "live" and path.stat().st_size > 800)
+    elif ready and require and not certified:
+        # Caller asked ready=True but file isn't Imagine-certified — demote.
         ready = False
+        print(
+            f"imagine_agent: demoting uncertified decoy to pending: {path.name}",
+            file=sys.stderr,
+        )
+
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
             continue
@@ -1063,7 +1100,10 @@ def _stamp_decoy(
                 continue
         except (TypeError, ValueError):
             continue
-        rep["media_url"] = url
+        rep["media_url"] = url if ready or not require else (url if certified else None)
+        # While waiting for Imagine, show pending chrome (no stock media).
+        if not ready and require and not certified:
+            rep["media_url"] = None
         rep["media_type"] = "video"  # Imagine decoy is always video
         rep["media_status"] = "ready" if ready else "pending"
         rep["media_source"] = "imagine"

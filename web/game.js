@@ -1499,11 +1499,12 @@ function centerRepliesInView(smooth) {
   });
 }
 
-/** True for Grok Imagine decoy videos (never human pool .gif paths). */
+/** True for Grok Imagine decoy videos (never human pool .gif / probe paths). */
 function isImagineVideoUrl(url) {
   if (!url) return false;
   const u = String(url).split("?")[0].toLowerCase();
   if (u.indexOf("/reply-gifs/decoy/") < 0) return false;
+  // Shared offline probe is not a real Grok Imagine generation.
   if (/_probe\.mp4$/i.test(u)) return false;
   return /\.(mp4|webm|mov)$/i.test(u);
 }

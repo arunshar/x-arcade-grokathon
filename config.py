@@ -35,9 +35,12 @@ REPLIES_PER_ROUND = 5
 # "always_gif" (default) → every round uses human pool GIFs + Grok Imagine decoy video.
 # "alternate" → text, gif, text…  "always_text" → text only. "half" → ~50% by hash.
 GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "always_gif").strip().lower()
-# When true (default in live), decoy media must come from grok-imagine-image +
-# grok-imagine-video — never a human pool .gif file.
-IMAGINE_DECOY_REQUIRED = os.environ.get("ARCADE_IMAGINE_DECOY", "1") != "0"# Match length: after this many rounds the room opens a results screen
+# When true (default), the decoy reply media MUST be produced by Grok Imagine:
+#   grok-imagine-image → still, then grok-imagine-video → short loop mp4.
+# Never a human pool .gif, never an uncertified probe clone.
+# Set ARCADE_IMAGINE_DECOY=0 only for offline demos that pre-bake certified files.
+IMAGINE_DECOY_REQUIRED = os.environ.get("ARCADE_IMAGINE_DECOY", "1") != "0"
+# Match length: after this many rounds the room opens a results screen
 # instead of looping forever. Override with ARCADE_MATCH_ROUNDS (1–20).
 try:
     MATCH_ROUNDS = int(os.environ.get("ARCADE_MATCH_ROUNDS", "6") or "6")

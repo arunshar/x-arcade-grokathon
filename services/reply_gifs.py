@@ -615,46 +615,58 @@ def make_decoy_imagine_gif(
     *,
     force: bool = False,
 ) -> Path | None:
-    """Generate (or reuse) decoy video via the Imagine agent.
+    """Generate (or reuse) decoy video via Grok Imagine only.
 
-    Grok Imagine invents a new clip from the thread's reply texts — never
-    regenerates a human pool GIF file.
+    Returns a path only when the file is a real per-round Imagine clip
+    (certified when ``IMAGINE_DECOY_REQUIRED``). Never returns pool .gifs
+    or the shared ``_probe.mp4`` placeholder.
     """
     from services.imagine_agent import (
         decoy_video_path,
         generate_matching_decoy,
+        is_imagine_certified,
+        is_placeholder_decoy,
         is_real_decoy_media,
     )
 
     rid = str(round_data.get("round_id") or "round")
     out = decoy_video_path(rid)
-    if not force and is_real_decoy_media(out):
+    require = bool(getattr(config, "IMAGINE_DECOY_REQUIRED", True))
+
+    def _ok(path: Path) -> bool:
+        if not path.is_file() or path.stat().st_size < 800:
+            return False
+        if is_placeholder_decoy(path):
+            return False
+        if not is_real_decoy_media(path):
+            return False
+        if require and not is_imagine_certified(path):
+            return False
+        return True
+
+    if not force and _ok(out):
         return out
 
-    result = generate_matching_decoy(round_data, force=force)
-    if out.is_file() and out.stat().st_size > 800:
+    generate_matching_decoy(round_data, force=force)
+    if _ok(out):
         return out
-    # Agent may have stamped probe path under a different file.
-    status = result.get("status")
-    if status in ("exists", "demo_probe", "ready", "failed_probe_fallback"):
-        path = Path(str(result.get("path") or out))
-        if path.is_file():
-            return path
-        probe = DECOY_DIR / "_probe.mp4"
-        if probe.is_file():
-            return probe
     return None
 
 
 def generate_decoy_media(round_data: dict[str, Any], *, force: bool = False) -> dict[str, Any]:
-    """Ensure decoy has Imagine media matched to this round's human GIFs."""
+    """Ensure decoy has Grok Imagine video (never pool GIF / probe)."""
     attach_reply_media(round_data)
     decoy = _decoy_slot(round_data)
     if decoy is None:
         return round_data
 
     try:
-        from services.imagine_agent import generate_matching_decoy
+        from services.imagine_agent import (
+            generate_matching_decoy,
+            is_imagine_certified,
+            is_placeholder_decoy,
+            is_real_decoy_media,
+        )
 
         result = generate_matching_decoy(round_data, force=force)
     except Exception as exc:
@@ -662,14 +674,18 @@ def generate_decoy_media(round_data: dict[str, Any], *, force: bool = False) -> 
         result = {"status": "failed", "error": str(exc)}
 
     status = str(result.get("status") or "")
-    if status in ("ready", "exists", "demo_probe", "failed_probe_fallback"):
-        # generate_matching_decoy already stamps media_url on success.
-        if round_data.get("decoy_media_status") != "ready":
-            path = make_decoy_imagine_gif(round_data, force=False)
-            if path and path.is_file():
+    # Only certified Imagine success counts — never probe fallback as "ready".
+    if status in ("ready", "exists") and result.get("certified", status == "ready"):
+        if round_data.get("decoy_media_status") == "ready":
+            return round_data
+        path = make_decoy_imagine_gif(round_data, force=False)
+        if path and path.is_file() and not is_placeholder_decoy(path):
+            if is_real_decoy_media(path) and (
+                not getattr(config, "IMAGINE_DECOY_REQUIRED", True)
+                or is_imagine_certified(path)
+            ):
                 rel = path.relative_to(REPO_ROOT / "web")
                 url = "/" + str(rel).replace("\\", "/")
-                mtype = "video" if path.suffix.lower() in (".mp4", ".webm") else "gif"
                 for rep in round_data.get("replies") or []:
                     if not isinstance(rep, dict):
                         continue
@@ -679,22 +695,43 @@ def generate_decoy_media(round_data: dict[str, Any], *, force: bool = False) -> 
                     except (TypeError, ValueError):
                         continue
                     rep["media_url"] = url
-                    rep["media_type"] = mtype
+                    rep["media_type"] = "video"
                     rep["media_status"] = "ready"
                     rep["media_source"] = "imagine"
+                    rep["media_engine"] = (
+                        f"{config.MODEL_IMAGE}+{config.MODEL_VIDEO}"
+                    )
                     break
                 round_data["decoy_media_status"] = "ready"
                 round_data["reply_art_status"] = "ready"
-        return round_data
+                return round_data
 
     for rep in round_data.get("replies") or []:
-        if isinstance(rep, dict):
-            try:
-                if int(rep.get("slot")) == decoy:
-                    rep["media_status"] = "failed"
-            except (TypeError, ValueError):
-                pass
-    round_data["decoy_media_status"] = "failed"
+        if not isinstance(rep, dict):
+            continue
+        try:
+            if int(rep.get("slot")) != decoy:
+                continue
+        except (TypeError, ValueError):
+            continue
+        # Never leave a pool gif URL on the decoy slot.
+        url = str(rep.get("media_url") or "")
+        if url.lower().endswith(".gif") or (
+            "/reply-gifs/" in url and "/decoy/" not in url
+        ) or url.rstrip("/").lower().endswith("_probe.mp4"):
+            rep["media_url"] = None
+        rep["media_type"] = "video"
+        rep["media_source"] = "imagine"
+        if status in ("failed", "failed_probe_fallback", "no_live"):
+            rep["media_status"] = "failed"
+        elif rep.get("media_status") != "ready":
+            rep["media_status"] = "pending"
+    if round_data.get("decoy_media_status") != "ready":
+        round_data["decoy_media_status"] = (
+            "failed"
+            if status in ("failed", "failed_probe_fallback", "no_live")
+            else "pending"
+        )
     return round_data
 
 
