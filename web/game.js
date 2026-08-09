@@ -2625,6 +2625,9 @@ if ($("restartBtn")) {
 if ($("homeBtn")) {
   $("homeBtn").addEventListener("click", withAudioUnlock(() => goHome()));
 }
+if ($("brandHome")) {
+  $("brandHome").addEventListener("click", withAudioUnlock(() => goHome()));
+}
 // Join form submit also counts as a user gesture for audio.
 $("lobbyForm").addEventListener("submit", () => { try { unlockAudio(); } catch (e) { /* ignore */ } }, true);
 
