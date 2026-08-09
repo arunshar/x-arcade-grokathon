@@ -1025,10 +1025,8 @@ async def _start_round(room: dict[str, Any]) -> None:
     # round can never serve this round's media.
     room["media_token"] = None
     room["media_files"] = {}
-    # Pin match length every round start (config default = 6).
-    match_rounds = int(getattr(config, "MATCH_ROUNDS", 6) or 6)
-    if match_rounds < 6 and os.environ.get("ARCADE_ALLOW_SHORT_MATCH", "") != "1":
-        match_rounds = 6
+    # Pin match length every round start from live config (default 6).
+    match_rounds = max(1, int(getattr(config, "MATCH_ROUNDS", 6) or 6))
     room["match_rounds"] = match_rounds
     rounds_played = int(room.get("rounds_played") or 0)
 
