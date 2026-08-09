@@ -196,7 +196,9 @@ async def main() -> int:
         await p1.send(json.dumps({"t": "join", "room": ROOM, "name": "P1"}))
         state = await recv_state(p1, "P1")
         check(state["phase"] == "lobby" and len(state["players"]) == 1, "first join lands in lobby")
-        check(isinstance(state.get("auto_ms"), int), "lobby carries the session-clock countdown")
+        # Multiplayer lobbies wait for an explicit START (no auto-start
+        # countdown); only solo rooms keep the short lobby clock.
+        check(state.get("auto_ms") is None, "multiplayer lobby has no auto-start countdown")
 
         await p2.send(json.dumps({"t": "join", "room": ROOM, "name": "P2"}))
         state = await recv_state(p1, "P1")
