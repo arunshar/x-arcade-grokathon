@@ -1182,17 +1182,9 @@ const commentary = {
           }
         }
       }
+      // Backup: server deadline_ms (primary trigger is the local timer tick).
       const left = typeof s.deadline_ms === "number" ? s.deadline_ms : null;
-      if (
-        !allGuessed
-        && left !== null
-        && left <= 10000
-        && left > 800
-        && !this.lowClockSaid
-      ) {
-        this.lowClockSaid = true;
-        this.comment("clock_low", s);
-      }
+      if (left !== null) this.onClockLow(left, s);
     }
 
     if (s.phase === "reveal" && was !== "reveal") {
@@ -1220,6 +1212,48 @@ const commentary = {
     }
 
     if (s.phase !== "lobby") this.lastLobbyCount = players.length;
+  },
+
+  /**
+   * ~10s left on the guess clock. Fired from the local timer (reliable) and
+   * from state broadcasts as backup. Speaks a short template immediately —
+   * no agent wait — so the line lands while the clock still matters.
+   */
+  onClockLow(leftMs, s) {
+    if (this.lowClockSaid) return;
+    if (!this.canSpeak() || muted) return;
+    const snap = s || state;
+    if (!snap || snap.phase !== "guessing") return;
+    const left = typeof leftMs === "number" ? leftMs : null;
+    if (left === null || left > 10000 || left <= 800) return;
+    const players = snap.players || [];
+    // Everyone already locked — reveal is imminent; skip the ten-second yell.
+    if (players.length > 0 && players.every((p) => p.guessed)) return;
+    if (!this.eventAllowed("clock_low", "guessing")) return;
+
+    this.lowClockSaid = true;
+    const gen = this.gen;
+    const phase = "guessing";
+    const roundId = snap.round && snap.round.round_id ? snap.round.round_id : null;
+    const line = sanitizeHostLine(this.templateLine("clock_low", snap, {}))
+      || "Ten seconds!";
+    // Drop pending chatter so "ten seconds" isn't stuck behind an opener tail.
+    // Do NOT bump epoch — that would cancel the current clip mid-word and
+    // invalidate this job's gen token.
+    try { voiceQueue.items = []; } catch (e) { /* ignore */ }
+
+    voiceQueue.enqueue(async () => {
+      if (!this.stillCurrent(gen, phase, roundId) || !this.canSpeak() || muted) return;
+      if (!this.eventAllowed("clock_low", state && state.phase)) return;
+      // Re-check clock — if we're already past the wire, don't yell late.
+      const stillLeft = timerEndAt ? (timerEndAt - performance.now()) : left;
+      if (stillLeft <= 400) return;
+      await speakWithGrok(line, { epoch: gen });
+      this.rememberLine(line);
+    }, voiceMeta({ phase: phase, roundId: roundId, epoch: gen }));
+
+    // Optional color from the agent — only if template already spoke and we're
+    // still in the window; skip agent to keep this snappy (template is enough).
   },
 
   /**
@@ -2415,8 +2449,15 @@ function startTimer() {
   const tick = () => {
     const left = Math.max(0, timerEndAt - performance.now());
     $("timerNum").textContent = String(Math.ceil(left / 1000));
-    $("ringFill").style.strokeDashoffset = String(RING_LEN * (1 - left / 30000));
-    $("timerWrap").classList.toggle("low", left < 5000 && left > 0);
+    // Ring length assumes ~30s rounds; clamp so short rounds still draw.
+    const total = Math.max(left, 30000);
+    $("ringFill").style.strokeDashoffset = String(RING_LEN * (1 - left / total));
+    // Visual urgency from 10s — matches the host "ten seconds" line.
+    $("timerWrap").classList.toggle("low", left <= 10000 && left > 0);
+    // Primary clock_low voice trigger (state broadcasts often miss this window).
+    if (left <= 10000 && left > 800) {
+      try { commentary.onClockLow(left, state); } catch (e) { /* ignore */ }
+    }
     if (left > 0) timerRaf = requestAnimationFrame(tick);
   };
   timerRaf = requestAnimationFrame(tick);
