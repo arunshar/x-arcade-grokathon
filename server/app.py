@@ -274,7 +274,7 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
             item["media_type"] = r["media_type"]
         if r.get("media_status"):
             item["media_status"] = r["media_status"]
-        # Never send media_source / is_decoy / author during guessing.
+        # Never send media_source / media_engine / is_decoy / author during guessing.
         safe_replies.append(item)
     safe["replies"] = safe_replies
     # Always advertise format so clients can mix text vs gif presentation.
@@ -498,31 +498,43 @@ async def _start_round(room: dict[str, Any]) -> None:
     room["deadline_at"] = asyncio.get_running_loop().time() + config.ROUND_SECONDS
     room["timer"] = asyncio.create_task(_round_timer(room))
     await _broadcast(room)
-    # Live GIF rounds: always ensure Grok Imagine video (not pool gifs).
-    # Uncertified/missing decoy media → background Imagine generation.
+    # Live GIF rounds: decoy MUST be Grok Imagine video (image+video APIs).
     if config.MODE == "live" and rnd.get("format") == "gif":
-        need_imagine = rnd.get("decoy_media_status") != "ready"
-        if not need_imagine:
-            # Double-check certification — never trust a bare mp4 without meta.
-            try:
-                from services.imagine_agent import decoy_video_path, is_imagine_certified
+        certified = False
+        try:
+            from services.imagine_agent import decoy_video_path, is_imagine_certified
 
-                need_imagine = not is_imagine_certified(
-                    decoy_video_path(str(rnd.get("round_id") or ""))
-                )
-            except Exception:
-                need_imagine = True
-        if need_imagine:
-            # Mark pending so clients don't show a stale/wrong asset.
+            certified = is_imagine_certified(
+                decoy_video_path(str(rnd.get("round_id") or ""))
+            )
+        except Exception:
+            certified = False
+        # Always clear any non-Imagine URL off the decoy slot.
+        for rep in rnd.get("replies") or []:
+            if not isinstance(rep, dict):
+                continue
+            if rep.get("media_source") != "imagine" and not rep.get("is_decoy"):
+                try:
+                    if int(rep.get("slot")) != int(rnd.get("decoy_slot")):
+                        continue
+                except (TypeError, ValueError):
+                    continue
+            url = str(rep.get("media_url") or "")
+            if (
+                not certified
+                or url.lower().endswith(".gif")
+                or ("/reply-gifs/" in url and "/decoy/" not in url)
+            ):
+                rep["media_url"] = None
+                rep["media_type"] = "video"
+                rep["media_status"] = "pending"
+                rep["media_source"] = "imagine"
+        if not certified:
             rnd["decoy_media_status"] = "pending"
-            for rep in rnd.get("replies") or []:
-                if isinstance(rep, dict) and rep.get("media_source") == "imagine":
-                    if not str(rep.get("media_url") or "").endswith(
-                        (".mp4", ".webm", ".mov")
-                    ) or "/decoy/" not in str(rep.get("media_url") or ""):
-                        rep["media_url"] = None
-                        rep["media_type"] = "video"
-                        rep["media_status"] = "pending"
+            print(
+                f"imagine: scheduling Grok Imagine video for {rnd.get('round_id')}",
+                file=sys.stderr,
+            )
             asyncio.create_task(_attach_decoy_imagine_gif(room, rnd, force=True))
 
 

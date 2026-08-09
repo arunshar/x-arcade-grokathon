@@ -32,10 +32,12 @@ LOBBY_SECONDS = 10
 REVEAL_SECONDS = 14
 REPLIES_PER_ROUND = 5
 # How often GIF rounds appear when a round JSON does not set "format".
-# "alternate" → text, gif, text, gif… within a room session (default).
-# "always_gif" / "always_text" → force one mode. "half" → ~50% by round_id hash.
-GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "alternate").strip().lower()
-# Match length: after this many rounds the room opens a results screen
+# "always_gif" (default) → every round uses human pool GIFs + Grok Imagine decoy video.
+# "alternate" → text, gif, text…  "always_text" → text only. "half" → ~50% by hash.
+GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "always_gif").strip().lower()
+# When true (default in live), decoy media must come from grok-imagine-image +
+# grok-imagine-video — never a human pool .gif file.
+IMAGINE_DECOY_REQUIRED = os.environ.get("ARCADE_IMAGINE_DECOY", "1") != "0"# Match length: after this many rounds the room opens a results screen
 # instead of looping forever. Override with ARCADE_MATCH_ROUNDS (1–20).
 try:
     MATCH_ROUNDS = int(os.environ.get("ARCADE_MATCH_ROUNDS", "6") or "6")

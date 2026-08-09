@@ -560,11 +560,23 @@ def _poll_video(request_id: str, timeout_s: float = VIDEO_POLL_S) -> dict[str, A
 
 
 def _full_video_gen(payload: dict[str, Any]) -> dict[str, Any]:
+    model = payload.get("model") or config.MODEL_VIDEO
+    print(
+        f"imagine_agent: POST /videos/generations model={model} "
+        f"duration={payload.get('duration')} has_still={bool(payload.get('image'))}",
+        file=sys.stderr,
+    )
+    # Refuse payloads that try to attach human pool media as references.
+    if payload.get("reference_images"):
+        raise RuntimeError("refusing video gen with reference_images (human gifs)")
     start = post_json("/videos/generations", payload, timeout=60)
     rid = start.get("request_id") or start.get("id")
     if not rid:
         raise RuntimeError(f"video start missing request_id: {start!r}")
-    return _poll_video(str(rid))
+    print(f"imagine_agent: video request_id={rid} polling…", file=sys.stderr)
+    done = _poll_video(str(rid))
+    print(f"imagine_agent: video {rid} status={done.get('status')}", file=sys.stderr)
+    return done
 
 
 def _video_payload(
@@ -613,6 +625,10 @@ def generate_own_still(
     }
 
     def invoke() -> dict[str, Any]:
+        print(
+            f"imagine_agent: POST /images/generations model={config.MODEL_IMAGE}",
+            file=sys.stderr,
+        )
         return post_json("/images/generations", request, timeout=120)
 
     try:
@@ -634,9 +650,14 @@ def generate_own_still(
             return None
         b64 = (data.get("data") or [{}])[0].get("b64_json") or ""
         if not b64:
+            print("imagine_agent: image gen returned empty b64", file=sys.stderr)
             return None
         raw = base64.b64decode(b64)
         mime = "image/png" if raw[:4] == b"\x89PNG" else "image/jpeg"
+        print(
+            f"imagine_agent: got Imagine still ({len(raw)} bytes, {mime})",
+            file=sys.stderr,
+        )
         return f"data:{mime};base64,{b64}"
     except Exception as exc:
         print(f"imagine_agent: own still failed: {exc}", file=sys.stderr)
@@ -774,9 +795,11 @@ def generate_matching_decoy(
     *,
     force: bool = False,
 ) -> dict[str, Any]:
-    """Run the full agent: style brief → Imagine video → stamp decoy media.
+    """Run the full agent: vision brief → Grok Imagine image → Imagine video.
 
     Mutates ``round_data``. Returns a small result dict for logs/CLI.
+    The decoy slot is ALWAYS Imagine-made media when this succeeds — never a
+    human pool GIF file.
     """
     rid = str(round_data.get("round_id") or "round")
     out = decoy_video_path(rid)
@@ -785,6 +808,7 @@ def generate_matching_decoy(
         "path": str(out),
         "style_brief": "",
         "status": "skipped",
+        "engine": f"{config.MODEL_IMAGE}+{config.MODEL_VIDEO}",
     }
 
     # Reuse only certified Grok Imagine video — never probe / pool / uncertified.
@@ -792,6 +816,7 @@ def generate_matching_decoy(
         _stamp_decoy(round_data, out)
         result["status"] = "exists"
         result["certified"] = True
+        result["engine"] = "grok-imagine-video (cached certified)"
         return result
 
     # Uncertified leftovers (old probe copies, unknown mp4s): regenerate.
@@ -816,15 +841,24 @@ def generate_matching_decoy(
                 pass
 
     if config.MODE != "live" and not force:
-        # Demo: serve probe only as a shared fallback (not copied per-round).
-        probe = DECOY_DIR / "_probe.mp4"
-        if probe.is_file():
-            _stamp_decoy(round_data, probe)
-            result["status"] = "demo_probe"
-            result["path"] = str(probe)
+        # Demo offline: only certified Imagine files count as ready decoy media.
+        # Never promote human pool gifs. Probe is last-resort pending, not ready.
+        if is_imagine_certified(out):
+            _stamp_decoy(round_data, out, ready=True)
+            result["status"] = "exists"
+            result["certified"] = True
             return result
         result["status"] = "no_live"
+        result["error"] = "demo mode needs pre-baked certified Imagine video"
+        _mark_decoy_failed(round_data)
         return result
+
+    # Live path MUST hit Grok Imagine APIs.
+    print(
+        f"imagine_agent: calling Grok Imagine "
+        f"image={config.MODEL_IMAGE} video={config.MODEL_VIDEO} for {rid}",
+        file=sys.stderr,
+    )
 
     # Ensure human GIFs are on the round so we can analyze their frames.
     try:
@@ -1014,6 +1048,13 @@ def _stamp_decoy(
     is_real = is_real_decoy_media(path)
     if ready is None:
         ready = is_real or config.MODE != "live"
+    # Never stamp a human pool .gif onto the decoy.
+    if url.lower().endswith(".gif") and "/decoy/" not in url.replace("\\", "/"):
+        print(f"imagine_agent: refusing to stamp pool gif on decoy: {url}", file=sys.stderr)
+        return
+    if ready and path.suffix.lower() not in (".mp4", ".webm", ".mov"):
+        print(f"imagine_agent: refusing non-video decoy media: {path}", file=sys.stderr)
+        ready = False
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
             continue
@@ -1023,9 +1064,10 @@ def _stamp_decoy(
         except (TypeError, ValueError):
             continue
         rep["media_url"] = url
-        rep["media_type"] = mtype
+        rep["media_type"] = "video"  # Imagine decoy is always video
         rep["media_status"] = "ready" if ready else "pending"
         rep["media_source"] = "imagine"
+        rep["media_engine"] = f"{config.MODEL_IMAGE}+{config.MODEL_VIDEO}"
         break
     round_data["decoy_media_status"] = "ready" if ready else "pending"
     round_data["reply_art_status"] = round_data["decoy_media_status"]

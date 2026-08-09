@@ -1551,7 +1551,7 @@ function buildReplyMedia(reply, isRevealDecoy, onReady) {
     box.className = "reply-media-frame";
     const pending = document.createElement("div");
     pending.className = "reply-media-pending";
-    pending.textContent = isRevealDecoy || status === "pending"
+    pending.textContent = (isRevealDecoy || status === "pending" || mtype === "video")
       ? "GROK IMAGINE…"
       : "LOADING…";
     box.appendChild(pending);
