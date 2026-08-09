@@ -57,9 +57,9 @@
           enterkeyhint="next" placeholder="PLAYER" inputmode="text">
       </label>
 
-      <!-- Create path: generated code, host enters immediately -->
+      <!-- Create / solo path: multiplayer shows room code; solo hides it -->
       <div id="createFields" hidden>
-        <div class="field">
+        <div class="field" id="roomCodeField">
           <span>YOUR ROOM CODE</span>
           <div class="room-code-row">
             <input id="createdRoomDisplay" maxlength="8" readonly
@@ -69,7 +69,7 @@
         </div>
         <div class="field topic-filter-field" id="topicFilterField">
           <span>POST TOPICS</span>
-          <p class="mode-hint topic-filter-hint">
+          <p class="mode-hint topic-filter-hint" id="topicFilterHint">
             Pick themes for this room — every post stays in those themes.
             Leave <b>RANDOM</b> for the full mix.
           </p>

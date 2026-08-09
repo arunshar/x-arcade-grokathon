@@ -1607,15 +1607,39 @@ function renderLobby(s) {
   // START skips the lobby wait. Multiplayer needs 2+ players; solo needs 1.
   const start = $("startBtn");
   const wait = $("waitLine");
+  const soloRoom = isSoloFriendlyRoom(s.room || myRoom) || lobbyMode === "solo";
   const minPlayers = (typeof s.min_players === "number")
     ? s.min_players
-    : (isSoloFriendlyRoom(s.room || myRoom) ? 1 : 2);
+    : (soloRoom ? 1 : 2);
   const canStart = (typeof s.can_start === "boolean")
     ? s.can_start
     : players.length >= minPlayers;
+  // Solo never shows join QR / share chrome.
+  if (soloRoom) {
+    const qr = $("lobbyQr");
+    if (qr) qr.hidden = true;
+  }
+  // One-tap solo: once the server accepts the join, kick the round.
+  if (pendingSoloStart && joined && canStart && soloRoom) {
+    pendingSoloStart = false;
+    try { sendNext(); } catch (e) { /* ignore */ }
+  }
   if (!joined) {
-    start.hidden = true;
-    start.disabled = true;
+    // Solo setup screen keeps START GAME visible before WS join.
+    if (lobbyMode === "solo") {
+      start.hidden = false;
+      start.disabled = false;
+      start.textContent = "START GAME";
+      if (wait) wait.hidden = true;
+    } else {
+      start.hidden = true;
+      start.disabled = true;
+      if (wait) wait.hidden = true;
+    }
+  } else if (soloRoom) {
+    start.hidden = false;
+    start.disabled = !canStart;
+    start.textContent = "START GAME";
     if (wait) wait.hidden = true;
   } else {
     start.hidden = false;
@@ -2252,6 +2276,7 @@ function goHome() {
   myName = "";
   myRoom = "";
   iAmHost = false;
+  pendingSoloStart = false;
   myGuessSlot = null;
   lastRoundId = null;
   roundNo = 0;
@@ -2267,6 +2292,10 @@ function goHome() {
     if ($("modeJoinBtn")) $("modeJoinBtn").disabled = false;
     if ($("modeSoloBtn")) $("modeSoloBtn").disabled = false;
     if ($("modeMockBtn")) $("modeMockBtn").disabled = false;
+    const chipBox = $("topicChips");
+    if (chipBox) {
+      chipBox.querySelectorAll("button").forEach((b) => { b.disabled = false; });
+    }
   } catch (e) { /* ignore */ }
   showModePick();
   $("screen-lobby").hidden = false;
@@ -2321,10 +2350,12 @@ function onGuess(slot, card) {
 // A scanned QR lands here with ?room=CODE: skip the mode picker and open Join.
 const PREFILL_ROOM = (new URLSearchParams(location.search).get("room") || "").toUpperCase();
 
-// Lobby path: null | "create" | "join". Prefill forces "join".
+// Lobby path: null | "create" | "join" | "solo". Prefill forces "join".
 let lobbyMode = null;
 // True when this client created the room (or is treated as host for START UI).
 let iAmHost = false;
+// Solo: one-tap START GAME joins a SOLO* room then kicks the first round.
+let pendingSoloStart = false;
 
 // A scanned phone gets a generated name too, otherwise "one tap" is a lie.
 const HANDLES = ["NEON", "VOLT", "PIXEL", "GHOST", "RELAY", "QUARK", "ORBIT", "FLUX",
@@ -2498,29 +2529,81 @@ function formatTopicFilterLabel(topics) {
 
 function showModePick() {
   lobbyMode = null;
+  pendingSoloStart = false;
   $("modePick").hidden = false;
   $("lobbyForm").hidden = true;
   $("createFields").hidden = true;
   $("joinFields").hidden = true;
   $("lobbyQr").hidden = true;
   $("startBtn").hidden = true;
+  $("startBtn").disabled = true;
+  $("startBtn").textContent = "START";
   $("waitLine").hidden = true;
+  // Restore multiplayer create chrome in case we left solo setup.
+  if ($("roomCodeField")) $("roomCodeField").hidden = false;
+  if ($("createEnterBtn")) $("createEnterBtn").hidden = false;
 }
 
 function showLobbyForm(mode) {
   lobbyMode = mode;
+  pendingSoloStart = false;
   $("modePick").hidden = true;
   $("lobbyForm").hidden = false;
-  $("createFields").hidden = mode !== "create";
+  const isSolo = mode === "solo";
+  const isCreate = mode === "create" || isSolo;
+  $("createFields").hidden = !isCreate;
   $("joinFields").hidden = mode !== "join";
   $("backToModeBtn").hidden = !!PREFILL_ROOM;
   if (!$("nameInput").value.trim()) $("nameInput").value = generatedName();
+
+  // Solo: name + topics + START GAME only (no room code / enter / QR).
+  if ($("roomCodeField")) $("roomCodeField").hidden = isSolo;
+  if ($("createEnterBtn")) $("createEnterBtn").hidden = isSolo;
+
+  if (isSolo) {
+    iAmHost = true;
+    const code = generatedSoloRoomCode();
+    $("createdRoomDisplay").value = code;
+    $("roomInput").value = code;
+    $("lobbyQr").hidden = true;
+    if ($("createHint")) {
+      $("createHint").textContent =
+        "Practice alone. Pick themes (or RANDOM), then tap START GAME.";
+    }
+    if ($("topicFilterHint")) {
+      $("topicFilterHint").innerHTML =
+        "Optional — every post stays in the themes you pick. Leave <b>RANDOM</b> for the full mix.";
+    }
+    const start = $("startBtn");
+    start.hidden = false;
+    start.disabled = false;
+    start.textContent = "START GAME";
+    if ($("waitLine")) $("waitLine").hidden = true;
+    setConn("SOLO PRACTICE · TAP START GAME");
+    loadTopicCatalog();
+    // Unlock topic chips if returning from a previous run.
+    const chipBox = $("topicChips");
+    if (chipBox) {
+      chipBox.querySelectorAll("button").forEach((b) => { b.disabled = false; });
+    }
+    return;
+  }
 
   if (mode === "create") {
     const code = generatedRoomCode();
     $("createdRoomDisplay").value = code;
     $("roomInput").value = code;
     iAmHost = true;
+    if ($("createHint")) {
+      $("createHint").textContent =
+        "Share this code (or the QR below) so others can join.";
+    }
+    if ($("topicFilterHint")) {
+      $("topicFilterHint").innerHTML =
+        "Pick themes for this room — every post stays in those themes. Leave <b>RANDOM</b> for the full mix.";
+    }
+    $("startBtn").hidden = true;
+    $("startBtn").disabled = true;
     setConn("ROOM " + code + " READY. ENTER WHEN YOU ARE.");
     // Preview QR before entering so host can share immediately.
     $("lobbyQr").hidden = false;
@@ -2529,6 +2612,8 @@ function showLobbyForm(mode) {
   } else {
     iAmHost = false;
     $("lobbyQr").hidden = true;
+    $("startBtn").hidden = true;
+    $("startBtn").disabled = true;
     if (PREFILL_ROOM) {
       $("roomInput").value = PREFILL_ROOM;
       setConn("JOINING ROOM " + PREFILL_ROOM);
@@ -2543,9 +2628,10 @@ function showLobbyForm(mode) {
 function doJoin(opts) {
   opts = opts || {};
   const asHost = !!opts.asHost;
+  const solo = lobbyMode === "solo" || !!opts.solo;
   let name = $("nameInput").value.trim().toUpperCase();
   let room = "";
-  if (lobbyMode === "create" || asHost) {
+  if (lobbyMode === "create" || lobbyMode === "solo" || asHost) {
     room = ($("createdRoomDisplay") && $("createdRoomDisplay").value || $("roomInput").value || "")
       .trim().toUpperCase();
   } else {
@@ -2560,7 +2646,7 @@ function doJoin(opts) {
   myName = name;
   myRoom = room;
   joined = true;
-  iAmHost = asHost || lobbyMode === "create" || iAmHost;
+  iAmHost = asHost || lobbyMode === "create" || lobbyMode === "solo" || iAmHost;
   $("nameInput").disabled = true;
   $("roomInput").disabled = true;
   if ($("createdRoomDisplay")) $("createdRoomDisplay").disabled = true;
@@ -2585,19 +2671,25 @@ function doJoin(opts) {
   }
   send(payload);
 
-  // Hosts see QR + START; guests wait.
+  if (solo || isSoloFriendlyRoom(myRoom)) {
+    // Solo practice: no share code / QR — just start.
+    $("lobbyQr").hidden = true;
+    $("startBtn").hidden = false;
+    $("startBtn").disabled = false;
+    $("startBtn").textContent = "START GAME";
+    if ($("waitLine")) $("waitLine").hidden = true;
+    setConn("SOLO PRACTICE · STARTING…");
+    return;
+  }
+
+  // Multiplayer hosts see QR + START; guests wait.
   $("lobbyQr").hidden = false;
   loadPhoneJoinInfo(myRoom);
   if (iAmHost) {
     $("startBtn").hidden = false;
     $("startBtn").disabled = false;
     $("waitLine").hidden = true;
-    if (isSoloFriendlyRoom(myRoom)) {
-      // Solo auto-starts on the server; START still works as a manual backup.
-      setConn("SOLO " + myRoom + " · ROUND SHOULD START — OR TAP START.");
-    } else {
-      setConn("ROOM " + myRoom + " · YOU ARE HOST. TAP START WHEN READY.");
-    }
+    setConn("ROOM " + myRoom + " · YOU ARE HOST. TAP START WHEN READY.");
   } else {
     $("startBtn").hidden = true;
     $("startBtn").disabled = true;
@@ -2605,6 +2697,24 @@ function doJoin(opts) {
     $("waitLine").textContent = "IN " + myRoom + " · WAITING FOR HOST TO START…";
     setConn("JOINED " + myRoom + ". WAIT FOR HOST.");
   }
+}
+
+/** Solo CTA: join a private SOLO* room and start the first round. */
+function beginSoloGame() {
+  if (joined) {
+    sendNext();
+    return;
+  }
+  if (!$("nameInput").value.trim()) $("nameInput").value = generatedName();
+  // Fresh code each run so a prior SOLO room state does not stick.
+  const code = generatedSoloRoomCode();
+  $("createdRoomDisplay").value = code;
+  $("roomInput").value = code;
+  lobbyMode = "solo";
+  pendingSoloStart = true;
+  $("startBtn").disabled = true;
+  $("startBtn").textContent = "STARTING…";
+  doJoin({ asHost: true, solo: true });
 }
 
 // Mode picker — unlock audio on every lobby click (autoplay policy).
@@ -2617,17 +2727,9 @@ function withAudioUnlock(fn) {
 $("modeCreateBtn").addEventListener("click", withAudioUnlock(() => showLobbyForm("create")));
 $("modeJoinBtn").addEventListener("click", withAudioUnlock(() => showLobbyForm("join")));
 $("modeSoloBtn").addEventListener("click", withAudioUnlock(() => {
-  // Real server, one player: SOLO* room auto-starts on enter.
+  // Solo setup: name + topics + START GAME only (no room code / enter / QR).
   if (!$("nameInput").value.trim()) $("nameInput").value = generatedName();
-  showLobbyForm("create");
-  const code = generatedSoloRoomCode();
-  $("createdRoomDisplay").value = code;
-  $("roomInput").value = code;
-  $("createHint").textContent =
-    "Solo practice. Pick topics (or RANDOM), then ENTER ROOM — the round starts automatically.";
-  setConn("SOLO ROOM " + code + " · ONE PLAYER OK");
-  loadPhoneJoinInfo(code);
-  loadTopicCatalog();
+  showLobbyForm("solo");
 }));
 $("modeMockBtn").addEventListener("click", withAudioUnlock(() => {
   const url = new URL(location.href);
@@ -2681,6 +2783,10 @@ if (PREFILL_ROOM) {
 $("lobbyForm").addEventListener("submit", (ev) => {
   ev.preventDefault();
   if (joined) return;
+  if (lobbyMode === "solo") {
+    beginSoloGame();
+    return;
+  }
   if (lobbyMode === "create") doJoin({ asHost: true });
   else doJoin({ asHost: false });
 });
@@ -2693,7 +2799,13 @@ function sendNext() {
   try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
   send({ t: "next", room: myRoom });
 }
-$("startBtn").addEventListener("click", () => sendNext());
+$("startBtn").addEventListener("click", withAudioUnlock(() => {
+  if (lobbyMode === "solo" && !joined) {
+    beginSoloGame();
+    return;
+  }
+  sendNext();
+}));
 $("nextBtn").addEventListener("click", () => sendNext());
 if ($("restartBtn")) {
   $("restartBtn").addEventListener("click", withAudioUnlock(() => sendRestart()));
