@@ -1,0 +1,14 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-209820925ff6",
+  "file": "decoy-209820925ff6_decoy.mp4",
+  "bytes": 282090,
+  "duration": 1,
+  "style_brief": "Palette: muted teal and slate. Mood: quiet tension. Framing: tight head-on, slight tilt. Motion: slow inhale, micro-twitch exhale. Grain: soft 240p web-GIF flicker.",
+  "ts": 1786249373,
+  "n_human_gifs": 0,
+  "own_still": false,
+  "pass": "imagine_video"
+}

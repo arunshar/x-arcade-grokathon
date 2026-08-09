@@ -42,6 +42,8 @@ jobs:
           mkdir -p /tmp/space
           bash deploy/huggingface/stage.sh /tmp/space
           echo "staged:" && ls /tmp/space
+          echo "media manifest:" && cat /tmp/space/artifacts/media_manifest.json
+          echo "decoy sample:" && ls /tmp/space/web/static-assets/reply-gifs/decoy | head -20
 
       - name: Refuse to ship a secret
         run: |
@@ -114,3 +116,29 @@ jobs:
           echo "GET / -> $code"
           [ "$code" = "200" ] || exit 1
           curl -s -L -m 30 https://arun0808-x-arcade.hf.space/health
+          echo
+          # Media must be reachable (not 404) after deploy.
+          python3 - <<'PY'
+          import json, urllib.request
+          base = "https://arun0808-x-arcade.hf.space"
+          health = json.load(urllib.request.urlopen(base + "/health", timeout=30))
+          ready = int(health.get("decoy_media_ready") or 0)
+          print("decoy_media_ready", ready)
+          if ready < 5:
+              raise SystemExit(f"decoy_media_ready too low: {ready}")
+          checks = [
+              "/static-assets/host_intro.mp3",
+              "/static-assets/qr.png",
+              "/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg",
+          ]
+          # Probe one decoy mp4 from the staged tree listing is not available
+          # remotely; hit a few common paths from health-ready pool via HEAD.
+          for path in checks:
+              req = urllib.request.Request(base + path, method="HEAD")
+              with urllib.request.urlopen(req, timeout=30) as resp:
+                  code = resp.status
+              print(path, code)
+              if code != 200:
+                  raise SystemExit(f"missing asset {path} -> {code}")
+          print("media smoke ok")
+          PY

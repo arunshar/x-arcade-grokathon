@@ -1,0 +1,14 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-9d1c8d1a83c4",
+  "file": "decoy-9d1c8d1a83c4_decoy.mp4",
+  "bytes": 204375,
+  "duration": 1,
+  "style_brief": "Cool slate palette, tight close-up of a single looping filament of light steadily threading through a stack of translucent panes. Gentle forward drift, soft micro-flicker, grainy web compression.",
+  "ts": 1786249421,
+  "n_human_gifs": 0,
+  "own_still": false,
+  "pass": "imagine_video"
+}

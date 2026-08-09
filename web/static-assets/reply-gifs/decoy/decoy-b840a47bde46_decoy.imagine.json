@@ -1,0 +1,14 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-b840a47bde46",
+  "file": "decoy-b840a47bde46_decoy.mp4",
+  "bytes": 142603,
+  "duration": 1,
+  "style_brief": "Warm dusk palette, tight 3:2 crop, soft horizontal drift, low-bit grain, gentle loop stutter.",
+  "ts": 1786249421,
+  "n_human_gifs": 0,
+  "own_still": false,
+  "pass": "imagine_video"
+}

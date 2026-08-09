@@ -1,0 +1,14 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-d107ba4b784f",
+  "file": "decoy-d107ba4b784f_decoy.mp4",
+  "bytes": 194973,
+  "duration": 1,
+  "style_brief": "Warm amber palette, tight close-up on a nodding head, slow approving tilt, soft grain, muted retro GIF compression.",
+  "ts": 1786249431,
+  "n_human_gifs": 0,
+  "own_still": false,
+  "pass": "imagine_video"
+}

@@ -1,0 +1,14 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-9f4aa9f3058b",
+  "file": "decoy-9f4aa9f3058b_decoy.mp4",
+  "bytes": 237388,
+  "duration": 1,
+  "style_brief": "Muted navy palette, tight close-up of a lone runner frozen mid-slide, dust cloud blooming then collapsing in reverse stutter, grainy 8-bit compression, heavy motion blur on limbs, low frame-rate…",
+  "ts": 1786249490,
+  "n_human_gifs": 0,
+  "own_still": false,
+  "pass": "imagine_video"
+}

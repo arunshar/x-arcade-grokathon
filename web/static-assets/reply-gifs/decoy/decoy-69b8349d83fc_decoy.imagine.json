@@ -1,0 +1,14 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-69b8349d83fc",
+  "file": "decoy-69b8349d83fc_decoy.mp4",
+  "bytes": 233888,
+  "duration": 1,
+  "style_brief": "Burnt-orange dusk palette, tight low-angle framing, slow-motion glove drop, grainy 8-bit dither, heavy JPEG crush, resigned slump.",
+  "ts": 1786249473,
+  "n_human_gifs": 0,
+  "own_still": false,
+  "pass": "imagine_video"
+}
