@@ -118,6 +118,18 @@ class PlayerState:
 # room id -> room dict. Single event loop, no locks needed at demo scale.
 ROOMS: dict[str, dict[str, Any]] = {}
 
+# Usage counters for the public /stats page. In memory on purpose: they reset
+# on every deploy or restart, and the page says so. Honest numbers only.
+import time as _time
+
+STATS: dict[str, Any] = {
+    "since": _time.strftime("%Y-%m-%d %H:%M UTC", _time.gmtime()),
+    "joins": 0,
+    "players": set(),
+    "guesses": 0,
+    "rounds_started": 0,
+}
+
 app = FastAPI(title="X Arcade")
 
 
@@ -476,6 +488,7 @@ async def _start_round(room: dict[str, Any]) -> None:
     room["reveal"] = None
     room["results"] = None
     room["phase"] = "guessing"
+    STATS["rounds_started"] += 1
     room["guess_counter"] = 0
     for p in room["players"].values():
         p.guessed = False
@@ -703,6 +716,52 @@ async def health() -> dict[str, Any]:
         "gif_round_mode": getattr(config, "GIF_ROUND_MODE", "alternate"),
         "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
     }
+
+
+@app.get("/stats.json")
+async def stats_json() -> dict[str, Any]:
+    """Usage counters since the last deploy or restart. Actions, not views."""
+    return {
+        "since": STATS["since"],
+        "unique_players": len(STATS["players"]),
+        "joins": STATS["joins"],
+        "guesses": STATS["guesses"],
+        "rounds_started": STATS["rounds_started"],
+        "note": "in-memory counters, reset on each deploy; every number is a user action, not an impression",
+    }
+
+
+@app.get("/stats")
+async def stats_page() -> Response:
+    """Human-readable usage page for prize judging. Same numbers as /stats.json."""
+    body = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Arcade usage</title>
+<style>
+body{{background:#04070b;color:#e8f6fb;font-family:ui-monospace,Menlo,monospace;
+display:flex;flex-direction:column;align-items:center;padding:40px 16px;gap:8px}}
+h1{{color:#22d3ee;letter-spacing:.12em;font-size:20px}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;
+width:100%;max-width:640px;margin-top:12px}}
+.card{{border:1px solid rgba(34,211,238,.4);border-radius:10px;padding:16px;text-align:center}}
+.card b{{display:block;font-size:32px;color:#22d3ee}}
+.card span{{font-size:11px;letter-spacing:.14em;color:#93a9b9}}
+p{{color:#93a9b9;font-size:12px;max-width:640px;text-align:center;line-height:1.6}}
+a{{color:#22d3ee}}
+</style></head><body>
+<h1>X ARCADE // USAGE</h1>
+<div class="grid">
+<div class="card"><b>{len(STATS["players"])}</b><span>UNIQUE PLAYERS</span></div>
+<div class="card"><b>{STATS["guesses"]}</b><span>GUESSES MADE</span></div>
+<div class="card"><b>{STATS["rounds_started"]}</b><span>ROUNDS PLAYED</span></div>
+<div class="card"><b>{STATS["joins"]}</b><span>ROOM JOINS</span></div>
+</div>
+<p>Counters are in server memory since the last deploy ({STATS["since"]}), so they reset
+when the app redeploys. Every number is a user action over the game websocket: joining a
+room or locking in a guess. Impressions and page views are not counted anywhere on this
+page. Raw data: <a href="/stats.json">/stats.json</a>. Play: <a href="/">the arcade</a>.</p>
+</body></html>"""
+    return Response(content=body, media_type="text/html")
 
 
 @app.get("/voices")
@@ -986,6 +1045,8 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 else:
                     room["players"][name] = PlayerState(name=name, ws=ws)
                 joined = (room_id, name)
+                STATS["joins"] += 1
+                STATS["players"].add(f"{room_id}/{name}")
                 # No host. The session clock runs the room: the first player
                 # in a lobby arms the countdown, and solo play is a real game
                 # against the house. Later joiners land in whatever phase is
@@ -1009,6 +1070,7 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 ):
                     continue
                 player.guessed = True
+                STATS["guesses"] += 1
                 player.guess_slot = slot
                 room["guess_counter"] += 1
                 player.guess_order = room["guess_counter"]
