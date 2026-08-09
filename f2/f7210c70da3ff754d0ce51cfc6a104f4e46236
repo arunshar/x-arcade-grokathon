@@ -1,0 +1,23 @@
+slides/build_deck.py
+  s_da6f3933cdb62d::t_0875ccfd452e72 122
+X_Arcade_deck_portable.html
+  s_da6f3933cdb62d::t_1f61274cbacbaa 64,115
+slides/index.html
+  s_da6f3933cdb62d::t_2e4283d02d9ac3 56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "f2f7210c70da3ff754d0ce51cfc6a104f4e46236",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
