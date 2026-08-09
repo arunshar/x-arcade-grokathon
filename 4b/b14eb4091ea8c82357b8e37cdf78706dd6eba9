@@ -1,0 +1,30 @@
+server/app.py
+  s_da6f3933cdb62d::t_7a8314a1a07e0a 40-46
+integration_check.py
+  s_da6f3933cdb62d::t_cce25d40516bab 282-293
+  s_da6f3933cdb62d::t_721beb7436014f 137-152,154-155
+  s_da6f3933cdb62d::t_e0b18c9ba9fc81 175
+  s_da6f3933cdb62d::t_073e88b91f4e97 153
+X_Arcade_autopresent.html
+  s_da6f3933cdb62d::t_0dc0a8cc254403 15-19
+  s_da6f3933cdb62d::t_1e71a6d04d04ef 134,136-139,143-144
+  s_da6f3933cdb62d::t_69ea43467cbaf9 114-123
+  s_da6f3933cdb62d::t_4b6f66c6b88047 1-14,20-53,58-113,124-133,135,140-142,145-241
+  s_da6f3933cdb62d::t_f203e536d2597a 54-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "4bb14eb4091ea8c82357b8e37cdf78706dd6eba9",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
