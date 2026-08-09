@@ -73,6 +73,17 @@ jobs:
               repo_id="Arun0808/x-arcade",
               repo_type="space",
               commit_message=reason,
+              # Mirror, don't accumulate: files deleted from the staged tree
+              # (e.g. rounds pulled by the human content read) must also leave
+              # the Space. Deletes and re-uploads land in one commit, so
+              # everything currently staged survives.
+              delete_patterns=[
+                  "server/**",
+                  "web/**",
+                  "cartridges/**",
+                  "plugins/**",
+                  "services/**",
+              ],
           )
           print("uploaded:", url)
           PY
