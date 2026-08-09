@@ -455,6 +455,51 @@ body.has-scoreboard main {
 
 .field input:focus { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan), 0 0 18px var(--cyan-soft); }
 
+/* Create-lobby topic filter chips */
+.topic-filter-field { margin-top: 4px; }
+.topic-filter-hint { margin: 0 0 8px; text-align: left; max-width: none; }
+.topic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.topic-chip {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--mut);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  min-height: 40px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, box-shadow 0.12s, background 0.12s;
+}
+.topic-chip:hover {
+  border-color: rgba(0, 229, 255, 0.45);
+  color: var(--text);
+}
+.topic-chip.is-on {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: rgba(0, 229, 255, 0.08);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+}
+.topic-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.lobby-topic-line {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--mut);
+  margin: 4px 0 0;
+  text-transform: uppercase;
+}
+.lobby-topic-line b { color: var(--cyan); font-weight: 700; }
+
 .big-btn {
   min-height: 58px;
   font-family: var(--font-display);
@@ -908,6 +953,23 @@ body.has-scoreboard main {
   border: 1px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
+  position: relative;
+}
+.share-card-frame.is-pending::after {
+  content: "PRINTING…";
+  position: absolute;
+  inset: auto 10px 10px auto;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  background: rgba(4, 7, 11, 0.75);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  padding: 4px 8px;
+  pointer-events: none;
+}
+.share-card-frame.is-pending .share-card {
+  opacity: 0.55;
+  filter: saturate(0.7);
 }
 
 .share-card {
@@ -917,7 +979,12 @@ body.has-scoreboard main {
   border: 0;
   border-radius: 0;
   display: block;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
+.share-card.is-ready { opacity: 1; }
+.share-card-frame.is-pending .share-card.is-ready { opacity: 0.55; }
+.share-card-frame.is-ready .share-card.is-ready { opacity: 1; }
 
 .share-card[hidden] { display: none !important; }
 

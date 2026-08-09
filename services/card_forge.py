@@ -81,6 +81,47 @@ def _image_gen(request: dict[str, Any]) -> dict[str, Any]:
     )
 
 
+def _existing_card(round_id: str, winner: str) -> Path | None:
+    """Return an on-disk card for this round+winner if already generated."""
+    slug = _slug(winner)
+    rid = str(round_id or "round")
+    for ext in ("jpg", "jpeg", "png", "webp"):
+        path = CARDS_DIR / f"{rid}_{slug}.{ext}"
+        if path.is_file() and path.stat().st_size > 2000:
+            return path
+    return None
+
+
+def _topic_cache_path(topic: str, winner: str, extension: str = "jpg") -> Path:
+    return CARDS_DIR / f"topic-{_slug(topic)}_{_slug(winner)}.{extension}"
+
+
+def find_cached_share_card(round_data: dict[str, Any], winner: str) -> Path | None:
+    """Fast path: reuse round-specific or topic+winner card without API."""
+    rid = str(round_data.get("round_id") or "")
+    hit = _existing_card(rid, winner)
+    if hit is not None:
+        return hit
+    topic = str((round_data.get("source") or {}).get("topic") or "")
+    if not topic:
+        return None
+    slug_w = _slug(winner)
+    for ext in ("jpg", "jpeg", "png", "webp"):
+        path = _topic_cache_path(topic, winner, ext)
+        if path.is_file() and path.stat().st_size > 2000:
+            # Copy under this round id so later lookups are O(1) by name.
+            if rid:
+                dest = CARDS_DIR / f"{rid}_{slug_w}.{ext}"
+                try:
+                    if not dest.is_file():
+                        dest.write_bytes(path.read_bytes())
+                    return dest
+                except OSError:
+                    return path
+            return path
+    return None
+
+
 def make_share_card(round_data: dict[str, Any], winner: str) -> Path:
     """Generate the share card for a finished round and return its image path.
 
@@ -89,8 +130,16 @@ def make_share_card(round_data: dict[str, Any], winner: str) -> Path:
     nobody did. Identical inputs hash to the same fixture, so demo mode
     replays the committed card byte for byte. The extension follows the real
     bytes the API returned, jpg today, because b64_json does not promise png.
+
+    Reuses on-disk cards (per-round or per-topic+winner) so live reveal is
+    instant on repeat winners / topics instead of waiting ~6s for Imagine.
     """
-    topic = round_data["source"]["topic"]
+    cached = find_cached_share_card(round_data, winner)
+    if cached is not None:
+        return cached
+
+    topic = str((round_data.get("source") or {}).get("topic") or "arcade")
+    rid = str(round_data.get("round_id") or "round")
     request = {
         "model": config.MODEL_IMAGE,
         "prompt": _card_prompt(topic, winner),
@@ -101,8 +150,15 @@ def make_share_card(round_data: dict[str, Any], winner: str) -> Path:
     raw = base64.b64decode(response["data"][0]["b64_json"])
     extension = "png" if raw[:4] == b"\x89PNG" else "jpg"
     CARDS_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = CARDS_DIR / f"{round_data['round_id']}_{_slug(winner)}.{extension}"
+    out_path = CARDS_DIR / f"{rid}_{_slug(winner)}.{extension}"
     out_path.write_bytes(raw)
+    # Topic cache for next round on the same theme + winner name.
+    try:
+        topic_path = _topic_cache_path(topic, winner, extension)
+        if not topic_path.is_file():
+            topic_path.write_bytes(raw)
+    except OSError:
+        pass
     return out_path
 
 

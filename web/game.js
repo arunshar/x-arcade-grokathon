@@ -1434,6 +1434,21 @@ function renderLobby(s) {
   ul.innerHTML = "";
   const board = getStandings(s);
   const players = s.players || [];
+  // Show room topic filter under standings label.
+  let topicLine = $("lobbyTopicLine");
+  if (!topicLine) {
+    const wrap = ul.parentElement;
+    if (wrap) {
+      topicLine = document.createElement("p");
+      topicLine.id = "lobbyTopicLine";
+      topicLine.className = "lobby-topic-line";
+      wrap.insertBefore(topicLine, ul);
+    }
+  }
+  if (topicLine) {
+    const tf = s.topic_filter || [];
+    topicLine.innerHTML = "TOPICS · <b>" + formatTopicFilterLabel(tf) + "</b>";
+  }
   if (board.length === 0) {
     const li = document.createElement("li");
     li.className = "empty";
@@ -1991,12 +2006,38 @@ function renderReveal(s) {
   });
 
   const img = $("shareCard");
-  if (s.reveal.share_card_url) {
-    img.src = s.reveal.share_card_url;
-    img.hidden = false;
-    img.onerror = () => { img.hidden = true; };
-  } else {
-    img.hidden = true;
+  const frame = img && img.parentElement;
+  if (img) {
+    const url = s.reveal.share_card_url || "";
+    const pending = !!s.reveal.share_card_pending;
+    if (frame) {
+      frame.classList.toggle("is-pending", pending && !!url);
+      frame.classList.toggle("is-ready", !pending && !!url);
+    }
+    if (url) {
+      // Only reset src when it changes — avoids flicker/reload on rebroadcast.
+      if (img.getAttribute("data-src") !== url) {
+        img.setAttribute("data-src", url);
+        img.hidden = false;
+        img.classList.remove("is-ready");
+        img.onload = () => { img.classList.add("is-ready"); };
+        img.onerror = () => {
+          // Fall back to demo poster if a live path 404s.
+          if (url.indexOf("decoy-3f2710c0a9e6_demo") < 0) {
+            img.src = "/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg";
+            img.setAttribute("data-src", img.src);
+          } else {
+            img.hidden = true;
+          }
+        };
+        img.src = url;
+      } else {
+        img.hidden = false;
+      }
+    } else {
+      img.hidden = true;
+      img.removeAttribute("data-src");
+    }
   }
 
   const next = $("nextBtn");
@@ -2193,6 +2234,107 @@ function isSoloFriendlyRoom(room) {
   return r === "GROK" || r.indexOf("SOLO") === 0 || MOCK;
 }
 
+/** Topic filter for create/solo lobby. Empty = random mix. */
+let selectedTopicGroups = []; // catalog group ids, e.g. ["ai","movies"]
+let topicCatalog = null; // from GET /topics
+const DEFAULT_TOPIC_GROUPS = [
+  { id: "random", label: "RANDOM", topics: [], count: 0 },
+  { id: "ai", label: "AI", topics: ["ai"], count: 0 },
+  { id: "tech", label: "TECH", topics: ["tech", "startups"], count: 0 },
+  { id: "movies", label: "MOVIES / TV", topics: ["movies", "tv"], count: 0 },
+  { id: "music", label: "MUSIC", topics: ["music"], count: 0 },
+  { id: "sports", label: "SPORTS", topics: ["sports", "nba", "baseball", "soccer"], count: 0 },
+  { id: "gaming", label: "GAMING", topics: ["gaming"], count: 0 },
+  { id: "science", label: "SCIENCE", topics: ["science", "space"], count: 0 },
+  { id: "crypto", label: "CRYPTO", topics: ["crypto"], count: 0 },
+  { id: "food", label: "FOOD", topics: ["food"], count: 0 },
+  { id: "travel", label: "TRAVEL", topics: ["travel"], count: 0 },
+  { id: "lifestyle", label: "LIFESTYLE", topics: ["fitness", "cars", "books", "photography", "memes"], count: 0 },
+];
+
+function loadTopicCatalog() {
+  if (MOCK) {
+    topicCatalog = { groups: DEFAULT_TOPIC_GROUPS.slice() };
+    renderTopicChips();
+    return Promise.resolve(topicCatalog);
+  }
+  return fetch("/topics")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => {
+      if (j && j.groups && j.groups.length) topicCatalog = j;
+      else topicCatalog = { groups: DEFAULT_TOPIC_GROUPS.slice() };
+      renderTopicChips();
+      return topicCatalog;
+    })
+    .catch(() => {
+      topicCatalog = { groups: DEFAULT_TOPIC_GROUPS.slice() };
+      renderTopicChips();
+      return topicCatalog;
+    });
+}
+
+function renderTopicChips() {
+  const box = $("topicChips");
+  if (!box) return;
+  const groups = (topicCatalog && topicCatalog.groups) || DEFAULT_TOPIC_GROUPS;
+  box.innerHTML = "";
+  const isRandom = !selectedTopicGroups.length;
+  groups.forEach((g) => {
+    const id = String(g.id || "").toLowerCase();
+    if (!id) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "topic-chip";
+    btn.dataset.topicId = id;
+    const count = typeof g.count === "number" ? g.count : null;
+    const label = g.label || id.toUpperCase();
+    btn.textContent = count != null && id !== "random" ? (label + " · " + count) : label;
+    const on = id === "random" ? isRandom : selectedTopicGroups.indexOf(id) >= 0;
+    if (on) btn.classList.add("is-on");
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.addEventListener("click", () => toggleTopicGroup(id));
+    box.appendChild(btn);
+  });
+}
+
+function toggleTopicGroup(id) {
+  if (joined) return;
+  id = String(id || "").toLowerCase();
+  if (!id || id === "random") {
+    selectedTopicGroups = [];
+    renderTopicChips();
+    return;
+  }
+  const idx = selectedTopicGroups.indexOf(id);
+  if (idx >= 0) selectedTopicGroups.splice(idx, 1);
+  else selectedTopicGroups.push(id);
+  renderTopicChips();
+}
+
+/** Expand selected group ids → topic slugs for the join payload. */
+function selectedTopicsPayload() {
+  if (!selectedTopicGroups.length) return [];
+  const groups = (topicCatalog && topicCatalog.groups) || DEFAULT_TOPIC_GROUPS;
+  const byId = {};
+  groups.forEach((g) => { byId[String(g.id || "").toLowerCase()] = g; });
+  const out = [];
+  const seen = {};
+  selectedTopicGroups.forEach((id) => {
+    const g = byId[id];
+    const topics = (g && g.topics) || [id];
+    topics.forEach((t) => {
+      const k = String(t || "").toLowerCase();
+      if (k && !seen[k]) { seen[k] = true; out.push(k); }
+    });
+  });
+  return out;
+}
+
+function formatTopicFilterLabel(topics) {
+  if (!topics || !topics.length) return "RANDOM MIX";
+  return topics.map((t) => String(t).toUpperCase()).join(" · ");
+}
+
 function showModePick() {
   lobbyMode = null;
   $("modePick").hidden = false;
@@ -2222,6 +2364,7 @@ function showLobbyForm(mode) {
     // Preview QR before entering so host can share immediately.
     $("lobbyQr").hidden = false;
     loadPhoneJoinInfo(code);
+    loadTopicCatalog();
   } else {
     iAmHost = false;
     $("lobbyQr").hidden = true;
@@ -2267,10 +2410,19 @@ function doJoin(opts) {
   if ($("modeSoloBtn")) $("modeSoloBtn").disabled = true;
   if ($("modeMockBtn")) $("modeMockBtn").disabled = true;
   if ($("backToModeBtn")) $("backToModeBtn").hidden = true;
+  // Lock topic chips after enter.
+  const chipBox = $("topicChips");
+  if (chipBox) {
+    chipBox.querySelectorAll("button").forEach((b) => { b.disabled = true; });
+  }
 
-  // arena:true asks the server to make this a host driven room, so it does
-  // not auto-start the moment a second phone scans in.
-  send({ t: "join", room: myRoom, name: myName, arena: iAmHost });
+  // arena:true marks creator/host. topics: filter X posts for this room
+  // (empty = random mix). Only applied for the creator on the server.
+  const payload = { t: "join", room: myRoom, name: myName, arena: iAmHost };
+  if (iAmHost) {
+    payload.topics = selectedTopicsPayload();
+  }
+  send(payload);
 
   // Hosts see QR + START; guests wait.
   $("lobbyQr").hidden = false;
@@ -2311,9 +2463,10 @@ $("modeSoloBtn").addEventListener("click", withAudioUnlock(() => {
   $("createdRoomDisplay").value = code;
   $("roomInput").value = code;
   $("createHint").textContent =
-    "Solo practice. Tap ENTER ROOM — the round starts automatically. Click once if sound is muted by the browser.";
+    "Solo practice. Pick topics (or RANDOM), then ENTER ROOM — the round starts automatically.";
   setConn("SOLO ROOM " + code + " · ONE PLAYER OK");
   loadPhoneJoinInfo(code);
+  loadTopicCatalog();
 }));
 $("modeMockBtn").addEventListener("click", withAudioUnlock(() => {
   const url = new URL(location.href);
