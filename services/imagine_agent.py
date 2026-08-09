@@ -49,14 +49,16 @@ DECOY_DIR = GIF_DIR / "decoy"
 ROUNDS_DIR = REPO_ROOT / "cartridges" / "decoy" / "rounds"
 _SKILL_REF = REPO_ROOT / ".grok" / "skills" / "decoy-imagine-gif" / "references"
 
-# Vision brief should stay snappy — this is offline/pre-round work, not the host.
-VISION_TIMEOUT_S = float(os.environ.get("ARCADE_IMAGINE_VISION_TIMEOUT", "18"))
-VIDEO_POLL_S = float(os.environ.get("ARCADE_IMAGINE_VIDEO_POLL", "300"))
+# Vision brief should stay snappy — in-round gen must finish before the timer.
+VISION_TIMEOUT_S = float(os.environ.get("ARCADE_IMAGINE_VISION_TIMEOUT", "8"))
+VIDEO_POLL_S = float(os.environ.get("ARCADE_IMAGINE_VIDEO_POLL", "90"))
 MAX_REF_IMAGES = int(os.environ.get("ARCADE_IMAGINE_REF_MAX", "4"))
 FRAME_MAX_PX = int(os.environ.get("ARCADE_IMAGINE_FRAME_PX", "512"))
-# Couple-second looping clip (API allows short durations).
-VIDEO_DURATION = int(os.environ.get("ARCADE_IMAGINE_VIDEO_DURATION", "2") or "2")
+# Short looping clip — 1s is enough for a reaction and generates faster.
+VIDEO_DURATION = int(os.environ.get("ARCADE_IMAGINE_VIDEO_DURATION", "1") or "1")
 VIDEO_DURATION = max(1, min(5, VIDEO_DURATION))
+# Skip vision frames and go straight to a text style brief (much faster live).
+IMAGINE_FAST = os.environ.get("ARCADE_IMAGINE_FAST", "1") != "0"
 
 _FALLBACK_VISION_SYSTEM = """You are a visual scout for a party game.
 You see still frames from the HUMAN reaction GIFs already on a chat thread.
@@ -759,8 +761,8 @@ def is_placeholder_decoy(path: Path | None) -> bool:
 def is_real_decoy_media(path: Path | None) -> bool:
     """True when the file is a unique per-round Imagine clip (not the probe).
 
-    Live play requires an ``*.imagine.json`` sidecar so we never treat a
-    leftover probe copy or random asset as Grok Imagine output.
+    Live play prefers an ``*.imagine.json`` sidecar. Unique non-probe mp4s
+    under decoy/ are also accepted after auto-certify (see ensure_certified).
     """
     if path is None or not path.is_file() or is_placeholder_decoy(path):
         return False
@@ -769,10 +771,54 @@ def is_real_decoy_media(path: Path | None) -> bool:
     # Trust certified Imagine outputs always.
     if is_imagine_certified(path):
         return True
-    # Optional escape hatch for offline demos with pre-baked files only.
-    if os.environ.get("ARCADE_IMAGINE_TRUST_FILES", "") == "1":
-        return not is_placeholder_decoy(path)
+    # Unique decoy file on disk — treat as real (caller should ensure_certified).
+    if os.environ.get("ARCADE_IMAGINE_TRUST_FILES", "1") != "0":
+        return True
     return False
+
+
+def ensure_certified(round_id: str, path: Path | None = None) -> bool:
+    """If a unique decoy mp4 exists without a sidecar, write one so live can serve it.
+
+    Avoids regenerating multi-second Imagine jobs for files already on disk
+    (and already deployed). Returns True when the path is certified afterward.
+    """
+    out = path if path is not None else decoy_video_path(round_id)
+    if out is None or not out.is_file() or is_placeholder_decoy(out):
+        return False
+    if is_imagine_certified(out):
+        return True
+    try:
+        write_imagine_meta(
+            str(round_id),
+            out,
+            style_brief="prebaked-on-disk",
+            extra={"pass": "ensure_certified", "auto": True},
+        )
+        print(
+            f"imagine_agent: auto-certified existing {out.name}",
+            file=sys.stderr,
+        )
+        return is_imagine_certified(out)
+    except OSError as exc:
+        print(f"imagine_agent: ensure_certified failed: {exc}", file=sys.stderr)
+        return False
+
+
+def certify_all_existing_decoys() -> int:
+    """Write missing *.imagine.json for unique decoy mp4s. Returns count certified."""
+    n = 0
+    if not DECOY_DIR.is_dir():
+        return 0
+    for path in DECOY_DIR.glob("*_decoy.mp4"):
+        if is_placeholder_decoy(path):
+            continue
+        # round id from decoy-<id>_decoy.mp4
+        stem = path.stem  # decoy-xxx_decoy
+        rid = stem[: -len("_decoy")] if stem.endswith("_decoy") else stem
+        if ensure_certified(rid, path):
+            n += 1
+    return n
 
 
 def purge_placeholder_decoys() -> list[str]:
@@ -892,29 +938,45 @@ def generate_matching_decoy(
     result["source"] = "vision_gif_agent"
     result["video_duration"] = VIDEO_DURATION
 
-    # Agent step: analyze user reply GIFs (vision) → style brief.
-    style_brief = analyze_user_reply_gifs(
-        round_data,
-        topic=topic,
-        reply_texts=human_texts,
-        post_text=post_text,
-        decoy_text=decoy_text,
-    )
+    # Agent step: style brief. Fast path skips vision frames (big latency win).
+    if IMAGINE_FAST or not gif_paths:
+        style_brief = describe_reply_style(
+            topic=topic,
+            reply_texts=human_texts,
+            post_text=post_text,
+            decoy_text=decoy_text,
+        )
+        result["source"] = "fast_text_brief"
+        print(
+            f"imagine_agent: FAST text brief for {rid}: {_snippet(style_brief, 100)}",
+            file=sys.stderr,
+        )
+    else:
+        style_brief = analyze_user_reply_gifs(
+            round_data,
+            topic=topic,
+            reply_texts=human_texts,
+            post_text=post_text,
+            decoy_text=decoy_text,
+        )
+        print(
+            f"imagine_agent: analyzed {len(gif_paths)} human gifs → brief: "
+            f"{_snippet(style_brief, 100)}",
+            file=sys.stderr,
+        )
     result["style_brief"] = style_brief
-    print(
-        f"imagine_agent: analyzed {len(gif_paths)} human gifs → brief: "
-        f"{_snippet(style_brief, 100)}",
-        file=sys.stderr,
-    )
 
     # Original still matching that style, then short looping video.
-    own_still = generate_own_still(
-        style_brief=style_brief,
-        topic=topic,
-        decoy_text=decoy_text,
-        post_text=post_text,
-        human_replies=human_texts,
-    )
+    # Fast path: skip still and go straight to T2V (one fewer API round-trip).
+    own_still = None
+    if not IMAGINE_FAST:
+        own_still = generate_own_still(
+            style_brief=style_brief,
+            topic=topic,
+            decoy_text=decoy_text,
+            post_text=post_text,
+            human_replies=human_texts,
+        )
     result["own_still"] = bool(own_still)
 
     if own_still:

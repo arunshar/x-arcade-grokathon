@@ -133,6 +133,76 @@ STATS: dict[str, Any] = {
 app = FastAPI(title="X Arcade")
 
 
+@app.on_event("startup")
+async def _startup_warm_decoy_media() -> None:
+    """Certify on-disk decoy clips and pre-generate missing ones in the background.
+
+    Live GIF rounds hide ALL media until every slot is a ready .mp4 (anti-cheat).
+    If the decoy is not prebaked, players only see text for the whole round while
+    Imagine runs (often longer than ROUND_SECONDS). Warmup fixes that.
+    """
+    try:
+        from services.imagine_agent import certify_all_existing_decoys
+
+        n = certify_all_existing_decoys()
+        print(f"imagine: auto-certified {n} existing decoy clips", file=sys.stderr)
+    except Exception as exc:
+        print(f"imagine: certify-on-startup failed: {exc}", file=sys.stderr)
+
+    if config.MODE != "live":
+        return
+    if os.environ.get("ARCADE_IMAGINE_WARMUP", "1") == "0":
+        return
+
+    async def _warm() -> None:
+        try:
+            await asyncio.to_thread(_warm_missing_decoy_media)
+        except Exception as exc:
+            print(f"imagine: warmup task failed: {exc}", file=sys.stderr)
+
+    asyncio.create_task(_warm())
+
+
+def _warm_missing_decoy_media() -> None:
+    """Generate certified decoy videos for rounds that lack them (blocking)."""
+    from services.imagine_agent import (
+        decoy_video_path,
+        ensure_certified,
+        generate_matching_decoy,
+        is_imagine_certified,
+    )
+
+    paths = sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json"))
+    missing: list[dict[str, Any]] = []
+    for path in paths:
+        try:
+            rnd = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        rid = str(rnd.get("round_id") or "")
+        if not rid:
+            continue
+        vpath = decoy_video_path(rid)
+        if ensure_certified(rid, vpath) or is_imagine_certified(vpath):
+            continue
+        missing.append(rnd)
+    print(f"imagine: warmup queue {len(missing)} rounds", file=sys.stderr)
+    for rnd in missing:
+        rid = str(rnd.get("round_id") or "")
+        try:
+            # Human GIFs help the brief; attach if possible.
+            try:
+                from services.reply_gifs import attach_reply_media
+
+                attach_reply_media(rnd)
+            except Exception:
+                pass
+            print(f"imagine: warmup generate {rid}", file=sys.stderr)
+            generate_matching_decoy(rnd, force=False)
+        except Exception as exc:
+            print(f"imagine: warmup {rid} failed: {exc}", file=sys.stderr)
+
+
 # Historical: rooms used to split into host-driven arenas and auto-starting
 # duels, and the mismatch between the two produced three dead-button bugs in
 # one day. Every room is now time driven by the session clock and these
@@ -557,41 +627,64 @@ async def _start_round(room: dict[str, Any]) -> None:
     await _broadcast(room)
     # Live GIF rounds: decoy reply media MUST come from Grok Imagine
     # (grok-imagine-image + grok-imagine-video), never a human pool .gif.
+    # If a unique mp4 already exists on disk, auto-certify it so cards can
+    # show immediately instead of waiting on a multi-minute API job.
     imagine_required = bool(getattr(config, "IMAGINE_DECOY_REQUIRED", True))
     if config.MODE == "live" and rnd.get("format") == "gif":
         certified = False
         try:
-            from services.imagine_agent import decoy_video_path, is_imagine_certified
-
-            certified = is_imagine_certified(
-                decoy_video_path(str(rnd.get("round_id") or ""))
+            from services.imagine_agent import (
+                decoy_video_path,
+                ensure_certified,
+                is_imagine_certified,
             )
+
+            rid = str(rnd.get("round_id") or "")
+            vpath = decoy_video_path(rid)
+            certified = ensure_certified(rid, vpath) or is_imagine_certified(vpath)
+            if certified and vpath.is_file():
+                # Stamp decoy so the uniform media gate can serve all five.
+                url = "/static-assets/reply-gifs/decoy/" + vpath.name
+                for rep in rnd.get("replies") or []:
+                    if not isinstance(rep, dict):
+                        continue
+                    try:
+                        is_d = int(rep.get("slot")) == int(rnd.get("decoy_slot"))
+                    except (TypeError, ValueError):
+                        is_d = bool(rep.get("is_decoy"))
+                    if is_d:
+                        rep["media_url"] = url
+                        rep["media_type"] = "video"
+                        rep["media_status"] = "ready"
+                        rep["media_source"] = "imagine"
+                rnd["decoy_media_status"] = "ready"
         except Exception:
             certified = False
-        # Always clear any non-Imagine URL off the decoy slot.
-        for rep in rnd.get("replies") or []:
-            if not isinstance(rep, dict):
-                continue
-            if rep.get("media_source") != "imagine" and not rep.get("is_decoy"):
-                try:
-                    if int(rep.get("slot")) != int(rnd.get("decoy_slot")):
-                        continue
-                except (TypeError, ValueError):
+        # Always clear any non-Imagine URL off the decoy slot when uncertified.
+        if not certified:
+            for rep in rnd.get("replies") or []:
+                if not isinstance(rep, dict):
                     continue
-            url = str(rep.get("media_url") or "")
-            if (
-                not certified
-                or url.lower().endswith(".gif")
-                or ("/reply-gifs/" in url and "/decoy/" not in url)
-                or url.rstrip("/").lower().endswith("_probe.mp4")
-            ):
-                rep["media_url"] = None
-                rep["media_type"] = "video"
-                rep["media_status"] = "pending"
-                rep["media_source"] = "imagine"
-                rep["media_engine"] = (
-                    f"{config.MODEL_IMAGE}+{getattr(config, 'MODEL_VIDEO', '')}"
-                )
+                if rep.get("media_source") != "imagine" and not rep.get("is_decoy"):
+                    try:
+                        if int(rep.get("slot")) != int(rnd.get("decoy_slot")):
+                            continue
+                    except (TypeError, ValueError):
+                        continue
+                url = str(rep.get("media_url") or "")
+                if (
+                    url.lower().endswith(".gif")
+                    or ("/reply-gifs/" in url and "/decoy/" not in url)
+                    or url.rstrip("/").lower().endswith("_probe.mp4")
+                    or not url
+                ):
+                    rep["media_url"] = None
+                    rep["media_type"] = "video"
+                    rep["media_status"] = "pending"
+                    rep["media_source"] = "imagine"
+                    rep["media_engine"] = (
+                        f"{config.MODEL_IMAGE}+{getattr(config, 'MODEL_VIDEO', '')}"
+                    )
         # Schedule Grok Imagine whenever the decoy reply is not certified ready.
         needs_imagine = (not certified) or (
             imagine_required and rnd.get("decoy_media_status") != "ready"
@@ -608,6 +701,13 @@ async def _start_round(room: dict[str, Any]) -> None:
             asyncio.create_task(
                 _attach_decoy_imagine_gif(room, rnd, force=not certified)
             )
+        else:
+            # Media may have become ready via ensure_certified — rebroadcast
+            # so clients get opaque /media/ URLs instead of text-only.
+            await _broadcast(room)
+        # Prefetch the next few uncertified rounds so the following match
+        # steps do not stall on Imagine mid-guess.
+        asyncio.create_task(_prefetch_upcoming_decoy_media(room))
 
 
 async def _do_reveal(room: dict[str, Any]) -> None:
@@ -769,6 +869,54 @@ async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: s
     if room.get("reveal") is reveal and room["phase"] == "reveal":
         reveal["share_card_url"] = url
         await _broadcast(room)
+
+
+async def _prefetch_upcoming_decoy_media(room: dict[str, Any]) -> None:
+    """Generate decoy videos for uncertified rounds (does not advance the queue)."""
+    if config.MODE != "live":
+        return
+    try:
+        from services.imagine_agent import (
+            decoy_video_path,
+            ensure_certified,
+            generate_matching_decoy,
+            is_imagine_certified,
+        )
+        from services.reply_gifs import attach_reply_media
+    except ImportError:
+        return
+
+    seen = {str(x) for x in (room.get("recent_round_ids") or []) if x}
+    # Prefer rounds this room has not played yet; never call queue.next_round
+    # here (that would steal the global cursor from live play).
+    candidates: list[dict[str, Any]] = []
+    try:
+        for path in sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json")):
+            try:
+                rnd = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            rid = str(rnd.get("round_id") or "")
+            if not rid or rid in seen:
+                continue
+            vpath = decoy_video_path(rid)
+            if ensure_certified(rid, vpath) or is_imagine_certified(vpath):
+                continue
+            candidates.append(rnd)
+            if len(candidates) >= 3:
+                break
+    except Exception as exc:
+        print(f"imagine: prefetch scan failed: {exc}", file=sys.stderr)
+        return
+
+    for nxt in candidates:
+        rid = str(nxt.get("round_id") or "")
+        try:
+            attach_reply_media(nxt)
+            print(f"imagine: prefetch {rid}", file=sys.stderr)
+            await asyncio.to_thread(generate_matching_decoy, nxt, force=False)
+        except Exception as exc:
+            print(f"imagine: prefetch {rid} failed: {exc}", file=sys.stderr)
 
 
 async def _attach_decoy_imagine_gif(

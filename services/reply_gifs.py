@@ -165,13 +165,14 @@ def existing_decoy_media_url_for_round(
     (so live mode regenerates a fresh clip every round id).
     """
     from services.imagine_agent import (
-        is_imagine_certified,
+        ensure_certified,
         is_placeholder_decoy,
         is_real_decoy_media,
     )
 
-    rid_slug = _slug(str(round_data.get("round_id") or "round"))
-    # ONLY Imagine video under decoy/ — never pool .gif, never uncertified files.
+    rid = str(round_data.get("round_id") or "round")
+    rid_slug = _slug(rid)
+    # ONLY Imagine video under decoy/ — never pool .gif.
     candidates: list[tuple[Path, str]] = [
         (DECOY_DIR / f"{rid_slug}_decoy.mp4", "video"),
         (DECOY_DIR / f"{rid_slug}_decoy.webm", "video"),
@@ -181,10 +182,11 @@ def existing_decoy_media_url_for_round(
             continue
         if is_placeholder_decoy(path):
             continue
-        if not is_real_decoy_media(path):
+        # Auto-certify unique on-disk clips so live play can serve immediately
+        # without a multi-minute Imagine round-trip mid-match.
+        if not ensure_certified(rid, path):
             continue
-        # Live requires Imagine certification sidecar.
-        if config.MODE == "live" and not is_imagine_certified(path):
+        if not is_real_decoy_media(path):
             continue
         rel = path.relative_to(REPO_ROOT / "web")
         return "/" + str(rel).replace("\\", "/"), "video"
@@ -565,13 +567,16 @@ def attach_reply_media(
 
         human_total += 1
         path = human_map.get(slot)
-        if path and path.suffix.lower() == ".gif":
+        if path and path.suffix.lower() in (".gif", ".mp4", ".webm", ".mov"):
             # Prefer the mp4 sibling so every reply's media is the same
             # container as the Imagine decoy. Mixed gif/mp4 was an oracle:
             # the one .mp4 among four .gif was always the machine.
-            mp4 = path.with_suffix(".mp4")
-            if mp4.is_file():
-                rep["media_url"] = _gif_public_url(mp4)
+            if path.suffix.lower() == ".gif":
+                mp4 = path.with_suffix(".mp4")
+                if mp4.is_file():
+                    path = mp4
+            if path.suffix.lower() in (".mp4", ".webm", ".mov"):
+                rep["media_url"] = _gif_public_url(path)
                 rep["media_type"] = "video"
             else:
                 rep["media_url"] = _gif_public_url(path)
@@ -581,7 +586,7 @@ def attach_reply_media(
             human_ready += 1
         else:
             rep["media_url"] = None
-            rep["media_type"] = "gif"
+            rep["media_type"] = "video"
             rep["media_status"] = "none"
             rep["media_source"] = "human"
         rep.pop("art_url", None)

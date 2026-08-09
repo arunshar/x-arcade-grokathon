@@ -1691,12 +1691,16 @@ function buildReplyMedia(reply, isRevealDecoy, onReady) {
       vid.setAttribute("webkit-playsinline", "");
       vid.loop = true;
       vid.autoplay = true;
-      vid.preload = "metadata";
+      // Full preload so the first loop starts quickly on phones.
+      vid.preload = "auto";
       vid.setAttribute("aria-label", "reply gif");
       vid.onloadeddata = () => {
         vid.classList.add("is-ready");
         try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
         markReady(effectiveUrl);
+      };
+      vid.oncanplay = () => {
+        try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
       };
       vid.onerror = () => {
         vid.remove();

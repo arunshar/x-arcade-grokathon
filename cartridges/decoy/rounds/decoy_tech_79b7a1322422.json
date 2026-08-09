@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-79b7a1322422",
+  "source": {
+    "post_text": "🚨JUST IN: Apple $AAPL is expected to unveil the iPhone 18 Pro on September 9, per Forbes.\n\nFor traders, the focus will be on upgrade demand, pricing and AI features. \n\nA strong launch could support Apple’s holiday-quarter revenue and benefit key supplier TSMC, while weak preorders may raise concerns about the upgrade cycle.",
+    "post_author": "@coinbureau",
+    "post_url": "https://x.com/coinbureau/status/2086263694661460391",
+    "topic": "tech"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Pricing and real AI utility will decide if this cycle beats the last one for upgrades.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "orange one looks like the only reason to upgrade ngl, AI features are just the excuse",
+      "author": "@CryptoTISMWeb3",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Gurman flagged possible $100-200 hikes, that could shape preorder numbers as much as the AI features do.",
+      "author": "@JungleReportFi",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "upgrade demand hinges on ai usefulness, not just specs",
+      "author": "@MacroBombastic",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "same phone, better camera, one more ai button",
+      "author": "@kash_bot",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "Slightly too polished and balanced phrasing that hedges both factors evenly like a mini-summary.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 112712252
+}

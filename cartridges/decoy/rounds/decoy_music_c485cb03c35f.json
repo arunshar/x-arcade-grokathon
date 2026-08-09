@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-c485cb03c35f",
+  "source": {
+    "post_text": "Morrissey cancels Las Vegas residency due to “unforeseen logistical challenges” a week before the first show https://www.nme.com/news/music/morrissey-cancels-las-vegas-residency-due-to-unforeseen-logistical-challenges-a-week-before-the-first-show-3961448",
+    "post_author": "@NME",
+    "post_url": "https://x.com/NME/status/2085995681563705634",
+    "topic": "music"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Get em out folks!!!",
+      "author": "@NoFilterGames",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "That is why, we no longer pay tickets  to his concerts in Mexico.",
+      "author": "@linnea_kar991",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "bigmouth strikes again",
+      "author": "@ceciyegros",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "He’s human and he needs to have more money, just like everybody else does..",
+      "author": "@MichaelCGM",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Vague excuses like that usually mean the numbers just didn't add up for him this time.",
+      "author": "decoy",
+      "is_decoy": true
+    }
+  ],
+  "decoy_slot": 4,
+  "decoy_rationale": "Slightly too polished and explanatory phrasing feels more composed than the casual real replies.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 48924283
+}

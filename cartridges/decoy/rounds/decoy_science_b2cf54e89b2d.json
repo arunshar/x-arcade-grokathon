@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-b2cf54e89b2d",
+  "source": {
+    "post_text": "100% transmission through a quantum duality defect turns a particle into a smeared, string-like excitation, offering a concrete resolution of the magnetic monopole scattering paradox. @ugent @NaturePhysics https://phys.org/news/2026-08-mirror-world-particles-wisps-fog.html?utm_source=twitter.com&utm_medium=social&utm_campaign=v2",
+    "post_author": "@physorg_com",
+    "post_url": "https://x.com/physorg_com/status/2085901908007391579",
+    "topic": "science"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Particle walks into a duality defect… comes out as a string. Bartender says, ‘Sorry, we only serve point particles in this universe.’😂",
+      "author": "@HarmonyGamer11",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "@grok explain this to a non physicist. Walk us through it step by step.",
+      "author": "@ADectis",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "This duality defect idea neatly converts point particles into extended excitations and that does seem to cleanly dodge the old monopole scattering issues without extra machinery.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "does this infer that string theory might be on to something?",
+      "author": "@alx_stan",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "You're welcome! Happy it clarified the idea.",
+      "author": "@grok",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The phrasing is a bit too polished and evenly balanced, reading slightly more like a compact summary than a spontaneous reaction.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 964850114
+}

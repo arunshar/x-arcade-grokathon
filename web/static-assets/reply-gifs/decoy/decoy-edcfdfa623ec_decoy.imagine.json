@@ -1,0 +1,13 @@
+{
+  "source": "grok-imagine-video",
+  "model_image": "grok-imagine-image",
+  "model_video": "grok-imagine-video-1.5",
+  "round_id": "decoy-edcfdfa623ec",
+  "file": "decoy-edcfdfa623ec_decoy.mp4",
+  "bytes": 511914,
+  "duration": 1,
+  "style_brief": "prebaked-on-disk",
+  "ts": 1786240537,
+  "pass": "ensure_certified",
+  "auto": true
+}

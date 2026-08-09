@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-dd2a795161cb",
+  "source": {
+    "post_text": "As a small restaurant owner, would you be upset if someone came and ordered food 40 minutes before your business was closing?",
+    "post_author": "@Slammin_Sammiee",
+    "post_url": "https://x.com/Slammin_Sammiee/status/2086264818793660731",
+    "topic": "food"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "No I wouldn't. Still open means still serving, and small spots can use the extra cash from late orders.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Nope. I would want the biz🤷‍♂️",
+      "author": "@AceOutlaw90",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Hell no \n\n40 minutes is plenty",
+      "author": "@thejbratc",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "No I worked 15 yrs in restuarants  happened every night",
+      "author": "@bro78204708",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "If I’m a “small restaurant owner” I think I’d just appreciate any customers who come in tbh",
+      "author": "@SgtSu31",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply is slightly too polished and explanatory in neatly justifying the business angle.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 56810586
+}

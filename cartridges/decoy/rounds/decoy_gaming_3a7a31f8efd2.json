@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-3a7a31f8efd2",
+  "source": {
+    "post_text": "We are watching the collapse of gaming and utter disrespect of players and the craft in real time, and we’re being gaslit to think it isn’t happening or that it’s somehow a good thing🚀\n\n🗣️Take-Two CEO Strauss Zelnick argues that physical game discs make no sense for consumers\n\n🗣️He also predicts that game streaming will be more commercial/mainstream in about 3 years due to the increasing prices of consoles and PC (Did he forget Stadia???)\n\nSo hear me out:\n\n✅PCs and consoles became more expensive due to data centers\n\n…",
+    "post_author": "@RinoTheBouncer",
+    "post_url": "https://x.com/RinoTheBouncer/status/2086207521509814430",
+    "topic": "gaming"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "What's wild is a lot of people are ok with it",
+      "author": "@CarcerCityJoker",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "The CEO's take on discs feels completely detached from what actual players want since ownership still matters way more than convenience for a lot of us, and streaming has flopped enough times already to prove it's not some inevitable future.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "Strauss doesn't play games. His opinion counts for Jack and shit.",
+      "author": "@Phidelitie",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "I just think the take two CEO is such nonsense for saying physical doesn’t makes sense for consumers, as if consumers themselves can’t decide themselves. Have gone from very very slight possibility of buying GTA6 to absolute no.",
+      "author": "@styigian",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "I heard the same thing about music and movies yet they are still kicking with blu ray and even music had a strong run on LP which is going back to retro",
+      "author": "@illmoney789",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "Slightly too polished and explanatory in balancing the points, lacking the rawer casual edge of the real replies.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 915258649
+}

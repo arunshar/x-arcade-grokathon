@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-4631caa78282",
+  "source": {
+    "post_text": "NASA’s WB-57 jet studies eclipses from about 50,000 feet (15,000 meters) — above most of the haze and turbulence that blur the view below, for a sharper look at the Sun’s corona. The WB-57 will observe the Aug. 12 total solar eclipse from above.\n\nMore: https://science.nasa.gov/science-research/heliophysics/nasa-science-soars-during-august-total-solar-eclipse/",
+    "post_author": "@NASASolarSystem",
+    "post_url": "https://x.com/NASASolarSystem/status/2086059853626195994",
+    "topic": "space"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "wait so the corona is only visible during totality from the ground but up there they can see it the whole time?",
+      "author": "@sofiafaye_8",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Is it possible if you can fly fast enough yo fly in line with the solar eclipse and view it for longer?",
+      "author": "@SpaceNerd0",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Grok tells me the colours represent a range of UV wavelengths.",
+      "author": "@GaryNicholls52",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Getting above most of the atmosphere like that should cut the usual distortion and give them way cleaner corona data during the short totality window.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Fifty thousand feet for a sharper look at a shadow. The paperwork calls it a business trip.",
+      "author": "@didnobodynotice",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory, neatly summarizing the scientific benefit in a balanced, almost instructional way.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 210289499
+}

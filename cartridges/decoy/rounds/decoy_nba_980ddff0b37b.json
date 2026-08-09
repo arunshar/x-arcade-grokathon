@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-980ddff0b37b",
+  "source": {
+    "post_text": "The Bucks have likely presented a player-centric offer in sign-and-trade talks with the Nuggets surrounding Peyton Watson.\n\nMilwaukee has a bevy of impactful role players, but a potential deal remains tricky with Denver currently unable to take back salary as a second apron team.",
+    "post_author": "@JWeinbachNBA",
+    "post_url": "https://x.com/JWeinbachNBA/status/2086240333931679846",
+    "topic": "nba"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "He won’t take himself on the QO. What Rich Paul client has ever done that? \n\nHe has guaranteed 22-25 mil with other teams and they know it. \n\nNuggets ownership doesn’t wanna pay 200m in tax either. No leverage",
+      "author": "@mkebucks6",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Rollins won’t event start if Porter on the team he’s better",
+      "author": "@cheftonygooden",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "He doesn’t have an option. If no other team offers Watson an offer sheet, he will be required to sign the qualifying offer.\n\nHe then becomes a free agent next summer and can go wherever he wants.\n\nI’ve been playing 2k for decades. I know.",
+      "author": "@paul_mohr2000",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Bucks depth like Portis or Green could intrigue Denver but the second apron really locks them out of taking salary back cleanly. Any deal would need some creative workaround or they wait it out.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Now I know this a troll account 😂",
+      "author": "@DKellner88",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory in neatly summarizing the constraints with balanced hedging.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 842667329
+}
