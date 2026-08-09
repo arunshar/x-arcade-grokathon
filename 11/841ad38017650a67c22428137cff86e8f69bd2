@@ -1,0 +1,22 @@
+cartridges/decoy/rounds/README.md
+  s_da6f3933cdb62d::t_079f91d2deb56f 44-50
+GUIDE.md
+  s_da6f3933cdb62d::t_baf2d30e8543cf 4194
+  s_da6f3933cdb62d::t_841f6db96ae920 851-862
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "11841ad38017650a67c22428137cff86e8f69bd2",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
