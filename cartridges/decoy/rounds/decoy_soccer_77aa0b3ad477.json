@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-77aa0b3ad477",
+  "source": {
+    "post_text": "There was a point last season when Mikel Arteta benched Eberechi Eze, and the reaction was loud. \n\nAfter spending around £67 million on him, many fans questioned why such an expensive signing was being left out. Eze was an unused substitute in four consecutive Premier League matches, while some fans accused Arteta of frustrating his development and deliberately holding him back. \n\nThe pundits joined in too, some claimed Arteta didn't fancy him, didn't like him, or was simply refusing to use him properly.",
+    "post_author": "@Emjenny605",
+    "post_url": "https://x.com/Emjenny605/status/2086125665091518850",
+    "topic": "soccer"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Trust the process after last season's title run, rotation will happen with this depth and Eze can still impact games off the bench without needing to force him over Odegaard or Tzolis every single week.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "I’d sell Odegaard in a heart beat and sign Rodri, Eze will come off the bench if needed. Tzolis isn’t a starter he’s a bench warmer for Kenan \n\nMain rotations in midfield should be \n\nBruno Rice Rodri\n\nBruno Rice Morino\n\nBruno Rice Havertz \n\nBruno Rice Eze",
+      "author": "@HerYerAzizFB",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Silly to suggest he won’t be used. IMO if you set up the team to be more aggressive and creative Eze is miles better than Odegaard. And I think Arteta wants to return to the true way Arsenal play football which is free flowing and creative. Except now we can win while doing that",
+      "author": "@TheHouse385",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Arteta knows ball",
+      "author": "@conneck13",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "He benched him because he had played more minutes than anybody else up until that point and he was absolutely knackered from it. The boy was not used to playing European football and PL matches week in and week out \n\nCut this ignorant shit out",
+      "author": "@DieHardGunner",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and oddly balanced in calmly hedging all options without raw fan emotion.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 947319870
+}

@@ -17,6 +17,7 @@ import asyncio
 import copy
 import json
 import os
+import random
 import secrets
 import sys
 from pathlib import Path
@@ -32,7 +33,11 @@ if str(REPO_ROOT) not in sys.path:
 
 import config
 from cartridges.decoy import queue as decoy_queue
+from cartridges.decoy import themes as decoy_themes
 from plugins.safety import screen as safety_screen
+
+_theme_pool_cache: dict[str, Any] = {"mtime": 0.0, "by_topic": {}, "all": []}
+_theme_rng = random.SystemRandom()
 
 # Internal knob, not part of the contract. When set to 1 the server skips the
 # round queue and always serves FALLBACK_ROUND. selfcheck.py sets it so the
@@ -277,35 +282,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
     return room
 
 
-# Broad theme picker — general buckets, each maps to several post topics.
-TOPIC_CATALOG: list[dict[str, Any]] = [
-    {"id": "random", "label": "RANDOM", "topics": []},
-    {
-        "id": "technology",
-        "label": "TECHNOLOGY",
-        "topics": ["ai", "tech", "startups", "crypto"],
-    },
-    {
-        "id": "entertainment",
-        "label": "ENTERTAINMENT",
-        "topics": ["movies", "tv", "music", "gaming", "memes"],
-    },
-    {
-        "id": "sports",
-        "label": "SPORTS",
-        "topics": ["sports", "nba", "baseball", "soccer"],
-    },
-    {
-        "id": "science",
-        "label": "SCIENCE & SPACE",
-        "topics": ["science", "space"],
-    },
-    {
-        "id": "lifestyle",
-        "label": "LIFESTYLE",
-        "topics": ["food", "travel", "fitness", "cars", "books", "photography"],
-    },
-]
+# Lobby chips + member topics — single source in cartridges/decoy/themes.py
+TOPIC_CATALOG: list[dict[str, Any]] = decoy_themes.catalog_groups()
 
 
 def _normalize_topic_filter(raw: Any) -> list[str]:
@@ -320,11 +298,7 @@ def _normalize_topic_filter(raw: Any) -> list[str]:
         raw = [raw]
     if not isinstance(raw, (list, tuple)):
         return []
-    group_map = {str(g["id"]).lower(): list(g.get("topics") or []) for g in TOPIC_CATALOG}
-    known_topics: set[str] = set()
-    for g in TOPIC_CATALOG:
-        for t in g.get("topics") or []:
-            known_topics.add(str(t).lower())
+    known_topics: set[str] = set(decoy_themes.all_member_topics())
     # Also accept any topic that exists on disk.
     try:
         for path in decoy_queue.ROUNDS_DIR.glob("decoy_*.json"):
@@ -332,7 +306,7 @@ def _normalize_topic_filter(raw: Any) -> list[str]:
                 data = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
                 continue
-            t = str((data.get("source") or {}).get("topic") or "").strip().lower()
+            t = decoy_themes.round_topic_of(data)
             if t:
                 known_topics.add(t)
     except Exception:
@@ -343,10 +317,9 @@ def _normalize_topic_filter(raw: Any) -> list[str]:
         key = str(item or "").strip().lower()
         if not key or key in ("random", "all", "*", "any"):
             continue
-        if key in group_map:
-            for t in group_map[key]:
-                if t:
-                    out.add(str(t).lower())
+        expanded = decoy_themes.expand_group_id(key)
+        if expanded:
+            out.update(expanded)
             continue
         if key in known_topics:
             out.add(key)
@@ -354,25 +327,71 @@ def _normalize_topic_filter(raw: Any) -> list[str]:
 
 
 def _round_topic(rnd: dict[str, Any]) -> str:
-    return str((rnd.get("source") or {}).get("topic") or "").strip().lower()
+    return decoy_themes.round_topic_of(rnd)
+
+
+def _rounds_dir_mtime() -> float:
+    try:
+        latest = 0.0
+        root = decoy_queue.ROUNDS_DIR
+        if root.is_dir():
+            latest = max(latest, root.stat().st_mtime)
+            for path in root.glob("decoy_*.json"):
+                try:
+                    latest = max(latest, path.stat().st_mtime)
+                except OSError:
+                    continue
+        return latest
+    except OSError:
+        return 0.0
+
+
+def _refresh_theme_pool(force: bool = False) -> dict[str, list[dict[str, Any]]]:
+    """Load screened, on-theme rounds indexed by topic slug."""
+    mtime = _rounds_dir_mtime()
+    if (
+        not force
+        and _theme_pool_cache.get("by_topic")
+        and abs(float(_theme_pool_cache.get("mtime") or 0) - mtime) < 0.001
+    ):
+        return _theme_pool_cache["by_topic"]  # type: ignore[return-value]
+
+    by_topic: dict[str, list[dict[str, Any]]] = {}
+    all_rows: list[dict[str, Any]] = []
+    try:
+        paths = sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json"))
+    except OSError:
+        paths = []
+    for path in paths:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        if not safety_screen.screen_round(data).get("screened"):
+            continue
+        if not decoy_themes.round_fits_theme(data, min_score=1):
+            continue
+        # Soft-drop clear misses (score 0) already handled; score 1–2 kept.
+        if decoy_themes.round_theme_score(data) < 1:
+            continue
+        topic = _round_topic(data)
+        if not topic:
+            continue
+        by_topic.setdefault(topic, []).append(data)
+        all_rows.append(data)
+
+    _theme_pool_cache["mtime"] = mtime
+    _theme_pool_cache["by_topic"] = by_topic
+    _theme_pool_cache["all"] = all_rows
+    return by_topic
 
 
 def _list_topics_payload() -> dict[str, Any]:
     """Catalog + live counts for the create-lobby picker."""
-    counts: dict[str, int] = {}
-    try:
-        for path in decoy_queue.ROUNDS_DIR.glob("decoy_*.json"):
-            try:
-                data = json.loads(path.read_text(encoding="utf-8"))
-            except (OSError, json.JSONDecodeError):
-                continue
-            if not safety_screen.screen_round(data).get("screened"):
-                continue
-            t = _round_topic(data)
-            if t:
-                counts[t] = counts.get(t, 0) + 1
-    except Exception:
-        pass
+    by_topic = _refresh_theme_pool()
+    counts = {t: len(rows) for t, rows in by_topic.items()}
     groups = []
     for g in TOPIC_CATALOG:
         topics = [str(t).lower() for t in (g.get("topics") or [])]
@@ -381,11 +400,57 @@ def _list_topics_payload() -> dict[str, Any]:
             {
                 "id": g["id"],
                 "label": g["label"],
+                "blurb": g.get("blurb") or "",
                 "topics": topics,
                 "count": n,
             }
         )
     return {"groups": groups, "topics": counts}
+
+
+def _pick_from_candidates(
+    candidates: list[dict[str, Any]],
+    *,
+    exclude: set[str],
+    prefer_media: bool,
+) -> dict[str, Any] | None:
+    """Pick one round from an already-filtered candidate list."""
+    if not candidates:
+        return None
+
+    def rid_of(rnd: dict[str, Any]) -> str:
+        return str(rnd.get("round_id") or "")
+
+    # Passes: fresh+media → fresh → any+media → any (always stay in candidates)
+    passes: list[tuple[bool, bool]] = []
+    if prefer_media:
+        passes = [(True, True), (True, False), (False, True), (False, False)]
+    else:
+        passes = [(True, False), (False, False)]
+
+    for require_fresh, require_media in passes:
+        pool: list[dict[str, Any]] = []
+        for rnd in candidates:
+            rid = rid_of(rnd)
+            if require_fresh and rid and rid in exclude:
+                continue
+            if require_media and not _round_has_ready_decoy_media(rnd):
+                continue
+            pool.append(rnd)
+        if not pool:
+            continue
+        # Prefer stronger on-theme hits, then shuffle among equals.
+        scored: list[tuple[int, dict[str, Any]]] = [
+            (decoy_themes.round_theme_score(r), r) for r in pool
+        ]
+        best = max(s for s, _ in scored)
+        top = [r for s, r in scored if s == best]
+        choice = _theme_rng.choice(top)
+        out = copy.deepcopy(choice)
+        decoy_queue.randomize_decoy_position(out)
+        out["safety"] = safety_screen.screen_round(out)
+        return out
+    return None
 
 
 def _round_has_ready_decoy_media(rnd: dict[str, Any]) -> bool:
@@ -413,6 +478,10 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
     fresh across a match. When GIF mode needs Imagine clips, also prefers
     rounds that already have certified decoy media so the Space does not
     deal text-only rounds while most of the pool lacks prebaked video.
+
+    Themed rooms pick **only** from an index of matching topic tags (never
+    sample the full queue and hope). Off-theme fallback is forbidden when a
+    filter is set — recycle on-theme posts instead.
     """
     exclude: set[str] = set()
     if room is not None:
@@ -433,47 +502,92 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
 
     if not FORCE_FALLBACK:
         try:
-            attempts = max(decoy_queue.round_count() * 3, 12)
-            # When a topic filter is set, NEVER leave that theme — even if we
-            # must reuse a recent round_id. Random rooms may fall back freely.
-            # Pass order within a theme:
-            #  1) theme + certified Imagine media (best for GIF rounds)
-            #  2) theme any screened post (text rounds / pending media)
+            by_topic = _refresh_theme_pool()
             if topic_filter:
-                passes = (
-                    [(True, True), (True, False)]
-                    if prefer_media
-                    else [(True, False)]
-                )
-            elif prefer_media:
-                passes = [(False, True), (False, False)]
-            else:
-                passes = [(False, False)]
-
-            for allow_recent in (False, True):
-                base_skip = set() if allow_recent else set(exclude)
-                for require_topic, require_media in passes:
-                    skip = set(base_skip)
-                    for _ in range(attempts):
-                        rnd = decoy_queue.next_round(exclude_ids=skip)
-                        gates = safety_screen.screen_round(rnd)
-                        rnd["safety"] = gates
+                # Direct index — guaranteed on-tag, on-theme posts only.
+                candidates: list[dict[str, Any]] = []
+                seen_ids: set[str] = set()
+                for t in topic_filter:
+                    for rnd in by_topic.get(t, []):
                         rid = str(rnd.get("round_id") or "")
-                        if not gates["screened"]:
-                            if rid:
-                                skip.add(rid)
+                        if rid and rid in seen_ids:
                             continue
-                        if require_topic and _round_topic(rnd) not in topic_filter:
-                            if rid:
-                                skip.add(rid)
-                            continue
-                        if require_media and not _round_has_ready_decoy_media(rnd):
-                            if rid:
-                                skip.add(rid)
-                            continue
-                        return rnd
+                        if rid:
+                            seen_ids.add(rid)
+                        candidates.append(rnd)
+                # Prefer score-2 (clear keyword hit); allow score-1 if needed.
+                strong = [
+                    r for r in candidates if decoy_themes.round_theme_score(r) >= 2
+                ]
+                pick_pool = strong if strong else candidates
+                picked = _pick_from_candidates(
+                    pick_pool, exclude=exclude, prefer_media=prefer_media
+                )
+                if picked is not None:
+                    return picked
+                # Last resort inside theme: ignore media preference, allow recent.
+                picked = _pick_from_candidates(
+                    candidates, exclude=set(), prefer_media=False
+                )
+                if picked is not None:
+                    return picked
+                # Do NOT fall through to global FALLBACK (wrong theme).
+                # Build a tiny themed stub only if the pool is empty on disk.
+            else:
+                # Random mix — still skip quarantined / off-tag junk.
+                all_rows: list[dict[str, Any]] = list(
+                    _theme_pool_cache.get("all") or []
+                )
+                if not all_rows:
+                    all_rows = [r for rows in by_topic.values() for r in rows]
+                picked = _pick_from_candidates(
+                    all_rows, exclude=exclude, prefer_media=prefer_media
+                )
+                if picked is not None:
+                    return picked
+                # Legacy queue walk for NO_SHUFFLE / empty index edge cases.
+                attempts = max(decoy_queue.round_count() * 3, 12)
+                skip = set(exclude)
+                for _ in range(attempts):
+                    rnd = decoy_queue.next_round(exclude_ids=skip)
+                    gates = safety_screen.screen_round(rnd)
+                    rnd["safety"] = gates
+                    rid = str(rnd.get("round_id") or "")
+                    if not gates.get("screened"):
+                        if rid:
+                            skip.add(rid)
+                        continue
+                    if not decoy_themes.round_fits_theme(rnd, min_score=1):
+                        if rid:
+                            skip.add(rid)
+                        continue
+                    if prefer_media and not _round_has_ready_decoy_media(rnd):
+                        # keep looking but don't permanently burn the id
+                        continue
+                    return rnd
         except Exception:
             pass
+
+    # Global fallback only for unthemed rooms (or total pool failure).
+    if topic_filter:
+        # Synthesize nothing off-theme — retry any on-disk themed file raw.
+        try:
+            for path in sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json")):
+                try:
+                    data = json.loads(path.read_text(encoding="utf-8"))
+                except (OSError, json.JSONDecodeError):
+                    continue
+                if _round_topic(data) not in topic_filter:
+                    continue
+                if not safety_screen.screen_round(data).get("screened"):
+                    continue
+                out = copy.deepcopy(data)
+                decoy_queue.randomize_decoy_position(out)
+                out["safety"] = safety_screen.screen_round(out)
+                return out
+        except Exception:
+            pass
+
     fallback = copy.deepcopy(FALLBACK_ROUND)
     decoy_queue.randomize_decoy_position(fallback)
     fallback["safety"] = safety_screen.screen_round(fallback)

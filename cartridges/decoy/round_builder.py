@@ -748,6 +748,17 @@ def build_round(topic: str, live: bool = False) -> dict[str, Any]:
             f"could not build novel round for {topic!r}: {last_error}"
         )
     thread = {**post, "replies": replies}
+    # Reject posts that only share a tag — body must actually fit the theme.
+    try:
+        from cartridges.decoy.themes import theme_fit_score
+
+        body = str(post.get("post_text") or "")
+        if theme_fit_score(str(topic or "").lower(), body) < 1:
+            raise RoundBuildError(
+                f"post off-theme for {topic!r}: {body[:120]!r}"
+            )
+    except ImportError:
+        pass
     decoy_text, rationale = _write_decoy(store, thread)
     round_dict = _assemble(topic, thread, decoy_text, rationale)
     validate_round(round_dict)

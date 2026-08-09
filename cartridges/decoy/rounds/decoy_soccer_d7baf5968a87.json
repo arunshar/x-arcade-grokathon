@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-d7baf5968a87",
+  "source": {
+    "post_text": "🚨 𝗝𝗨𝗦𝗧 𝗜𝗡: José Mourinho wants Real Madrid to win the ball back quickly and high up the pitch.\n\n— @diarioas",
+    "post_author": "@TouchlineX",
+    "post_url": "https://x.com/TouchlineX/status/2086283934090875116",
+    "topic": "soccer"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "With mbappe & Vini??\nNot possible",
+      "author": "@kaceyfootball1",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Mourinho demanding high pressing at Real Madrid is going to surprise a lot of people. \n\nThe old Mourinho reputation says ‘sit deep’, but this sounds like a very different approach. \n\nIs José about to reinvent himself again?",
+      "author": "@I_am_Babatope",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "High pressing under Mourinho at Madrid could click with their pacey forwards, though it feels like a stretch from his usual deeper setups.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "So he wants the ball to sprint faster than his press conferences. 😅",
+      "author": "@WUVIYRuKxxNZir5",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "He’s rage baiting",
+      "author": "@RrrGidah",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply is oddly balanced and hedged, weighing pros and cons in a slightly too measured way for casual fan banter.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 915118164
+}

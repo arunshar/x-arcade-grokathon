@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-e144b5e68c3e",
+  "source": {
+    "post_text": "🚨🇪🇸 JUST IN - Pending Confirmation: Atlético Madrid’s plan is to sign Jorge Salinas once Matteo Ruggeri leaves for Aston Villa.\n\nThere is a possibility of including a player on loan as part of the deal.\n\nSalinas was on the radar of several Premier League clubs, but the Atlético option appeals to him more.\n\n@marqoss",
+    "post_author": "@atletiuniverse",
+    "post_url": "https://x.com/atletiuniverse/status/2086136789144940702",
+    "topic": "soccer"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Salinas choosing Atleti over those PL options feels like a smart fit for their system, though the loan piece in the deal could go either way depending on who they send.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Madre mía, Julián Álvarez, el Cuti y luego salinas no estaría mal para que los cules lo paséis fatal el año que viene y si lo rematan con Oshimen, cagaitos estariais",
+      "author": "@VIDIPE",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Pues se está notando. Julián  sw queda, el Cuti os rechaza y ya veremos lo que pasa con Salinas. Si no tenéis ni donde caeros muertos, cu- lerdos.",
+      "author": "@josemanuelra63",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "No one want to join Atletico ahead of Barcelona",
+      "author": "@l4tr3l4",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "maybe the radar was sleeping just like you 😪😪",
+      "author": "@galla_giridhar",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply is oddly balanced and slightly explanatory in weighing both sides of the transfer.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 523752436
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-d341e0e4a11f",
+  "source": {
+    "post_text": "If they released this game today, built on a modern engine, it would be a GOTY nominee\n\nDid you guys play this?",
+    "post_author": "@ArcadeChannel",
+    "post_url": "https://x.com/ArcadeChannel/status/2086287901768245623",
+    "topic": "gaming"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Played it before but never finished it as well. I was just at the start. Looks good.",
+      "author": "@ShiroSaints777",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Yeah I ran through Prototype 1 when it dropped and the powers felt wild even then. A fresh engine version would probably snag nominations easy.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 2,
+      "text": "100% i would play it Already Played both of them though 😭 No prototype 3",
+      "author": "@herogamer0108",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Might be prototype was soo good in its days. Absolutely loved it so much",
+      "author": "@vinsmokee_0",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "I've played this prototype 1, it would be really cool if there was a remake/reboot of it",
+      "author": "@KesendirianX",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 1,
+  "decoy_rationale": "Slightly too polished phrasing and neat cause-effect structure make it feel essay-like rather than offhand.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 183051206
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-324dfd5ffd44",
+  "source": {
+    "post_text": "Again, people have no idea how hard creating a good video game is...\n\nNo, the gaming category is in fact not dead",
+    "post_author": "@ThePrimeagen",
+    "post_url": "https://x.com/ThePrimeagen/status/2086292797062033808",
+    "topic": "gaming"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Which games have you made?",
+      "author": "@villain_thropic",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "making a character moving on screen and do some basics stuff is easy. Turning that into a fully complete videogame is really hard, beyond what people think it is",
+      "author": "@SnekTCO",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "It feels like at best one day someone can get their own crappy remake of an existing game.",
+      "author": "@CodeBanger",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Game dev really is brutal once you get past the prototype stage—so many interconnected systems to balance and polish that most outsiders just never clock how long it actually takes, yet that difficulty is exactly why good titles still keep dropping.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "You might think people would wait for at least ONE instance of something successfully happening, before declaring it the inevitable future of ALL cases.\n\nOr not. It’s Twitter.",
+      "author": "@Jonathan_Blow",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory in chaining cause-effect clauses, with an oddly balanced hedge that lands more essay-like than casual.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 502309607
+}

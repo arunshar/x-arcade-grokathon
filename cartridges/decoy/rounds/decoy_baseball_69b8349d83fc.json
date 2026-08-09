@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-69b8349d83fc",
+  "source": {
+    "post_text": "That is a pathetic play from Alec Bohm. How in the world do you even make that mistake?",
+    "post_author": "@AlexCarrMLB",
+    "post_url": "https://x.com/AlexCarrMLB/status/2086263286899581281",
+    "topic": "baseball"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Better question is. How is he still employed??",
+      "author": "@SBrood76",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "One or both of those throws get by Harper in the 9th",
+      "author": "@warminster10027",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Bohm's fundamental error there is hard to defend given his experience, it really undercuts any argument for keeping him locked in at third.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "He needs to be DFA'd along with Alvarado. Hey Dave grow a set. And bring up McFarland.\n\nGood old Donnie Baseball looks like he dosent give two shits.",
+      "author": "@RichHeinrich2",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "I’m done with this. Put Harper back to first and De La Cruz in RF.  This is not a playoff team",
+      "author": "@ShatStafford",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The phrasing is slightly too polished and oddly balanced/explanatory rather than pure raw venting.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 716229276
+}

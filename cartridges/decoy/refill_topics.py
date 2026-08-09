@@ -25,35 +25,34 @@ sys.path.insert(0, str(REPO))
 from cartridges.decoy import round_builder as rb  # noqa: E402
 from plugins.safety.screen import screen_round  # noqa: E402
 
-# Keep in sync with server TOPIC_CATALOG member topics (broad themes).
-TOPICS = [
-    # Technology
-    "ai",
-    "tech",
-    "startups",
-    "crypto",
-    # Entertainment
-    "movies",
-    "tv",
-    "music",
-    "gaming",
-    "memes",
-    # Sports
-    "sports",
-    "nba",
-    "baseball",
-    "soccer",
-    # Science & space
-    "science",
-    "space",
-    # Lifestyle
-    "food",
-    "travel",
-    "fitness",
-    "cars",
-    "books",
-    "photography",
-]
+# Keep in sync with cartridges/decoy/themes.py member topics.
+try:
+    from cartridges.decoy.themes import all_member_topics
+
+    TOPICS = sorted(all_member_topics())
+except Exception:
+    TOPICS = [
+        "ai",
+        "tech",
+        "startups",
+        "crypto",
+        "movies",
+        "tv",
+        "music",
+        "gaming",
+        "sports",
+        "nba",
+        "baseball",
+        "soccer",
+        "science",
+        "space",
+        "food",
+        "travel",
+        "fitness",
+        "cars",
+        "books",
+        "photography",
+    ]
 
 
 def _counts() -> dict[str, list[dict]]:

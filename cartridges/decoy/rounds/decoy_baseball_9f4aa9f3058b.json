@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-9f4aa9f3058b",
+  "source": {
+    "post_text": "O's last 7g, they've scored 11 runs getting in order 0,0,3,5,1,1, and 1.\n\nThey are 2-5 this stretch despite a 7-gm starter ERA of 2.27 with 5 quality starts.\n\nWasting chances and losing ground.\n\nI miss the days they ranked 7th and 4th in MLB runs per game in 2023 and 2024.",
+    "post_author": "@Steveonbaseball",
+    "post_url": "https://x.com/Steveonbaseball/status/2086282572795945214",
+    "topic": "baseball"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Elias: “so you’re saying it’s our defense?”",
+      "author": "@pat_chim93",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Keep batting Gunnar in the 1-3 spots...brilliant results.  Also, his defensive is pure 💩 .  Knoblachian and pathetic",
+      "author": "@Huffandstuff180",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Elias fired that hitting coach who’s now leading the Nats to one of the best offenses in baseball.",
+      "author": "@RyanM30baseball",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "Pitching has held up fine but the offense keeps stranding chances and going quiet in key spots. Hard not to notice how far the run production has slipped from those stronger 2023-24 levels.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "Who is teaching these guys how to come from behind?  Swinging at the first pitch and chasing balls way out of the zone aint how you get base runners and manufacture runs.  Awful baseball.",
+      "author": "@mhodgins22",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory, neatly summarizing the pitching-offense gap in balanced clauses rather than raw fan venting.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 367165451
+}

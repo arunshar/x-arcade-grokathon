@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-c2335fd71952",
+  "source": {
+    "post_text": "Can’t believe Johan Vasquez hasn’t received a single offer from a top Serie A club after being one of the most consistent center-backs in the league and then having a great World Cup.\n\nMexican players are unfortunately not well valued in Europe, and the nationality matters a lot.",
+    "post_author": "@AllFutbolMX",
+    "post_url": "https://x.com/AllFutbolMX/status/2086269318308766143",
+    "topic": "sports"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Araujo hasn't been on his days for 3 years. Johan clears big time",
+      "author": "@fkngera",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Araujo on his day is 400x the player Vasquez is in Liverpool he’d have an Ozan Kabak type of impact",
+      "author": "@Duadibalz",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Vasquez has been solid week in week out plus that WC form, yet top clubs still pass him over which does feel like the Mexican label holds more weight than pure output sometimes.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "Entiendan que es malo maldita sea  el día q un jugador mexa sea bueno vendrán por el y se lo llevarán carajo",
+      "author": "@webster3067",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Pues porque no le da pa más, la verdad no le da pa más y ya , igual ser capitán del Génova no está mal. El pedo es que ustedes creen que cualquier cabrón mexicano que de 3 partidos buenos está para la élite.",
+      "author": "@TuCachavacha",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "Slightly too polished and explanatory in how it neatly balances praise with the nationality angle.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 29627537
+}

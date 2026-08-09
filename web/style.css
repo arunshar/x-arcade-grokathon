@@ -494,9 +494,28 @@ body.has-scoreboard main {
   background: var(--panel);
   border: 1px solid var(--line);
   padding: 8px 12px;
-  min-height: 40px;
+  min-height: 44px;
   cursor: pointer;
   transition: border-color 0.12s, color 0.12s, box-shadow 0.12s, background 0.12s;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  max-width: 220px;
+}
+.topic-chip-label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  line-height: 1.2;
+}
+.topic-chip-blurb {
+  font-size: 9px;
+  letter-spacing: 0.8px;
+  text-transform: none;
+  opacity: 0.7;
+  line-height: 1.25;
+  font-weight: 400;
 }
 .topic-chip:hover {
   border-color: rgba(0, 229, 255, 0.45);
@@ -507,6 +526,10 @@ body.has-scoreboard main {
   border-color: var(--cyan);
   background: rgba(0, 229, 255, 0.08);
   box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+}
+.topic-chip.is-on .topic-chip-blurb {
+  opacity: 0.85;
+  color: var(--cyan);
 }
 .topic-chip:disabled {
   opacity: 0.4;

@@ -2373,14 +2373,19 @@ function isSoloFriendlyRoom(room) {
 /** Topic filter for create/solo lobby. Empty = random mix. */
 let selectedTopicGroups = []; // catalog group ids, e.g. ["ai","movies"]
 let topicCatalog = null; // from GET /topics
+// Keep in sync with cartridges/decoy/themes.py TOPIC_CATALOG
 const DEFAULT_TOPIC_GROUPS = [
-  { id: "random", label: "RANDOM", topics: [], count: 0 },
-  { id: "technology", label: "TECHNOLOGY", topics: ["ai", "tech", "startups", "crypto"], count: 0 },
-  { id: "entertainment", label: "ENTERTAINMENT", topics: ["movies", "tv", "music", "gaming", "memes"], count: 0 },
-  { id: "sports", label: "SPORTS", topics: ["sports", "nba", "baseball", "soccer"], count: 0 },
-  { id: "science", label: "SCIENCE & SPACE", topics: ["science", "space"], count: 0 },
-  { id: "lifestyle", label: "LIFESTYLE", topics: ["food", "travel", "fitness", "cars", "books", "photography"], count: 0 },
+  { id: "random", label: "RANDOM", blurb: "any topic", topics: [], count: 0 },
+  { id: "technology", label: "TECHNOLOGY", blurb: "AI · tech · startups · crypto", topics: ["ai", "tech", "startups", "crypto"], count: 0 },
+  { id: "movies_tv", label: "MOVIES & TV", blurb: "films · series · streaming", topics: ["movies", "tv"], count: 0 },
+  { id: "music", label: "MUSIC", blurb: "artists · albums · concerts", topics: ["music"], count: 0 },
+  { id: "gaming", label: "GAMING", blurb: "games · studios · esports", topics: ["gaming"], count: 0 },
+  { id: "sports", label: "SPORTS", blurb: "NBA · soccer · baseball", topics: ["sports", "nba", "baseball", "soccer"], count: 0 },
+  { id: "science", label: "SCIENCE & SPACE", blurb: "research · NASA · cosmos", topics: ["science", "space"], count: 0 },
+  { id: "lifestyle", label: "LIFESTYLE", blurb: "food · travel · fitness · cars", topics: ["food", "travel", "fitness", "cars", "books", "photography"], count: 0 },
 ];
+// Older clients/servers used a mega entertainment bucket.
+const LEGACY_TOPIC_GROUP_MAP = { entertainment: "movies_tv" };
 
 function loadTopicCatalog() {
   if (MOCK) {
@@ -2417,10 +2422,15 @@ function renderTopicChips() {
     btn.className = "topic-chip";
     btn.dataset.topicId = id;
     const label = g.label || id.toUpperCase();
-    btn.textContent = label;
+    const blurb = g.blurb || (g.topics && g.topics.length ? g.topics.join(" · ") : "");
+    btn.innerHTML = blurb
+      ? ("<span class=\"topic-chip-label\">" + label + "</span>"
+        + "<span class=\"topic-chip-blurb\">" + blurb + "</span>")
+      : ("<span class=\"topic-chip-label\">" + label + "</span>");
     const on = id === "random" ? isRandom : selectedTopicGroups.indexOf(id) >= 0;
     if (on) btn.classList.add("is-on");
     btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.title = blurb ? (label + " — " + blurb) : label;
     btn.addEventListener("click", () => toggleTopicGroup(id));
     box.appendChild(btn);
   });
@@ -2429,6 +2439,7 @@ function renderTopicChips() {
 function toggleTopicGroup(id) {
   if (joined) return;
   id = String(id || "").toLowerCase();
+  id = LEGACY_TOPIC_GROUP_MAP[id] || id;
   if (!id || id === "random") {
     selectedTopicGroups = [];
     renderTopicChips();
@@ -2446,9 +2457,14 @@ function selectedTopicsPayload() {
   const groups = (topicCatalog && topicCatalog.groups) || DEFAULT_TOPIC_GROUPS;
   const byId = {};
   groups.forEach((g) => { byId[String(g.id || "").toLowerCase()] = g; });
+  // legacy entertainment → movies_tv members if server still lists it
+  byId.entertainment = byId.entertainment || byId.movies_tv || {
+    topics: ["movies", "tv"],
+  };
   const out = [];
   const seen = {};
   selectedTopicGroups.forEach((id) => {
+    id = LEGACY_TOPIC_GROUP_MAP[id] || id;
     const g = byId[id];
     const topics = (g && g.topics) || [id];
     topics.forEach((t) => {
@@ -2461,7 +2477,23 @@ function selectedTopicsPayload() {
 
 function formatTopicFilterLabel(topics) {
   if (!topics || !topics.length) return "RANDOM MIX";
-  return topics.map((t) => String(t).toUpperCase()).join(" · ");
+  const want = {};
+  topics.forEach((t) => { want[String(t || "").toLowerCase()] = true; });
+  const groups = (topicCatalog && topicCatalog.groups) || DEFAULT_TOPIC_GROUPS;
+  const labels = [];
+  const covered = {};
+  groups.forEach((g) => {
+    const members = (g.topics || []).map((t) => String(t).toLowerCase()).filter(Boolean);
+    if (!members.length) return;
+    if (members.every((m) => want[m])) {
+      labels.push(String(g.label || g.id || "").toUpperCase());
+      members.forEach((m) => { covered[m] = true; });
+    }
+  });
+  Object.keys(want).forEach((t) => {
+    if (!covered[t]) labels.push(t.toUpperCase());
+  });
+  return labels.length ? labels.join(" · ") : "RANDOM MIX";
 }
 
 function showModePick() {

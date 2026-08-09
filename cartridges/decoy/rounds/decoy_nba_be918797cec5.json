@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-be918797cec5",
+  "source": {
+    "post_text": "If the Lakers eventually pivot away from Jonathan Kuminga, there are still a few situations worth watching around the league.\n\nPeyton Watson: Denver is exploring sign-and trade possibilities because of its cap situation, but Milwaukee, Cleveland and the Clippers are also reportedly involved. He’d give LA another young, athletic two way wing, but his next contract could get expensive. \n\nP.J. Washington: The basketball fit next to Luka Doncic is obvious, and Luka would reportedly be in favor of a reunion.",
+    "post_author": "@SleeperLakers",
+    "post_url": "https://x.com/SleeperLakers/status/2085898791073226999",
+    "topic": "nba"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "It’s only bc he’s a LA native and went to ucla, so there’s some hope he would force his way to lakers. (Not going to happen) if he takes the QO tho👀",
+      "author": "@roh4ilans4ri",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Absolutely i perfer Watson but I think Kuminga has better situation for gave him",
+      "author": "@Reza_7997",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "PJ Washington feels like the cleanest basketball fit next to Luka if the reunion interest is real, though Kuzma's expiring number might actually be simpler to make work without overpaying in assets.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "Starting caliber wing. Another year of Luka waisted away. You are setting him up for failure if you start the season with a wing committee of Thybulle, Williams and Jake all of them wouldnt get minutes on the top 6 teams in the west and we are about to start one of them lol",
+      "author": "@Sin16502",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Lakers have no shot at Watson. That is unrealistic",
+      "author": "@kjrboston035485",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply is oddly balanced and mildly explanatory in calmly weighing two options side-by-side without raw fan urgency.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 579380319
+}

@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-04d6122d325f",
+  "source": {
+    "post_text": "Arsenal's midfield depth is a joke! 🤯\n\nFollowing Bruno Guimaraes' arrival, who should Mikel Arteta start in the midfield? 🤔",
+    "post_author": "@goal",
+    "post_url": "https://x.com/goal/status/2086131156588900643",
+    "topic": "sports"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Bruno Rice and Odegaard feels like the balanced pick for control plus creativity.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Where is Odegaard😂😂",
+      "author": "@junior_flexxx",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "Hope this helps",
+      "author": "@united_twh",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "what does this mean for partey then",
+      "author": "@sophie_dawn_20",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Why not stop now since it’s the same Mikel who’s gone and made sure we brought Bruno in you fucking melt.",
+      "author": "@IsYoursGold14",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The phrasing is a bit too polished and explanatory in weighing the 'balanced' qualities.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 956513892
+}

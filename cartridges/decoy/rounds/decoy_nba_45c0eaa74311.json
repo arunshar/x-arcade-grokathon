@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-45c0eaa74311",
+  "source": {
+    "post_text": "Zach Lowe says the Lakers are TRAPPED after the Walker Kessler trade and may be forced to trade Austin Reaves\n\n“There’s no question that they overpaid for him [Walker Kessler] and are now trapped with this team and have to figure out: either this is the team or is there a way to pivot by trading Austin Reaves down the line or something like that. They are out of tradeable assets because of the Walker Kessler deal.”",
+    "post_author": "@TheNBABase",
+    "post_url": "https://x.com/TheNBABase/status/2086272377613348870",
+    "topic": "nba"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "Kessler does lock them into a certain build and the asset cost was steep, but pairing him with Luka still leaves room to see if the fit works before forcing a Reaves move. Feels early to call it a full trap.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "Dude I'm just not seeing what these people are seeing, ur core is Luka AR and Kessler. U build everything out around those 3, I don't understand the problem. A lot of teams don't even have two players that are that good, lakers got 3. Top 3 team in the west if healthy...",
+      "author": "@MattHatten0623",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "two swaps that won’t convert is a haul? lolololol these guys are stupid.",
+      "author": "@amedna0",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "And this is another guy that just listened to the media way too much nobody as what I said we’ll play a whole 82 games for a Utah team every season you can look at the stats against contending teams like Toronto, OKC and that’s actually a reasonable contract look what Jakob got",
+      "author": "@Dknowball2",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Reaves should've BEEN traded long ago.  Instead the Lakers chose to pay a role player a Max salary.  They won't be close to contending until they trade Reaves for a true 2nd option.",
+      "author": "@Trone99",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply is oddly balanced and slightly essay-like in calmly weighing both sides without raw fan emotion.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 637528778
+}
