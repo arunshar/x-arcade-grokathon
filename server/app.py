@@ -407,41 +407,45 @@ async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
 
     if not FORCE_FALLBACK:
         try:
-            attempts = max(decoy_queue.round_count() * 2, 8)
-            # Pass order:
-            #  1) topic match + media ready (if prefer_media)
-            #  2) topic match any
-            #  3) any screened (ignore topic if pool exhausted)
-            passes: list[tuple[bool, bool]] = []
-            if topic_filter and prefer_media:
-                passes = [(True, True), (True, False), (False, False)]
-            elif topic_filter:
-                passes = [(True, False), (False, False)]
+            attempts = max(decoy_queue.round_count() * 3, 12)
+            # When a topic filter is set, NEVER leave that theme — even if we
+            # must reuse a recent round_id. Random rooms may fall back freely.
+            # Pass order within a theme:
+            #  1) theme + certified Imagine media (best for GIF rounds)
+            #  2) theme any screened post (text rounds / pending media)
+            if topic_filter:
+                passes = (
+                    [(True, True), (True, False)]
+                    if prefer_media
+                    else [(True, False)]
+                )
             elif prefer_media:
                 passes = [(False, True), (False, False)]
             else:
                 passes = [(False, False)]
 
-            for require_topic, require_media in passes:
-                skip = set(exclude)
-                for _ in range(attempts):
-                    rnd = decoy_queue.next_round(exclude_ids=skip)
-                    gates = safety_screen.screen_round(rnd)
-                    rnd["safety"] = gates
-                    rid = str(rnd.get("round_id") or "")
-                    if not gates["screened"]:
-                        if rid:
-                            skip.add(rid)
-                        continue
-                    if require_topic and _round_topic(rnd) not in topic_filter:
-                        if rid:
-                            skip.add(rid)
-                        continue
-                    if require_media and not _round_has_ready_decoy_media(rnd):
-                        if rid:
-                            skip.add(rid)
-                        continue
-                    return rnd
+            for allow_recent in (False, True):
+                base_skip = set() if allow_recent else set(exclude)
+                for require_topic, require_media in passes:
+                    skip = set(base_skip)
+                    for _ in range(attempts):
+                        rnd = decoy_queue.next_round(exclude_ids=skip)
+                        gates = safety_screen.screen_round(rnd)
+                        rnd["safety"] = gates
+                        rid = str(rnd.get("round_id") or "")
+                        if not gates["screened"]:
+                            if rid:
+                                skip.add(rid)
+                            continue
+                        if require_topic and _round_topic(rnd) not in topic_filter:
+                            if rid:
+                                skip.add(rid)
+                            continue
+                        if require_media and not _round_has_ready_decoy_media(rnd):
+                            if rid:
+                                skip.add(rid)
+                            continue
+                        return rnd
         except Exception:
             pass
     fallback = copy.deepcopy(FALLBACK_ROUND)
