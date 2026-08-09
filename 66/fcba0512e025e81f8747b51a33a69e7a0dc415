@@ -1,0 +1,19 @@
+artifacts/integration_trace.txt
+  s_da6f3933cdb62d::t_b16baf6ad28be6 1-2,4,19-20,22-47,60-86,89-90,98-99,101,114-115,117-144,152-153,155,168-194,197-198,206-207,209,221-245,247-248,250-360,368-369,371,384-410,413-414,422-423,425,438-464,467-1764,1772-1773,1775,1788-1789,1792-1793,1806,1808,1811,1814,1817-1822,1827
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "66fcba0512e025e81f8747b51a33a69e7a0dc415",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
