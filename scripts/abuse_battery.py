@@ -144,8 +144,12 @@ async def main():
         socks.append(w)
     s = await drain(socks[0], lambda m: len(m.get("players", [])) == 30, timeout=20)
     check(s and len(s["players"]) == 30, "30 players joined and broadcast")
-    await socks[0].send(json.dumps({"t": "next", "room": "CROWD"}))
-    s = await drain(socks[0], lambda m: m.get("phase") == "guessing", timeout=15)
+    # Over a WAN, 30 sequential joins can outlast the 10s session clock, so
+    # the round may already be running. Only send the skip from the lobby;
+    # a next during guessing is deliberately ignored by the server.
+    if s and s.get("phase") != "guessing":
+        await socks[0].send(json.dumps({"t": "next", "room": "CROWD"}))
+        s = await drain(socks[0], lambda m: m.get("phase") == "guessing", timeout=15)
     check(s and s["phase"] == "guessing", "30-player round starts")
     for i, w in enumerate(socks):
         await w.send(json.dumps({"t": "guess", "room": "CROWD", "slot": i % 5, "ms": i}))
@@ -186,8 +190,14 @@ async def main():
     check(code in (200, 501, 503), f"POST /agent/commentate demo-mode -> {code}")
     code, _ = http("/agent/commentate", data=None, method="POST")
     check(code in (400, 422), f"POST /agent/commentate empty body -> {code}")
-    code, _ = http("/tts", data={"text": "hello"})
-    check(code == 503, f"POST /tts demo-mode gated -> {code}")
+    # Mode-aware: demo gates TTS behind 503, live serves real audio.
+    _, hbody = http("/health")
+    mode = json.loads(hbody).get("mode")
+    code, tts_body = http("/tts", data={"text": "battery check"})
+    if mode == "live":
+        check(code == 200 and len(tts_body) > 1000, f"POST /tts live serves audio -> {code}")
+    else:
+        check(code == 503, f"POST /tts demo-mode gated -> {code}")
     check(alive(), "server alive after endpoint battery")
 
     print(f"\nRESULT: {len(PASS)} passed, {len(FAIL)} failed")
