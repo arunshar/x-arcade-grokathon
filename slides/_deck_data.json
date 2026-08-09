@@ -29,12 +29,15 @@
       "layout": "chart",
       "body": [],
       "highlights": [
-        {"label": "The product expression of that mission", "value": "A game"}
+        {
+          "label": "The product expression of that mission",
+          "value": "A game"
+        }
       ],
       "chartRef": "bier_mission",
       "figureRef": "",
       "equations": [],
-      "notes": "Open on the platform's own words, per Mohit's direction. This is X's head of product stating the mission in February 2026: the platform exists to give people an authentic pulse on humanity, and nothing is more unsettling than machine text wearing a human face. Decoy is that sentence turned into a game. The quote is verbatim from the public post at the URL on the slide. Land the beat: we did not invent this problem statement. X wrote it. We built the product for it."
+      "notes": "SAY: This is X's head of product, writing in February. The platform exists to give people a pulse on humanity, and nothing is more unsettling than reading what you think is a person and finding it was a machine. We did not invent that problem. X wrote it down. We built the product for it.  CUE: the quote is on screen, point and paraphrase, do not read it line by line."
     },
     {
       "n": 2,
@@ -44,14 +47,23 @@
       "layout": "chart",
       "body": [],
       "highlights": [
-        {"label": "Chatbot accounts removed, reported", "value": "42,000"},
-        {"label": "Games shipped by X in 20 years", "value": "0"},
-        {"label": "The 2026 AI-game promise", "value": "Unshipped"}
+        {
+          "label": "Chatbot accounts removed, reported",
+          "value": "42,000"
+        },
+        {
+          "label": "Games shipped by X in 20 years",
+          "value": "0"
+        },
+        {
+          "label": "The 2026 AI-game promise",
+          "value": "Unshipped"
+        }
       ],
       "chartRef": "bier_receipts",
       "figureRef": "",
       "equations": [],
-      "notes": "Three receipts, all public posts from X's head of product, quoted verbatim with dates and URLs on the slide. July 24: 42,000 chatbot accounts removed, with the bright line named, no AI engagement without a human in the loop. July 31: the slop-ocalypse framing. January 15: the InfoFi ban, X kills apps whose incentives manufacture slop. Reported engagement on the purge post was about 62.9k likes, quoted as reported, not measured by us. The gap: for all that war footing, X has never shipped a game, and the promised AI game from October 2025 remains unshipped. The lane is open and the mission is stated. Next slide is what we drove into it."
+      "notes": "SAY: And X is already at war with this. Forty-two thousand chatbot accounts removed in one sweep. The InfoFi ban, killing the apps that pay people to post slop. They named the enemy, the slop-ocalypse. But in twenty years X has never shipped a game, and the AI game they promised is still unshipped. That lane is open and the mission is already stated.  CUE: point at the three cards, do not read them. The 62.9k likes figure is reported, not ours, keep it off the mic."
     },
     {
       "n": 3,
@@ -67,14 +79,23 @@
         "Reveal shows every player's pick and the machine's tell"
       ],
       "highlights": [
-        {"label": "Match length", "value": "6 rounds"},
-        {"label": "Round clock", "value": "30s"},
-        {"label": "Topic rounds built", "value": "12"}
+        {
+          "label": "Match length",
+          "value": "6 rounds"
+        },
+        {
+          "label": "Round clock",
+          "value": "30s"
+        },
+        {
+          "label": "Topic rounds built",
+          "value": "12"
+        }
       ],
       "chartRef": "loop",
       "figureRef": "",
       "equations": [],
-      "notes": "The loop is one breath long. A real post, four replies read verbatim from the thread, one imposter Grok wrote to match the thread's register. Thirty seconds to tap the machine. New today: matches cap at six rounds and end on a results screen with standings, rounds alternate between text and GIF modes where the fake is an Imagine-generated clip hidden among real reaction GIFs, and the reveal chips every card with who picked it. Twelve topic rounds are committed across sports, gaming, science, space, music, movies, food, crypto, ai, tech, travel, and nba. The live demo build plays six of them with GIF rounds enabled."
+      "notes": "SAY: Here is what we built. One real trending thread off X. Four of these replies are real people, one was written by Grok to blend in. Thirty seconds to find the machine. Matches run six rounds and end on a results screen. Some rounds are text, some are GIF rounds where the fake is an Imagine video.  CUE: this is the shape of the game. We play it live at the end, not now."
     },
     {
       "n": 4,
@@ -88,14 +109,23 @@
         "Solo works, a crowd works, latecomers just land in the next beat"
       ],
       "highlights": [
-        {"label": "Room code", "value": "GROK"},
-        {"label": "On the clock", "value": "30s"},
-        {"label": "Match", "value": "6 rounds"}
+        {
+          "label": "Room code",
+          "value": "GROK"
+        },
+        {
+          "label": "On the clock",
+          "value": "30s"
+        },
+        {
+          "label": "Match",
+          "value": "6 rounds"
+        }
       ],
       "chartRef": "",
       "figureRef": "",
       "equations": [],
-      "notes": "Stop talking and play. The QR on screen drops everyone into room GROK. There is no host to wait for: the first player in a lobby arms a ten second countdown and the room runs itself from there, reveal to next round on a clock, with any player able to skip the wait. A lone judge clicking the link at 2am gets a real game against the house. If the venue network dies, the demo runs offline from committed fixtures with zero network egress, proven by a socket guard. Open the Space ten minutes before the slot so the container is warm."
+      "notes": "SAY: Before we go further, take out your phone and scan this code. It drops you straight into the room. There is no host to wait for, the room runs itself on a clock. Get in now, and we will play a live round together at the end.  CUE: THE QR MUST BE ON SCREEN HERE. The audience joins during the rest of the deck, so the room is full by slide 9. Do not tap START yet."
     },
     {
       "n": 5,
@@ -105,15 +135,27 @@
       "layout": "chart",
       "body": [],
       "highlights": [
-        {"label": "x_search probe", "value": "42s"},
-        {"label": "Image gen probe", "value": "6.5s"},
-        {"label": "TTS probe", "value": "1.78s"},
-        {"label": "Commentator line, fast model", "value": "0.6s"}
+        {
+          "label": "x_search probe",
+          "value": "42s"
+        },
+        {
+          "label": "Image gen probe",
+          "value": "6.5s"
+        },
+        {
+          "label": "TTS probe",
+          "value": "1.78s"
+        },
+        {
+          "label": "Commentator line, fast model",
+          "value": "0.6s"
+        }
       ],
       "chartRef": "pipeline",
       "figureRef": "",
       "equations": [],
-      "notes": "Five beats: x_search finds a live thread, a second grounded call reads its replies verbatim and rejects any response that made no search call, Grok writes the imposter, five deterministic gates screen the round and fail closed, and the queue serves only clean rounds. All probe numbers are measured and committed under artifacts/probes/. The commentator agent runs on a fast model because we measured the big one at 5.3 to 5.9 seconds per line versus 0.6 (artifacts/probes/host_agent_chat.json). Anti-cheat runs deeper than field stripping: during guessing, real media URLs never leave the server. Every reply's clip serves through an opaque per-round URL with identical shape and headers, because the decoy used to be identifiable three ways without playing, by its URL path, by being the only mp4, and by a pending status only a decoy could have. Proven closed by fetching every media URL across twelve straight rounds."
+      "notes": "SAY: Under the hood it is five beats. A search finds a live thread, a second grounded call reads the real replies, Grok writes the imposter, five deterministic gates screen the round and fail closed, and only clean rounds serve. One event-day pull was rejected for an embedded link and never served. And you cannot cheat: during guessing, the answer never leaves the server.  CUE: only go deep here if the room is technical, otherwise one sentence and move on."
     },
     {
       "n": 6,
@@ -128,13 +170,19 @@
         "This is a thesis. No flywheel number is measured."
       ],
       "highlights": [
-        {"label": "Labeled as such", "value": "Thesis"},
-        {"label": "Flywheel metrics measured", "value": "0"}
+        {
+          "label": "Labeled as such",
+          "value": "Thesis"
+        },
+        {
+          "label": "Flywheel metrics measured",
+          "value": "0"
+        }
       ],
       "chartRef": "flywheel",
       "figureRef": "",
       "equations": [],
-      "notes": "Tie this straight back to slide two: X drew the bright line at AI engagement with no human in the loop, and enforcement of that line is starved for labeled data about what reads as machine-written to actual humans. Every Decoy guess is exactly that label, attached to real content, at game speed. The wrong guesses are the richest half, real people whose replies read like bots. We have measured none of it and say so on the slide. The claim is that the loop exists and the game mints the labels as a side effect of being fun."
+      "notes": "SAY: Here is the thesis. X drew a bright line at AI with no human in the loop. Enforcing that line is starved for data about what reads as machine-written to real people. Every guess in the game is exactly that label, and the wrong guesses are the richest half, real people who read like bots. We have measured none of this yet, and it says so on the slide.  CUE: say the word thesis out loud, it is your honesty anchor."
     },
     {
       "n": 7,
@@ -149,13 +197,19 @@
         "A rejected round is the screen working"
       ],
       "highlights": [
-        {"label": "Gates, fail closed", "value": "5"},
-        {"label": "Event-day pull gated on G_URL", "value": "1"}
+        {
+          "label": "Gates, fail closed",
+          "value": "5"
+        },
+        {
+          "label": "Event-day pull gated on G_URL",
+          "value": "1"
+        }
       ],
       "chartRef": "gates",
       "figureRef": "",
       "equations": [],
-      "notes": "The platform claim rests on the seam. A cartridge ships rounds that satisfy one small contract, and the cabinet supplies rooms, the session clock, scoring, the voice host, the commentator agent, and the share card forge. The gates run at load, deterministic, and fail closed, and they proved themselves on real content: an event-day live pull was rejected on G_URL and never served. The gates check integrity, not taste, so freshly pulled rounds also get a human read before they serve. That is the answer an ads buyer needs first, a deterministic screen that a brand never sits behind."
+      "notes": "SAY: This is a platform, not one game. A cartridge ships rounds behind one small contract, and the cabinet supplies the rooms, the clock, scoring, the voice host, and the share cards. The gates are infrastructure. A rejected round is not a bug, it is the screen working.  CUE: keep this short unless a judge asks."
     },
     {
       "n": 8,
@@ -170,13 +224,19 @@
         "Every revenue figure is illustrative, none is measured"
       ],
       "highlights": [
-        {"label": "Ad module CPM field", "value": "ILLUSTRATIVE"},
-        {"label": "Demo sponsor names", "value": "Fictional"}
+        {
+          "label": "Ad module CPM field",
+          "value": "ILLUSTRATIVE"
+        },
+        {
+          "label": "Demo sponsor names",
+          "value": "Fictional"
+        }
       ],
       "chartRef": "",
       "figureRef": "share_card",
       "equations": [],
-      "notes": "Two ad surfaces fall out of the game. Sponsored arenas: a brand picks a topic, gets an accent and its name on the arena, the game stays identical. The share card: the winner's card carries the sponsor mark, so every organic share is brand reach next to a topic the brand chose. Tie it to the receipts: X's InfoFi ban killed apps that pay users to post, because that incentive manufactures slop, while a sponsored arena aligns the incentive with brand-safe, human play. The ad module ships with its cpm field set to the literal string ILLUSTRATIVE and every demo sponsor is fictional, so no invented market number appears anywhere. Any revenue figure attached to this is a projection, said plainly."
+      "notes": "SAY: The money is the sponsored arena. A brand picks a topic, the game stays identical, and the winner's share card carries the sponsor mark, so every share is brand reach next to a topic the brand chose. Tie it to the receipts: X killed pay-to-post because it makes slop, and this aligns the incentive with brand-safe human play. Every number here is illustrative and labeled as such.  CUE: never quote a market size, there is not a real one."
     },
     {
       "n": 9,
@@ -191,13 +251,19 @@
         "The ask: ship one cartridge on X, instrument the guess stream"
       ],
       "highlights": [
-        {"label": "License", "value": "MIT"},
-        {"label": "On the xAI API", "value": "1 day"}
+        {
+          "label": "License",
+          "value": "MIT"
+        },
+        {
+          "label": "On the xAI API",
+          "value": "1 day"
+        }
       ],
       "chartRef": "",
       "figureRef": "",
       "equations": [],
-      "notes": "Close on candor. Built on the xAI API surfaces: x_search, Grok 4.5 text, Imagine image and video, Grok voice. What is real: live rounds from real threads, six-round matches, GIF rounds with an opaque anti-cheat, gates that rejected real content on event day, and an offline proof with zero network egress. What is staged and stated as staged: the post-back to X. The usage page at /stats counts real player actions and says its counters reset on deploy, so the number is honest, not an impression count. The ask is small and concrete: ship one cartridge behind a real X surface and instrument the guess stream to test the flywheel thesis for real."
+      "notes": "SAY: Built in a day, on the xAI API, live and playable right now. Usage is public and honest at slash stats, real player actions, never impressions. What is staged, the post-back to X, we say so. The ask is small: ship one cartridge behind a real X surface and instrument the guess stream. And now, let us actually play.  CUE: SWITCH TO THE APP. The room is already full from slide 4. Tap START, run one round, land the reveal. Done."
     }
   ],
   "tweets": {
@@ -210,19 +276,22 @@
     },
     "receipts": [
       {
-        "handle": "@nikitabier", "name": "Nikita Bier",
+        "handle": "@nikitabier",
+        "name": "Nikita Bier",
         "date": "Jul 24, 2026",
         "url": "x.com/nikitabier/status/2080747924380856519",
         "text": "We found 42,000 accounts automating replies using chatbots and have removed them from the platform.\n\nX's core value is providing an authentic pulse on humanity -- and using AI to programmatically engage with users without a human in the loop runs counter to our mission."
       },
       {
-        "handle": "@nikitabier", "name": "Nikita Bier",
+        "handle": "@nikitabier",
+        "name": "Nikita Bier",
         "date": "Jul 31, 2026",
         "url": "x.com/nikitabier/status/2083254001014120458",
         "text": "We have a common enemy: the slop-ocalypse"
       },
       {
-        "handle": "@nikitabier", "name": "Nikita Bier",
+        "handle": "@nikitabier",
+        "name": "Nikita Bier",
         "date": "Jan 15, 2026",
         "url": "x.com/nikitabier/status/2011825522817270230",
         "text": "We are revising our developer API policies:\n\nWe will no longer allow apps that reward users for posting on X (aka \"infofi\"). This has led to a tremendous amount of AI slop & reply spam on the platform."
