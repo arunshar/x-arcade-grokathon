@@ -1525,7 +1525,37 @@ function renderGame(s) {
   const src = r.source || {};
   $("postAuthor").textContent = src.post_author || "@unknown";
   $("postAvatar").textContent = (src.post_author || "?").replace("@", "").charAt(0) || "?";
-  const fmt = (r.format === "gif") ? "gif" : "text";
+
+  // During guessing, freeze format on first paint for this round_id so a late
+  // server media attach cannot pop GIFs in after the user already picked.
+  let fmt = (r.format === "gif") ? "gif" : "text";
+  if (s.phase === "guessing" && r.round_id) {
+    if (guessingMediaFreezeRid !== r.round_id) {
+      guessingMediaFreezeRid = r.round_id;
+      guessingMediaFreezeGif = fmt === "gif"
+        && (r.replies || []).some((rep) => rep && rep.media_url);
+    }
+    // If we started without media, keep text for the whole guess.
+    if (!guessingMediaFreezeGif) {
+      fmt = "text";
+      // Strip media so renderReplies cannot paint late-arriving URLs.
+      if (r.replies) {
+        r.replies = r.replies.map((rep) => {
+          if (!rep || typeof rep !== "object") return rep;
+          const copy = Object.assign({}, rep);
+          delete copy.media_url;
+          delete copy.media_type;
+          delete copy.media_status;
+          return copy;
+        });
+      }
+      r.format = "text";
+    }
+  } else if (s.phase !== "guessing") {
+    guessingMediaFreezeRid = "";
+    guessingMediaFreezeGif = false;
+  }
+
   const topic = src.topic || "";
   $("postTopic").textContent = topic
     ? (topic + " · " + (fmt === "gif" ? "GIF ROUND" : "TEXT ROUND"))
@@ -1548,6 +1578,10 @@ function renderGame(s) {
 
 // Fingerprint of reply media set last used for recenter — avoid jitter.
 let lastCenteredReplyArtKey = "";
+// Freeze gif-vs-text for the current guessing round so late media does not
+// pop in after the player has already locked a pick.
+let guessingMediaFreezeRid = "";
+let guessingMediaFreezeGif = false;
 
 /** Hide legacy post-level Imagine block. */
 function hidePostRoundArt() {

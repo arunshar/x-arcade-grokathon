@@ -322,14 +322,55 @@ def _deadline_ms(room: dict[str, Any]) -> int | None:
     return max(0, int(remaining * 1000))
 
 
+def _uniform_ready_media(rnd: dict[str, Any]) -> dict[int, str] | None:
+    """Return slot→local .mp4 path if every reply has ready video, else None."""
+    real: dict[int, str] = {}
+    replies = [r for r in (rnd.get("replies") or []) if isinstance(r, dict) and "slot" in r]
+    if not replies:
+        return None
+    for r in replies:
+        url = r.get("media_url")
+        status = str(r.get("media_status") or "")
+        if not url or status not in ("", "ready"):
+            return None
+        path = _media_local_path(str(url))
+        if path is None or path.suffix.lower() != ".mp4":
+            return None
+        real[int(r["slot"])] = str(path)
+    if len(real) != len(replies):
+        return None
+    return real
+
+
+def _freeze_guessing_media(room: dict[str, Any], rnd: dict[str, Any]) -> bool:
+    """Lock whether this guessing phase shows GIFs — never flip mid-round.
+
+    If media is not fully ready when the round starts, clients play text-only
+    for the whole guess. Late Imagine results must not pop GIFs in after a
+    pick (that felt like a glitch and could leak timing).
+    """
+    fmt = str(rnd.get("format") or "text").lower()
+    real = _uniform_ready_media(rnd) if fmt == "gif" else None
+    serve = bool(real)
+    room["guessing_media"] = serve
+    if serve and real is not None:
+        room["media_files"] = real
+        if not room.get("media_token"):
+            room["media_token"] = secrets.token_hex(4)
+    else:
+        # Keep any files for reveal, but do not advertise media while guessing.
+        room["media_files"] = real or room.get("media_files") or {}
+    return serve
+
+
 def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
     """The round as clients may see it in the current phase.
 
     During guessing this is the contract's critical strip: no decoy_slot, no
     decoy_rationale, no media_source. Replies are slot + text + media only.
 
-    GIF rounds show looping media on every card (4 human GIFs + 1 Imagine
-    video-as-gif). media_source is stripped so clients cannot tell which is AI.
+    GIF media is frozen at round start (``room['guessing_media']``). Late
+    Imagine completion does not inject media mid-guess.
     """
     rnd = room["round"]
     if rnd is None or room["phase"] != "guessing":
@@ -344,34 +385,17 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
     )
     safe = {k: v for k, v in rnd.items() if k not in strip_keys}
 
-    # The media itself was an oracle in three ways: the decoy's URL contained
-    # /decoy/, it was the only .mp4 among .gif files, and it was the only slot
-    # whose status could read "pending". So during guessing the real URLs never
-    # leave the server. Every slot's media is either served for ALL five
-    # replies through opaque per-round proxy URLs of identical shape and type,
-    # or for none of them, in which case the round presents as text.
-    real: dict[int, str] = {}
-    uniform = True
-    for r in rnd.get("replies") or []:
-        if not isinstance(r, dict) or "slot" not in r:
-            continue
-        url = r.get("media_url")
-        status = str(r.get("media_status") or "")
-        if not url or status not in ("", "ready"):
-            uniform = False
-            break
-        path = _media_local_path(str(url))
-        if path is None or path.suffix.lower() != ".mp4":
-            uniform = False
-            break
-        real[int(r["slot"])] = str(path)
-    fmt = str(rnd.get("format") or "text").lower()
-    serve_media = fmt == "gif" and uniform and len(real) == len(rnd.get("replies") or [])
-
+    # Frozen at round start — never promote text→gif after the first broadcast.
+    serve_media = bool(room.get("guessing_media"))
     if serve_media:
-        room["media_files"] = real
-        if not room.get("media_token"):
-            room["media_token"] = secrets.token_hex(4)
+        real = room.get("media_files") or _uniform_ready_media(rnd) or {}
+        if len(real) != len(rnd.get("replies") or []):
+            # Safety: incomplete map → text for this view only (flag stays).
+            serve_media = False
+        else:
+            room["media_files"] = real
+            if not room.get("media_token"):
+                room["media_token"] = secrets.token_hex(4)
     token = room.get("media_token")
 
     safe_replies = []
@@ -379,7 +403,7 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
         if not isinstance(r, dict) or "slot" not in r:
             continue
         item: dict[str, Any] = {"slot": r["slot"], "text": r.get("text") or ""}
-        if serve_media:
+        if serve_media and token is not None:
             item["media_url"] = f"/media/{room['room_id']}/{token}/{r['slot']}.mp4"
             item["media_type"] = "video"
             item["media_status"] = "ready"
@@ -611,27 +635,11 @@ async def _start_round(room: dict[str, Any]) -> None:
         # Keep last ~12 stems (~3 gif rounds) so the pool can rotate.
         prev = [s for s in (room.get("recent_gif_stems") or []) if s not in stems]
         room["recent_gif_stems"] = (stems + prev)[:12]
-    room["round"] = rnd
-    room["reveal"] = None
-    room["results"] = None
-    room["phase"] = "guessing"
-    STATS["rounds_started"] += 1
-    room["guess_counter"] = 0
-    for p in room["players"].values():
-        p.guessed = False
-        p.guess_slot = None
-        p.guess_order = None
-        p.client_ms = None
-    room["deadline_at"] = asyncio.get_running_loop().time() + config.ROUND_SECONDS
-    room["timer"] = asyncio.create_task(_round_timer(room))
-    await _broadcast(room)
-    # Live GIF rounds: decoy reply media MUST come from Grok Imagine
-    # (grok-imagine-image + grok-imagine-video), never a human pool .gif.
-    # If a unique mp4 already exists on disk, auto-certify it so cards can
-    # show immediately instead of waiting on a multi-minute API job.
-    imagine_required = bool(getattr(config, "IMAGINE_DECOY_REQUIRED", True))
+
+    # Live: stamp certified decoy BEFORE freezing media so the first paint
+    # already has all five videos when files exist (no mid-round pop-in).
+    certified = False
     if config.MODE == "live" and rnd.get("format") == "gif":
-        certified = False
         try:
             from services.imagine_agent import (
                 decoy_video_path,
@@ -643,7 +651,6 @@ async def _start_round(room: dict[str, Any]) -> None:
             vpath = decoy_video_path(rid)
             certified = ensure_certified(rid, vpath) or is_imagine_certified(vpath)
             if certified and vpath.is_file():
-                # Stamp decoy so the uniform media gate can serve all five.
                 url = "/static-assets/reply-gifs/decoy/" + vpath.name
                 for rep in rnd.get("replies") or []:
                     if not isinstance(rep, dict):
@@ -658,55 +665,58 @@ async def _start_round(room: dict[str, Any]) -> None:
                         rep["media_status"] = "ready"
                         rep["media_source"] = "imagine"
                 rnd["decoy_media_status"] = "ready"
-        except Exception:
-            certified = False
-        # Always clear any non-Imagine URL off the decoy slot when uncertified.
-        if not certified:
-            for rep in rnd.get("replies") or []:
-                if not isinstance(rep, dict):
-                    continue
-                if rep.get("media_source") != "imagine" and not rep.get("is_decoy"):
-                    try:
-                        if int(rep.get("slot")) != int(rnd.get("decoy_slot")):
-                            continue
-                    except (TypeError, ValueError):
+            else:
+                for rep in rnd.get("replies") or []:
+                    if not isinstance(rep, dict):
                         continue
-                url = str(rep.get("media_url") or "")
-                if (
-                    url.lower().endswith(".gif")
-                    or ("/reply-gifs/" in url and "/decoy/" not in url)
-                    or url.rstrip("/").lower().endswith("_probe.mp4")
-                    or not url
-                ):
+                    if rep.get("media_source") != "imagine" and not rep.get("is_decoy"):
+                        try:
+                            if int(rep.get("slot")) != int(rnd.get("decoy_slot")):
+                                continue
+                        except (TypeError, ValueError):
+                            continue
                     rep["media_url"] = None
                     rep["media_type"] = "video"
                     rep["media_status"] = "pending"
                     rep["media_source"] = "imagine"
-                    rep["media_engine"] = (
-                        f"{config.MODEL_IMAGE}+{getattr(config, 'MODEL_VIDEO', '')}"
-                    )
-        # Schedule Grok Imagine whenever the decoy reply is not certified ready.
+                rnd["decoy_media_status"] = "pending"
+        except Exception:
+            certified = False
+
+    room["round"] = rnd
+    room["reveal"] = None
+    room["results"] = None
+    room["phase"] = "guessing"
+    # Freeze gif-vs-text for this entire guess. Late Imagine must not inject
+    # media after players have already started picking.
+    _freeze_guessing_media(room, rnd)
+    STATS["rounds_started"] += 1
+    room["guess_counter"] = 0
+    for p in room["players"].values():
+        p.guessed = False
+        p.guess_slot = None
+        p.guess_order = None
+        p.client_ms = None
+    room["deadline_at"] = asyncio.get_running_loop().time() + config.ROUND_SECONDS
+    room["timer"] = asyncio.create_task(_round_timer(room))
+    await _broadcast(room)
+
+    if config.MODE == "live" and rnd.get("format") == "gif":
+        imagine_required = bool(getattr(config, "IMAGINE_DECOY_REQUIRED", True))
         needs_imagine = (not certified) or (
             imagine_required and rnd.get("decoy_media_status") != "ready"
         )
         if needs_imagine:
-            if not certified:
-                rnd["decoy_media_status"] = "pending"
             print(
                 f"imagine: scheduling Grok Imagine "
                 f"({config.MODEL_IMAGE}+{getattr(config, 'MODEL_VIDEO', '')}) "
-                f"for decoy reply {rnd.get('round_id')}",
+                f"for decoy reply {rnd.get('round_id')} "
+                f"(guessing stays text until next round if not ready yet)",
                 file=sys.stderr,
             )
             asyncio.create_task(
                 _attach_decoy_imagine_gif(room, rnd, force=not certified)
             )
-        else:
-            # Media may have become ready via ensure_certified — rebroadcast
-            # so clients get opaque /media/ URLs instead of text-only.
-            await _broadcast(room)
-        # Prefetch the next few uncertified rounds so the following match
-        # steps do not stall on Imagine mid-guess.
         asyncio.create_task(_prefetch_upcoming_decoy_media(room))
 
 
@@ -1005,8 +1015,22 @@ async def _attach_decoy_imagine_gif(
                 rep["media_status"] = "pending"
                 rnd["decoy_media_status"] = "pending"
 
-    if room.get("round") is rnd and room["phase"] in ("guessing", "reveal"):
+    # Refresh media_files for reveal, but never un-freeze guessing presentation.
+    if certified and certified_url:
+        real = _uniform_ready_media(rnd)
+        if real:
+            room["media_files"] = real
+
+    if room.get("round") is not rnd:
+        return
+    if room["phase"] == "reveal":
+        # Reveal may show media even if guessing was text-only.
         await _broadcast(room)
+    elif room["phase"] == "guessing":
+        # Only rebroadcast if this round already started WITH media (token
+        # refresh etc.). Never promote text → gif after players started picking.
+        if room.get("guessing_media"):
+            await _broadcast(room)
 
 @app.get("/health")
 async def health() -> dict[str, Any]:
