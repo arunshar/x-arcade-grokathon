@@ -29,8 +29,9 @@ if str(REPO_ROOT) not in sys.path:
 os.environ["ARCADE_MODE"] = "demo"
 os.environ["ARCADE_NO_SHUFFLE"] = "1"  # suite asserts against committed round files
 # The wrap proof plays every servable round plus one, which must exceed the
-# default 6-round match cap. The cap itself gets focused coverage below.
-os.environ["ARCADE_MATCH_ROUNDS"] = "20"
+# default 6-round match cap. Cap is raised after the answer key is loaded
+# (pool can grow past 20). The cap itself gets focused coverage below.
+os.environ["ARCADE_MATCH_ROUNDS"] = "64"
 os.environ.pop("ARCADE_FORCE_FALLBACK", None)
 
 # Any connection attempt that leaves loopback is an integration failure.
@@ -133,6 +134,9 @@ async def http_get(path: str) -> tuple[int, bytes, str]:
 async def main() -> int:
     key, servable, gated = load_answer_key()
     log(f"answer key: {len(servable)} servable rounds, gated out: {gated}")
+    # Match cap must fit the full wrap proof (every servable + 1).
+    config.MATCH_ROUNDS = max(int(getattr(config, "MATCH_ROUNDS", 6) or 6), len(servable) + 5)
+    log(f"match cap for wrap proof: {config.MATCH_ROUNDS}")
 
     server = uvicorn.Server(uvicorn.Config(app, host=HOST, port=PORT, log_level="warning"))
     serve_task = asyncio.create_task(server.serve())
@@ -286,7 +290,7 @@ async def main() -> int:
             check(me["score"] == 0 and state.get("rounds_played") == 1,
                   "new match resets score and round counter")
     finally:
-        config.MATCH_ROUNDS = 20
+        config.MATCH_ROUNDS = max(64, len(servable) + 5)
 
     server.should_exit = True
     await serve_task

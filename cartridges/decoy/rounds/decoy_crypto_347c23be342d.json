@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-347c23be342d",
+  "source": {
+    "post_text": "💹 Market update:\n\n Global crypto market cap holds at $1.76T (+1.06% 24h), with BTC leading trading volume at $9.99B while SOL (+3%) and BNB (+1.74%) outperform.\n\n Strong institutional demand returns as US Spot Bitcoin ETFs log $1B in weekly inflows, acting as the main driver for large-cap price action.  \n\n Headline friction creates mixed sentiment, driven by self-custody debates post-Coldcard exploit, US legislative delays on the Clarity Act, and Ethereum EIP-8363 backlash.  \n\n🎯 Actionable Insights:\n\n…",
+    "post_author": "@CryptoIntelXYZ",
+    "post_url": "https://x.com/CryptoIntelXYZ/status/2086252533308362875",
+    "topic": "crypto"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "ETF inflows doing the heavy lifting again. You think alt season finally kicks in once BTC consolidates above this range?",
+      "author": "@DezHu_TCX",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "Holding my SOL bags tight through this weekend volatility.",
+      "author": "@thuykeo56",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "ETF inflows are propping up the large caps nicely right now, so leaning into SOL and BNB relative strength while BTC chops around seems solid even with the regulatory noise lingering.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 3,
+      "text": "@CryptoIntelXYZ $1B ETF inflow is real demand signal, but watch BTC's $9.99B volume vs SOL +3%: retail chase lags until ETF seat money sets the floor.",
+      "author": "@0xkakaakl",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "Spot inflows rising makes me so proud",
+      "author": "@NamPhuo30795912",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 2,
+  "decoy_rationale": "The reply feels slightly too polished and evenly hedged, reading more like a mini-summary than a raw casual take.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 85159025
+}

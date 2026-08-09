@@ -182,9 +182,15 @@ def next_round(
             rid = str(rnd.get("round_id") or path.stem)
             if honor_ban and banned and rid in banned:
                 continue
-            # Light jitter: sometimes skip to next so consecutive matches
-            # starting at the same wall-clock don't feel locked in.
-            if prefer_fresh and not banned and n > 3 and (_rng.random() < 0.08):
+            # Light jitter only in live play — never in ARCADE_NO_SHUFFLE
+            # (integration_check asserts exact cycle order).
+            if (
+                prefer_fresh
+                and not banned
+                and n > 3
+                and os.environ.get("ARCADE_NO_SHUFFLE") != "1"
+                and (_rng.random() < 0.08)
+            ):
                 continue
             return rnd
 

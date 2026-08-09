@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-d107ba4b784f",
+  "source": {
+    "post_text": "Anne Hathaway when asked what her favourite line from ‘THE ODYSSEY’ is:\n\n“‘Somebody get these beggars out of here!’ — People are using that one savagely and I’m here for it.”\n\n(Via @EW)",
+    "post_author": "@FilmUpdates",
+    "post_url": "https://x.com/FilmUpdates/status/2086254475438887017",
+    "topic": "movies"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "It's wild how that Odyssey line about the beggars still slaps so hard today, Anne totally gets why people are weaponizing it online.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 1,
+      "text": "perfect odyssey quote because it works at every dinner party too",
+      "author": "@Unver71",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "That's such a great line! Anne always knows how to bring the sass.",
+      "author": "@1999_Plus",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "anne hathaway approving her own quote for savage internet use before EW even ran the piece, who signed off on that clause?",
+      "author": "@chaoszoid",
+      "is_decoy": false
+    },
+    {
+      "slot": 4,
+      "text": "the odyssey as a workplace comedy where the biggest threat is uninvited guests is a reading I can get behind",
+      "author": "@eren81416622",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 0,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory in neatly linking the classic quote to modern meme culture.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 817272950
+}
