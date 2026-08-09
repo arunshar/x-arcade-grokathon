@@ -1,0 +1,31 @@
+slides/make_portable.py
+  s_da6f3933cdb62d::t_f8e38035855b60 67-75,77
+slides/build_deck.py
+  s_da6f3933cdb62d::t_a094c984d75fa5 121-123
+  s_da6f3933cdb62d::t_1320b084c423da 243
+  s_da6f3933cdb62d::t_66de69ea02bb63 55-64
+slides/render_all.sh
+  s_da6f3933cdb62d::t_413fff9e1c5b39 13-15
+X_Arcade_deck_portable.html
+  s_da6f3933cdb62d::t_6ee28ec1c2a419 63-65,115,185
+slides/_deck_data.json
+  s_da6f3933cdb62d::t_1519f2094ce725 162-239,266,293,320
+slides/index.html
+  s_da6f3933cdb62d::t_bea1b3c29fc1bb 55-57,107,177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "94c887e22e11f33cc989e3fdac61cbd46a3549f5",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
