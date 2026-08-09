@@ -248,6 +248,11 @@ def _enough_players_to_start(room: dict[str, Any]) -> bool:
     return len(room.get("players") or {}) >= _min_players_to_start(room)
 
 
+def _lobby_auto_starts(room: dict[str, Any]) -> bool:
+    """Solo lobbies may auto-start; multiplayer waits for host START only."""
+    return _allows_solo(room)
+
+
 def _get_room(room_id: str) -> dict[str, Any]:
     room = ROOMS.get(room_id)
     if room is None:
@@ -993,7 +998,12 @@ async def _auto_advance(room: dict[str, Any], delay: float) -> None:
     phase = room["phase"]
     match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     if phase == "lobby":
-        # Multiplayer needs 2+ players; solo rooms may start alone.
+        # Multiplayer: no lobby countdown — host must tap START.
+        if not _lobby_auto_starts(room):
+            room["auto_timer"] = None
+            room["auto_deadline_at"] = None
+            return
+        # Solo may auto-start once a player is present.
         if not _enough_players_to_start(room):
             if room["players"]:
                 _schedule_auto(room, config.LOBBY_SECONDS)
@@ -1071,7 +1081,8 @@ async def _start_round(room: dict[str, Any]) -> None:
         room["reveal"] = None
         room["results"] = None
         room["deadline_at"] = None
-        if room["players"]:
+        # Solo only — multiplayer waits for host START (no lobby countdown).
+        if room["players"] and _lobby_auto_starts(room):
             _schedule_auto(room, config.LOBBY_SECONDS)
         await _broadcast(room)
         return
@@ -1440,7 +1451,8 @@ async def _return_to_lobby(room: dict[str, Any], *, reset_scores: bool) -> None:
             p.guess_slot = None
             p.guess_order = None
             p.client_ms = None
-    if room["players"]:
+    # Solo may auto-start again; multiplayer waits for host START.
+    if room["players"] and _lobby_auto_starts(room):
         _schedule_auto(room, config.LOBBY_SECONDS)
     await _broadcast(room)
 
@@ -2066,11 +2078,13 @@ async def ws_endpoint(ws: WebSocket) -> None:
                     _apply_room_topics(
                         room, msg, allow=bool(only_player or host_claim)
                     )
-                # No host. The session clock runs the room: the first player
-                # in a lobby arms the countdown, and solo play is a real game
-                # against the house. Later joiners land in whatever phase is
-                # running and play the next beat.
-                if room["phase"] == "lobby" and room["auto_timer"] is None:
+                # Solo lobbies may auto-start after LOBBY_SECONDS. Multiplayer
+                # waits for the host START button — no lobby countdown.
+                if (
+                    room["phase"] == "lobby"
+                    and room["auto_timer"] is None
+                    and _lobby_auto_starts(room)
+                ):
                     _schedule_auto(room, config.LOBBY_SECONDS)
                 await _broadcast(room)
 
@@ -2148,7 +2162,12 @@ async def ws_endpoint(ws: WebSocket) -> None:
                     _apply_room_topics(room, msg, allow=is_creator)
                     if not _enough_players_to_start(room):
                         # Keep waiting — do not start a 1-player multiplayer match.
-                        if room["auto_timer"] is None and room["players"]:
+                        # No lobby auto-timer for multiplayer (host START only).
+                        if (
+                            room["auto_timer"] is None
+                            and room["players"]
+                            and _lobby_auto_starts(room)
+                        ):
                             _schedule_auto(room, config.LOBBY_SECONDS)
                         await _broadcast(room)
                         continue

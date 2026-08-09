@@ -2053,19 +2053,22 @@ function renderLobby(s) {
     start.textContent = "START GAME";
     if (wait) wait.hidden = true;
   } else {
+    // Multiplayer: host starts manually — no lobby countdown.
     start.hidden = false;
     start.disabled = !canStart;
     start.textContent = canStart
-      ? "START NOW"
+      ? (iAmHost ? "START GAME" : "WAITING FOR HOST")
       : ("NEED " + minPlayers + " PLAYERS");
     if (wait) {
       wait.hidden = false;
       if (!canStart) {
         wait.textContent = "WAITING FOR PLAYERS · "
           + players.length + "/" + minPlayers;
+      } else if (iAmHost) {
+        wait.textContent = "READY · " + players.length
+          + " PLAYERS · TAP START WHEN READY";
       } else {
-        wait.textContent = autoCountdownText(s, "ROUND STARTS")
-          || ("READY · " + players.length + " PLAYERS");
+        wait.textContent = "READY · WAITING FOR HOST TO START…";
       }
     }
   }
@@ -2085,7 +2088,13 @@ function autoCountdownText(s, prefix) {
 }
 setInterval(() => {
   if (!state || !autoEndAt) return;
-  if (state.phase === "lobby" && $("waitLine") && !$("waitLine").hidden) {
+  // Multiplayer lobby has no auto-start countdown (host START only).
+  if (
+    state.phase === "lobby"
+    && $("waitLine")
+    && !$("waitLine").hidden
+    && (isSoloFriendlyRoom(state.room || myRoom) || lobbyMode === "solo")
+  ) {
     $("waitLine").textContent = autoCountdownText(state, "ROUND STARTS");
   }
   if (state.phase === "reveal" && !$("revealPanel").hidden) {
