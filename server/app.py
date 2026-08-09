@@ -17,6 +17,7 @@ import asyncio
 import copy
 import json
 import os
+import secrets
 import sys
 from pathlib import Path
 from typing import Any
@@ -159,6 +160,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
             # Stems of human GIFs used on recent gif rounds — for diversity.
             "recent_gif_stems": [],
+            # Per-room entropy so the same topic does not always draw the same GIFs.
+            "gif_session_salt": secrets.token_hex(4),
             "arena": room_id in ARENA_ROOMS,
             "host": None,
             "auto_timer": None,
@@ -169,6 +172,8 @@ def _get_room(room_id: str) -> dict[str, Any]:
     room.setdefault("results", None)
     room.setdefault("match_rounds", int(getattr(config, "MATCH_ROUNDS", 6) or 6))
     room.setdefault("rounds_played", 0)
+    room.setdefault("recent_gif_stems", [])
+    room.setdefault("gif_session_salt", secrets.token_hex(4))
     return room
 
 
@@ -420,6 +425,7 @@ async def _start_round(room: dict[str, Any]) -> None:
     ):
         room["rounds_played"] = 0
         room["recent_gif_stems"] = []
+        room["gif_session_salt"] = secrets.token_hex(4)
         for p in room["players"].values():
             p.score = 0
             p.streak = 0
@@ -436,11 +442,16 @@ async def _start_round(room: dict[str, Any]) -> None:
     session_index = rounds_played
     room["rounds_played"] = session_index + 1
     recent = set(room.get("recent_gif_stems") or [])
+    room.setdefault("gif_session_salt", secrets.token_hex(4))
+    diversity_salt = f"{room.get('gif_session_salt')}:{session_index}:{room.get('room_id')}"
     try:
         from services.reply_gifs import prepare_round_presentation
 
         prepare_round_presentation(
-            rnd, session_index=session_index, recent_stems=recent
+            rnd,
+            session_index=session_index,
+            recent_stems=recent,
+            diversity_salt=diversity_salt,
         )
     except Exception as exc:
         print(f"prepare_round_presentation failed: {exc}", file=sys.stderr)
@@ -608,6 +619,7 @@ async def _restart_match(room: dict[str, Any]) -> None:
     _cancel_auto(room)
     room["rounds_played"] = 0
     room["recent_gif_stems"] = []
+    room["gif_session_salt"] = secrets.token_hex(4)
     room["results"] = None
     room["reveal"] = None
     for p in room["players"].values():

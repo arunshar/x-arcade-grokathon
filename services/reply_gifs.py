@@ -260,16 +260,16 @@ def assign_human_gifs(
     round_data: dict[str, Any],
     *,
     recent_stems: set[str] | None = None,
+    diversity_salt: str = "",
 ) -> dict[int, Path]:
     """Pick a diverse set of human GIFs for this round.
 
     Strategy:
-      1. Seed-shuffle the full pool from round_id + topic + post (so different
-         posts start from different ends of the library).
-      2. Score every gif against each human reply using reply text, post text,
-         and topic tags.
-      3. Greedy assign highest unused score per slot; penalize stems used in
-         the previous few rounds (``recent_stems``) so sessions don't loop.
+      1. Shuffle the pool with round content **plus** a per-match salt so the
+         same topic does not always draw the same four files.
+      2. Deal a fresh *hand* (subset) of the pool, preferring stems not used
+         earlier in this match (``recent_stems``).
+      3. Score only within that hand against each reply; greedy unique assign.
     """
     pool = list_human_gifs()
     if not pool:
@@ -278,7 +278,9 @@ def assign_human_gifs(
     rid = str(round_data.get("round_id") or "round")
     topic, post, author = _post_context(round_data)
     seed = str(round_data.get("seed") or "")
-    shuffle_key = f"{rid}|{topic}|{author}|{post[:160]}|{seed}"
+    salt = str(diversity_salt or "")
+    # Salt is required for variety — without it every AI/crypto/… round is fixed.
+    shuffle_key = f"{rid}|{topic}|{author}|{post[:120]}|{seed}|{salt}"
     ordered_pool = _seeded_shuffle(pool, shuffle_key)
     round_bias = int(hashlib.sha256(shuffle_key.encode()).hexdigest()[:8], 16)
     recent = {s.lower() for s in (recent_stems or set())}
@@ -299,46 +301,64 @@ def assign_human_gifs(
     if not human_slots:
         return {}
 
-    # Precompute scores: slot → [(score, path), ...]
+    n_humans = len(human_slots)
+    # Prefer unused stems for the hand; fall back to full pool if thin.
+    fresh = [p for p in ordered_pool if p.stem.lower() not in recent]
+    recycled = [p for p in ordered_pool if p.stem.lower() in recent]
+    # Hand larger than n_humans so scoring still has choice, but small enough
+    # that different salts deal different visual sets.
+    hand_size = min(len(ordered_pool), max(n_humans + 3, min(10, n_humans * 2 + 2)))
+    hand: list[Path] = []
+    for p in fresh + recycled:
+        if p not in hand:
+            hand.append(p)
+        if len(hand) >= hand_size:
+            break
+    if len(hand) < n_humans:
+        hand = list(ordered_pool)
+
+    # Rotate hand start by salt so even overlapping pools look different.
+    rot = round_bias % max(1, len(hand))
+    hand = hand[rot:] + hand[:rot]
+
     scored: dict[int, list[tuple[int, Path]]] = {}
     for slot, text in human_slots:
         ranked: list[tuple[int, Path]] = []
-        for path in ordered_pool:
+        for path in hand:
             stem = path.stem.lower()
             s = _score_gif_for_reply(
                 stem,
                 reply_text=text,
                 topic=topic,
                 post_text=post,
-                round_bias=round_bias + slot * 17,
+                round_bias=round_bias + slot * 31,
             )
+            # Strong ban on recently used stems — force visual change.
             if stem in recent:
-                s -= 22  # push away from last round's set
+                s -= 80
             ranked.append((s, path))
         ranked.sort(key=lambda t: (-t[0], t[1].name))
         scored[slot] = ranked
 
-    # Assign higher-confidence slots first so strong keyword hits win their gif.
-    slot_order = sorted(
-        human_slots,
-        key=lambda st: (-(scored[st[0]][0][0] if scored[st[0]] else 0), st[0]),
-    )
+    # Assign in slot order (stable) so every human gets something unique first.
+    slot_order = sorted(human_slots, key=lambda st: st[0])
     used: set[str] = set()
     assignment: dict[int, Path] = {}
     for slot, _text in slot_order:
-        for _s, path in scored[slot]:
-            if path.stem.lower() not in used:
-                used.add(path.stem.lower())
+        for _s, path in scored.get(slot, []):
+            stem = path.stem.lower()
+            if stem not in used:
+                used.add(stem)
                 assignment[slot] = path
                 break
-        if slot not in assignment and ordered_pool:
-            # Exhausted unique — take next from round shuffle.
-            for path in ordered_pool:
-                if path.stem.lower() not in used:
-                    used.add(path.stem.lower())
+        if slot not in assignment:
+            for path in hand + ordered_pool:
+                stem = path.stem.lower()
+                if stem not in used:
+                    used.add(stem)
                     assignment[slot] = path
                     break
-            if slot not in assignment:
+            if slot not in assignment and ordered_pool:
                 assignment[slot] = ordered_pool[slot % len(ordered_pool)]
 
     return assignment
@@ -443,11 +463,16 @@ def prepare_round_presentation(
     *,
     session_index: int = 0,
     recent_stems: set[str] | None = None,
+    diversity_salt: str = "",
 ) -> dict[str, Any]:
     """Apply text vs gif presentation for a freshly loaded round."""
     fmt = resolve_round_format(round_data, session_index=session_index)
     if fmt == "gif":
-        return attach_reply_media(round_data, recent_stems=recent_stems)
+        return attach_reply_media(
+            round_data,
+            recent_stems=recent_stems,
+            diversity_salt=diversity_salt or str(session_index),
+        )
     return clear_reply_media(round_data)
 
 
@@ -455,6 +480,7 @@ def attach_reply_media(
     round_data: dict[str, Any],
     *,
     recent_stems: set[str] | None = None,
+    diversity_salt: str = "",
 ) -> dict[str, Any]:
     """Stamp media_url onto every reply. Mutates round_data.
 
@@ -475,8 +501,12 @@ def attach_reply_media(
     if not has_own_decoy and config.MODE != "live":
         decoy_demo = existing_decoy_media_url_for_round(round_data, allow_probe=True)
 
-    # One diverse hand of human GIFs for the whole round (post-aware).
-    human_map = assign_human_gifs(round_data, recent_stems=recent_stems)
+    # One diverse hand of human GIFs for the whole round (post + match salt).
+    human_map = assign_human_gifs(
+        round_data,
+        recent_stems=recent_stems,
+        diversity_salt=diversity_salt,
+    )
 
     for rep in round_data.get("replies") or []:
         if not isinstance(rep, dict):
