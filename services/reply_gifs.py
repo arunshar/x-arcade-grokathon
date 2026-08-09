@@ -566,8 +566,16 @@ def attach_reply_media(
         human_total += 1
         path = human_map.get(slot)
         if path and path.suffix.lower() == ".gif":
-            rep["media_url"] = _gif_public_url(path)
-            rep["media_type"] = "gif"
+            # Prefer the mp4 sibling so every reply's media is the same
+            # container as the Imagine decoy. Mixed gif/mp4 was an oracle:
+            # the one .mp4 among four .gif was always the machine.
+            mp4 = path.with_suffix(".mp4")
+            if mp4.is_file():
+                rep["media_url"] = _gif_public_url(mp4)
+                rep["media_type"] = "video"
+            else:
+                rep["media_url"] = _gif_public_url(path)
+                rep["media_type"] = "gif"
             rep["media_status"] = "ready"
             rep["media_source"] = "human"
             human_ready += 1

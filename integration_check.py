@@ -202,6 +202,24 @@ async def main() -> int:
                 all("guess_slot" not in p for p in state["players"]),
                 "guessing hides who picked what",
             )
+            # Media uniformity: during guessing, either every reply carries an
+            # opaque /media/ URL of identical shape and type, or none carries
+            # media at all. Any real path, mixed extension, or lone pending
+            # status is an oracle that marks the decoy.
+            media = [(r.get("media_url"), r.get("media_type"), r.get("media_status"))
+                     for r in rnd["replies"]]
+            with_media = [m for m in media if m[0]]
+            if with_media:
+                import re as _re
+                pat = _re.compile(r"^/media/[^/]+/[0-9a-f]{8}/\d\.mp4$")
+                check(len(with_media) == 5, "gif round serves media on all five or none")
+                check(all(pat.match(u) for u, _, _ in with_media),
+                      "guessing media urls are opaque proxy paths")
+                check(all(t == "video" and s == "ready" for _, t, s in with_media),
+                      "guessing media type and status are uniform")
+                check(not any("/decoy/" in (u or "") or ".gif" in (u or "")
+                              for u, _, _ in with_media),
+                      "no real media path reaches the client during guessing")
 
             decoy_slot = key[rid]["decoy_slot"]
             wrong_slot = next(s for s in range(5) if s != decoy_slot)

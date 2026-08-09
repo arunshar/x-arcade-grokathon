@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import Body, FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -262,40 +262,64 @@ def _round_view(room: dict[str, Any]) -> dict[str, Any] | None:
         "decoy_media_status",
     )
     safe = {k: v for k, v in rnd.items() if k not in strip_keys}
+
+    # The media itself was an oracle in three ways: the decoy's URL contained
+    # /decoy/, it was the only .mp4 among .gif files, and it was the only slot
+    # whose status could read "pending". So during guessing the real URLs never
+    # leave the server. Every slot's media is either served for ALL five
+    # replies through opaque per-round proxy URLs of identical shape and type,
+    # or for none of them, in which case the round presents as text.
+    real: dict[int, str] = {}
+    uniform = True
+    for r in rnd.get("replies") or []:
+        if not isinstance(r, dict) or "slot" not in r:
+            continue
+        url = r.get("media_url")
+        status = str(r.get("media_status") or "")
+        if not url or status not in ("", "ready"):
+            uniform = False
+            break
+        path = _media_local_path(str(url))
+        if path is None or path.suffix.lower() != ".mp4":
+            uniform = False
+            break
+        real[int(r["slot"])] = str(path)
+    fmt = str(rnd.get("format") or "text").lower()
+    serve_media = fmt == "gif" and uniform and len(real) == len(rnd.get("replies") or [])
+
+    if serve_media:
+        room["media_files"] = real
+        if not room.get("media_token"):
+            room["media_token"] = secrets.token_hex(4)
+    token = room.get("media_token")
+
     safe_replies = []
     for r in rnd.get("replies") or []:
         if not isinstance(r, dict) or "slot" not in r:
             continue
         item: dict[str, Any] = {"slot": r["slot"], "text": r.get("text") or ""}
-        # Motion media is safe during guessing — every slot has it.
-        # Sanitize: Imagine decoy is video under /decoy/*.mp4 — never a pool .gif.
-        url = r.get("media_url")
-        mtype = str(r.get("media_type") or "")
-        status = str(r.get("media_status") or "")
-        if url and mtype == "video":
-            u = str(url).lower()
-            if u.endswith(".gif") or ("/reply-gifs/" in u and "/decoy/" not in u):
-                url = None
-                status = "pending"
-        if url:
-            item["media_url"] = url
-        if mtype:
-            item["media_type"] = mtype
-        if status:
-            item["media_status"] = status
-        # Never send media_source / media_engine / is_decoy / author during guessing.
+        if serve_media:
+            item["media_url"] = f"/media/{room['room_id']}/{token}/{r['slot']}.mp4"
+            item["media_type"] = "video"
+            item["media_status"] = "ready"
+        # Never send media_source / media_engine / is_decoy / author during
+        # guessing, and never a real media URL or a per-slot status.
         safe_replies.append(item)
     safe["replies"] = safe_replies
-    # Always advertise format so clients can mix text vs gif presentation.
-    fmt = str(rnd.get("format") or "text").lower()
-    safe["format"] = "gif" if fmt == "gif" else "text"
-    # Text rounds must not leak leftover media fields.
-    if safe["format"] != "gif":
-        for item in safe["replies"]:
-            item.pop("media_url", None)
-            item.pop("media_type", None)
-            item.pop("media_status", None)
+    safe["format"] = "gif" if serve_media else "text"
     return safe
+
+
+def _media_local_path(url: str) -> Path | None:
+    """Resolve a /static-assets media URL to a file inside the web tree."""
+    u = url.split("?", 1)[0]
+    if not u.startswith("/static-assets/"):
+        return None
+    candidate = (REPO_ROOT / "web" / u.lstrip("/")).resolve()
+    web_root = (REPO_ROOT / "web").resolve()
+    if not str(candidate).startswith(str(web_root)) or not candidate.is_file():
+        return None
+    return candidate
 
 
 def _standings(room: dict[str, Any]) -> list[dict[str, Any]]:
@@ -437,6 +461,10 @@ async def _round_timer(room: dict[str, Any]) -> None:
 async def _start_round(room: dict[str, Any]) -> None:
     _cancel_timer(room)
     _cancel_auto(room)
+    # Fresh opaque-media namespace per round, so a cached URL from the last
+    # round can never serve this round's media.
+    room["media_token"] = None
+    room["media_files"] = {}
     match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     rounds_played = int(room.get("rounds_played") or 0)
 
@@ -776,6 +804,28 @@ async def health() -> dict[str, Any]:
         "gif_round_mode": getattr(config, "GIF_ROUND_MODE", "alternate"),
         "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
     }
+
+
+@app.get("/media/{room_id}/{token}/{slot_file}")
+async def media_proxy(room_id: str, token: str, slot_file: str) -> FileResponse:
+    """Opaque per-round media. The URL says nothing about what it serves.
+
+    Every slot in a round is fetched through this route with an identical URL
+    shape and an identical content type, so neither the path, the extension,
+    nor the response headers can mark the decoy. The token rotates per round,
+    which also defeats cross-round caching.
+    """
+    room = ROOMS.get(room_id)
+    if room is None or not token or token != room.get("media_token"):
+        raise HTTPException(status_code=404, detail="no such media")
+    try:
+        slot = int(slot_file.removesuffix(".mp4"))
+    except ValueError:
+        raise HTTPException(status_code=404, detail="no such media")
+    path = (room.get("media_files") or {}).get(slot)
+    if not path or not Path(path).is_file():
+        raise HTTPException(status_code=404, detail="no such media")
+    return FileResponse(path, media_type="video/mp4")
 
 
 @app.get("/stats.json")

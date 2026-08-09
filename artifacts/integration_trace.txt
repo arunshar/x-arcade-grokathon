@@ -1,6 +1,6 @@
 answer key: 6 servable rounds, gated out: []
 == http checks ==
-GET /health -> 200 {'mode': 'demo', 'rounds_available': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'tts_voice': 'eve', 'image_model': 'grok-imagine-image', 'video_model': 'grok-imagine-video-1.5', 'gif_round_mode': 'alternate', 'match_rounds': 20}
+GET /health -> 200 {'mode': 'demo', 'rounds_available': 6, 'voice_model': 'grok-voice-think-fast-2.0', 'tts_voice': 'eve', 'image_model': 'grok-imagine-image', 'video_model': 'grok-imagine-video-1.5', 'gif_round_mode': 'always_gif', 'match_rounds': 20}
   [PASS] /health reports demo mode
   [PASS] /health counts screened rounds
 GET /token -> 200 keys=['demo', 'detail', 'expires_at', 'model', 'value']
@@ -26,6 +26,10 @@ P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
 P1 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=0 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=0 guessed=False) deadline_ms=14999
@@ -51,6 +55,10 @@ P2 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
 P1 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=1 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-5913ef31dd6d P1(score=0 guessed=True) P2(score=1 guessed=False) deadline_ms=14999
@@ -76,6 +84,10 @@ P2 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
 P1 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=2 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-fdc7764b7ebb P1(score=0 guessed=True) P2(score=2 guessed=False) deadline_ms=14999
@@ -101,6 +113,10 @@ P2 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
 P1 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=True) P2(score=3 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-e9ae15e902d5 P1(score=0 guessed=True) P2(score=3 guessed=False) deadline_ms=14999
@@ -126,6 +142,10 @@ P2 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=1 (wrong)
 P1 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=4 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-4da38a122dd5 P1(score=0 guessed=True) P2(score=4 guessed=False) deadline_ms=14999
@@ -151,6 +171,10 @@ P2 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
 P1 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=True) P2(score=5 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-17e290ce4a4f P1(score=0 guessed=True) P2(score=5 guessed=False) deadline_ms=14999
@@ -176,6 +200,10 @@ P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=False) P2(score
   [PASS] guessing replies carry no is_decoy and no author
   [PASS] round has exactly 5 replies
   [PASS] guessing hides who picked what
+  [PASS] gif round serves media on all five or none
+  [PASS] guessing media urls are opaque proxy paths
+  [PASS] guessing media type and status are uniform
+  [PASS] no real media path reaches the client during guessing
 P1 -> guess slot=0 (wrong)
 P1 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=6 guessed=False) deadline_ms=14999
 P2 <- phase=guessing round=decoy-f6ad9d10aa85 P1(score=0 guessed=True) P2(score=6 guessed=False) deadline_ms=14999
