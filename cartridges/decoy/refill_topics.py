@@ -25,28 +25,34 @@ sys.path.insert(0, str(REPO))
 from cartridges.decoy import round_builder as rb  # noqa: E402
 from plugins.safety.screen import screen_round  # noqa: E402
 
+# Keep in sync with server TOPIC_CATALOG member topics (broad themes).
 TOPICS = [
+    # Technology
     "ai",
     "tech",
     "startups",
+    "crypto",
+    # Entertainment
     "movies",
     "tv",
     "music",
+    "gaming",
+    "memes",
+    # Sports
     "sports",
     "nba",
     "baseball",
     "soccer",
-    "gaming",
+    # Science & space
     "science",
     "space",
-    "crypto",
+    # Lifestyle
     "food",
     "travel",
     "fitness",
     "cars",
     "books",
     "photography",
-    "memes",
 ]
 
 
@@ -67,7 +73,12 @@ def _counts() -> dict[str, list[dict]]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--min", type=int, default=4, help="min screened posts per topic")
+    parser.add_argument(
+        "--min",
+        type=int,
+        default=6,
+        help="min screened posts per topic (default 6 = full match length)",
+    )
     parser.add_argument(
         "--imagine",
         action="store_true",

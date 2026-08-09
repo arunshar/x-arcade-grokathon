@@ -277,20 +277,34 @@ def _get_room(room_id: str) -> dict[str, Any]:
     return room
 
 
-# Friendly groups for the create-lobby topic picker (ids must match round JSON).
+# Broad theme picker — general buckets, each maps to several post topics.
 TOPIC_CATALOG: list[dict[str, Any]] = [
     {"id": "random", "label": "RANDOM", "topics": []},
-    {"id": "ai", "label": "AI", "topics": ["ai"]},
-    {"id": "tech", "label": "TECH", "topics": ["tech", "startups"]},
-    {"id": "movies", "label": "MOVIES / TV", "topics": ["movies", "tv"]},
-    {"id": "music", "label": "MUSIC", "topics": ["music"]},
-    {"id": "sports", "label": "SPORTS", "topics": ["sports", "nba", "baseball", "soccer"]},
-    {"id": "gaming", "label": "GAMING", "topics": ["gaming"]},
-    {"id": "science", "label": "SCIENCE", "topics": ["science", "space"]},
-    {"id": "crypto", "label": "CRYPTO", "topics": ["crypto"]},
-    {"id": "food", "label": "FOOD", "topics": ["food"]},
-    {"id": "travel", "label": "TRAVEL", "topics": ["travel"]},
-    {"id": "lifestyle", "label": "LIFESTYLE", "topics": ["fitness", "cars", "books", "photography", "memes"]},
+    {
+        "id": "technology",
+        "label": "TECHNOLOGY",
+        "topics": ["ai", "tech", "startups", "crypto"],
+    },
+    {
+        "id": "entertainment",
+        "label": "ENTERTAINMENT",
+        "topics": ["movies", "tv", "music", "gaming", "memes"],
+    },
+    {
+        "id": "sports",
+        "label": "SPORTS",
+        "topics": ["sports", "nba", "baseball", "soccer"],
+    },
+    {
+        "id": "science",
+        "label": "SCIENCE & SPACE",
+        "topics": ["science", "space"],
+    },
+    {
+        "id": "lifestyle",
+        "label": "LIFESTYLE",
+        "topics": ["food", "travel", "fitness", "cars", "books", "photography"],
+    },
 ]
 
 

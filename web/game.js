@@ -2252,17 +2252,11 @@ let selectedTopicGroups = []; // catalog group ids, e.g. ["ai","movies"]
 let topicCatalog = null; // from GET /topics
 const DEFAULT_TOPIC_GROUPS = [
   { id: "random", label: "RANDOM", topics: [], count: 0 },
-  { id: "ai", label: "AI", topics: ["ai"], count: 0 },
-  { id: "tech", label: "TECH", topics: ["tech", "startups"], count: 0 },
-  { id: "movies", label: "MOVIES / TV", topics: ["movies", "tv"], count: 0 },
-  { id: "music", label: "MUSIC", topics: ["music"], count: 0 },
+  { id: "technology", label: "TECHNOLOGY", topics: ["ai", "tech", "startups", "crypto"], count: 0 },
+  { id: "entertainment", label: "ENTERTAINMENT", topics: ["movies", "tv", "music", "gaming", "memes"], count: 0 },
   { id: "sports", label: "SPORTS", topics: ["sports", "nba", "baseball", "soccer"], count: 0 },
-  { id: "gaming", label: "GAMING", topics: ["gaming"], count: 0 },
-  { id: "science", label: "SCIENCE", topics: ["science", "space"], count: 0 },
-  { id: "crypto", label: "CRYPTO", topics: ["crypto"], count: 0 },
-  { id: "food", label: "FOOD", topics: ["food"], count: 0 },
-  { id: "travel", label: "TRAVEL", topics: ["travel"], count: 0 },
-  { id: "lifestyle", label: "LIFESTYLE", topics: ["fitness", "cars", "books", "photography", "memes"], count: 0 },
+  { id: "science", label: "SCIENCE & SPACE", topics: ["science", "space"], count: 0 },
+  { id: "lifestyle", label: "LIFESTYLE", topics: ["food", "travel", "fitness", "cars", "books", "photography"], count: 0 },
 ];
 
 function loadTopicCatalog() {
