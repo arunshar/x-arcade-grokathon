@@ -1635,8 +1635,9 @@ function isHumanPoolGifUrl(url) {
 
 /**
  * Build looping media for a reply card.
- * Humans → <img gif> from pool. Decoy → Grok Imagine <video> only.
- * Never labels source during guessing (server strips media_source).
+ *
+ * During guessing every card must look identical — no "GIF" vs "GROK IMAGINE"
+ * labels, no different pending copy. Source is only named on the revealed decoy.
  */
 function buildReplyMedia(reply, isRevealDecoy, onReady) {
   let url = reply && reply.media_url ? String(reply.media_url) : "";
@@ -1656,41 +1657,17 @@ function buildReplyMedia(reply, isRevealDecoy, onReady) {
   }
   const effectiveUrl = url || legacyUrl;
   if (status === "none" && !effectiveUrl) return null;
-  // Pending Imagine generation — show wait state, not a stock gif.
-  if (!effectiveUrl && (status === "pending" || isRevealDecoy)) {
-    const frame = document.createElement("div");
-    frame.className = "reply-media";
-    const label = document.createElement("div");
-    label.className = "reply-media-label" + (isRevealDecoy ? " is-imagine" : "");
-    label.textContent = isRevealDecoy ? "GROK IMAGINE" : "GIF";
-    frame.appendChild(label);
-    const box = document.createElement("div");
-    box.className = "reply-media-frame";
-    const pending = document.createElement("div");
-    pending.className = "reply-media-pending";
-    pending.textContent = (isRevealDecoy || status === "pending" || mtype === "video")
-      ? "GROK IMAGINE…"
-      : "LOADING…";
-    box.appendChild(pending);
-    frame.appendChild(box);
-    return frame;
-  }
-  if (!effectiveUrl) return null;
 
   const frame = document.createElement("div");
   frame.className = "reply-media";
 
-  const label = document.createElement("div");
-  label.className = "reply-media-label";
-  // Only name Imagine on the revealed decoy — otherwise neutral GIF chrome.
-  const treatAsImagine = isRevealDecoy || isImagineVideoUrl(effectiveUrl);
-  if (treatAsImagine) {
+  // Labels only after reveal: name the decoy. Guessing stays anonymous.
+  if (isRevealDecoy) {
+    const label = document.createElement("div");
+    label.className = "reply-media-label is-imagine";
     label.textContent = "GROK IMAGINE";
-    label.classList.add("is-imagine");
-  } else {
-    label.textContent = "GIF";
+    frame.appendChild(label);
   }
-  frame.appendChild(label);
 
   const box = document.createElement("div");
   box.className = "reply-media-frame";
@@ -1699,93 +1676,108 @@ function buildReplyMedia(reply, isRevealDecoy, onReady) {
     if (typeof onReady === "function") onReady(key || effectiveUrl);
   };
 
-  if (effectiveUrl) {
-    // Force video element for Imagine decoy paths; img only for pool gifs.
-    const isVideo = treatAsImagine
-      || mtype === "video"
-      || isImagineVideoUrl(effectiveUrl)
-      || /\.(mp4|webm|mov)(\?|$)/i.test(effectiveUrl);
-    // Refuse to render a pool gif as if it were the decoy video.
-    if (treatAsImagine && isHumanPoolGifUrl(effectiveUrl)) {
+  // Pending / empty — same chrome on every card (never "GROK IMAGINE…" pre-reveal).
+  if (!effectiveUrl && (status === "pending" || isRevealDecoy)) {
+    const pending = document.createElement("div");
+    pending.className = "reply-media-pending";
+    pending.textContent = isRevealDecoy ? "GROK IMAGINE…" : "LOADING…";
+    box.appendChild(pending);
+    frame.appendChild(box);
+    return frame;
+  }
+  if (!effectiveUrl) {
+    if (status === "pending") {
       const pending = document.createElement("div");
       pending.className = "reply-media-pending";
-      pending.textContent = "GROK IMAGINE…";
+      pending.textContent = "LOADING…";
       box.appendChild(pending);
       frame.appendChild(box);
       return frame;
     }
-    if (isVideo) {
-      const vid = document.createElement("video");
-      vid.className = "reply-media-el reply-media-video";
-      vid.src = effectiveUrl;
-      vid.muted = true;
-      vid.defaultMuted = true;
-      vid.playsInline = true;
-      vid.setAttribute("playsinline", "");
-      vid.setAttribute("webkit-playsinline", "");
-      vid.loop = true;
-      vid.autoplay = true;
-      // Full preload so the first loop starts quickly on phones.
-      vid.preload = "auto";
-      vid.setAttribute("aria-label", "reply gif");
-      vid.onloadeddata = () => {
-        vid.classList.add("is-ready");
-        try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
-        markReady(effectiveUrl);
-      };
-      vid.oncanplay = () => {
-        try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
-      };
-      vid.onerror = () => {
-        vid.remove();
-        const fail = document.createElement("div");
-        fail.className = "reply-media-pending";
-        fail.textContent = "GIF UNAVAILABLE";
-        box.appendChild(fail);
-      };
-      box.appendChild(vid);
-      // Already buffered
-      if (vid.readyState >= 2) {
-        vid.classList.add("is-ready");
-        try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
-        markReady(effectiveUrl);
-      }
-    } else {
-      const img = document.createElement("img");
-      img.className = "reply-media-el reply-media-img";
-      img.alt = "reply gif";
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.onload = () => {
-        img.classList.add("is-ready");
-        markReady(effectiveUrl);
-      };
-      img.onerror = () => {
-        img.remove();
-        const fail = document.createElement("div");
-        fail.className = "reply-media-pending";
-        fail.textContent = "GIF UNAVAILABLE";
-        box.appendChild(fail);
-      };
-      img.src = effectiveUrl;
-      box.appendChild(img);
-      if (img.complete && img.naturalWidth > 0) {
-        img.classList.add("is-ready");
-        markReady(effectiveUrl);
-      }
+    if (status === "failed") {
+      const fail = document.createElement("div");
+      fail.className = "reply-media-pending";
+      fail.textContent = "UNAVAILABLE";
+      box.appendChild(fail);
+      frame.appendChild(box);
+      return frame;
     }
-  } else if (status === "pending") {
+    return null;
+  }
+
+  // Prefer <video> for all mp4/webm so human pool and decoy match in the DOM.
+  const isVideo = mtype === "video"
+    || isImagineVideoUrl(effectiveUrl)
+    || /\.(mp4|webm|mov)(\?|$)/i.test(effectiveUrl)
+    || effectiveUrl.indexOf("/media/") === 0;
+
+  if (isRevealDecoy && isHumanPoolGifUrl(effectiveUrl)) {
     const pending = document.createElement("div");
     pending.className = "reply-media-pending";
-    pending.textContent = "LOADING GIF…";
+    pending.textContent = "GROK IMAGINE…";
     box.appendChild(pending);
-  } else if (status === "failed") {
-    const fail = document.createElement("div");
-    fail.className = "reply-media-pending";
-    fail.textContent = "GIF UNAVAILABLE";
-    box.appendChild(fail);
+    frame.appendChild(box);
+    return frame;
+  }
+
+  if (isVideo) {
+    const vid = document.createElement("video");
+    vid.className = "reply-media-el reply-media-video";
+    vid.src = effectiveUrl;
+    vid.muted = true;
+    vid.defaultMuted = true;
+    vid.playsInline = true;
+    vid.setAttribute("playsinline", "");
+    vid.setAttribute("webkit-playsinline", "");
+    vid.loop = true;
+    vid.autoplay = true;
+    vid.preload = "auto";
+    vid.setAttribute("aria-label", "reply media");
+    vid.onloadeddata = () => {
+      vid.classList.add("is-ready");
+      try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
+      markReady(effectiveUrl);
+    };
+    vid.oncanplay = () => {
+      try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
+    };
+    vid.onerror = () => {
+      vid.remove();
+      const fail = document.createElement("div");
+      fail.className = "reply-media-pending";
+      fail.textContent = "UNAVAILABLE";
+      box.appendChild(fail);
+    };
+    box.appendChild(vid);
+    if (vid.readyState >= 2) {
+      vid.classList.add("is-ready");
+      try { vid.play().catch(() => {}); } catch (e) { /* ignore */ }
+      markReady(effectiveUrl);
+    }
   } else {
-    return null;
+    // Fallback still/gif — still no source label during guessing.
+    const img = document.createElement("img");
+    img.className = "reply-media-el reply-media-img";
+    img.alt = "reply media";
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.onload = () => {
+      img.classList.add("is-ready");
+      markReady(effectiveUrl);
+    };
+    img.onerror = () => {
+      img.remove();
+      const fail = document.createElement("div");
+      fail.className = "reply-media-pending";
+      fail.textContent = "UNAVAILABLE";
+      box.appendChild(fail);
+    };
+    img.src = effectiveUrl;
+    box.appendChild(img);
+    if (img.complete && img.naturalWidth > 0) {
+      img.classList.add("is-ready");
+      markReady(effectiveUrl);
+    }
   }
 
   frame.appendChild(box);
@@ -1874,8 +1866,9 @@ function renderReplies(s) {
 
     const author = document.createElement("span");
     author.className = "reply-author";
+    // Never tip the decoy during guessing. Only name Grok after reveal.
     if (isDecoy) {
-      author.textContent = isGifRound ? "grok imagine · this gif" : "grok wrote this one";
+      author.textContent = isGifRound ? "grok imagine · this one" : "grok wrote this one";
     } else if (isReveal && reply.author) {
       author.textContent = reply.author;
     } else {
