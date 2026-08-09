@@ -262,31 +262,65 @@ def _get_room(room_id: str) -> dict[str, Any]:
     return room
 
 
+def _round_has_ready_decoy_media(rnd: dict[str, Any]) -> bool:
+    """True when a certified unique decoy mp4 exists for this round id."""
+    try:
+        from services.imagine_agent import (
+            decoy_video_path,
+            ensure_certified,
+            is_imagine_certified,
+        )
+
+        rid = str(rnd.get("round_id") or "")
+        if not rid:
+            return False
+        path = decoy_video_path(rid)
+        return bool(ensure_certified(rid, path) or is_imagine_certified(path))
+    except Exception:
+        return False
+
+
 async def _next_round(room: dict[str, Any] | None = None) -> dict[str, Any]:
     """Pull the next safety-screened round from the decoy queue.
 
     Prefers rounds this room has not seen recently so posts/replies feel
-    fresh across a match. Every round is re-screened at load time (fail
-    closed). FALLBACK_ROUND is last resort.
+    fresh across a match. When GIF mode needs Imagine clips, also prefers
+    rounds that already have certified decoy media so the Space does not
+    deal text-only rounds while most of the pool lacks prebaked video.
     """
     exclude: set[str] = set()
     if room is not None:
         exclude = {str(x) for x in (room.get("recent_round_ids") or []) if x}
 
+    # Prefer prebaked Imagine clips so GIF rounds actually show media.
+    # Disabled under ARCADE_NO_SHUFFLE so integration_check can walk the full pool.
+    prefer_media = os.environ.get("ARCADE_NO_SHUFFLE") != "1" and (
+        str(getattr(config, "GIF_ROUND_MODE", "") or "").lower()
+        in ("always_gif", "gif", "all_gif")
+        or config.MODE == "live"
+    )
+
     if not FORCE_FALLBACK:
         try:
-            # Try up to 2× pool size so exclusions + failed gates still land.
             attempts = max(decoy_queue.round_count() * 2, 8)
-            for _ in range(attempts):
-                rnd = decoy_queue.next_round(exclude_ids=exclude)
-                gates = safety_screen.screen_round(rnd)
-                rnd["safety"] = gates
-                if gates["screened"]:
+            # Pass 1 (optional): only rounds with certified decoy mp4.
+            # Pass 2: any screened round.
+            for require_media in ((True, False) if prefer_media else (False,)):
+                skip = set(exclude)
+                for _ in range(attempts):
+                    rnd = decoy_queue.next_round(exclude_ids=skip)
+                    gates = safety_screen.screen_round(rnd)
+                    rnd["safety"] = gates
+                    rid = str(rnd.get("round_id") or "")
+                    if not gates["screened"]:
+                        if rid:
+                            skip.add(rid)
+                        continue
+                    if require_media and not _round_has_ready_decoy_media(rnd):
+                        if rid:
+                            skip.add(rid)
+                        continue
                     return rnd
-                # Don't keep retrying a permanently gated round id forever.
-                rid = str(rnd.get("round_id") or "")
-                if rid:
-                    exclude.add(rid)
         except Exception:
             pass
     fallback = copy.deepcopy(FALLBACK_ROUND)
@@ -313,6 +347,24 @@ def _rounds_available() -> int:
         except Exception:
             pass
     return 1
+
+
+def _decoy_media_ready_count() -> int:
+    """How many screened rounds already have a certified decoy mp4."""
+    n = 0
+    try:
+        for path in sorted(decoy_queue.ROUNDS_DIR.glob("decoy_*.json")):
+            try:
+                rnd = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if not safety_screen.screen_round(rnd).get("screened"):
+                continue
+            if _round_has_ready_decoy_media(rnd):
+                n += 1
+    except Exception:
+        return 0
+    return n
 
 
 def _deadline_ms(room: dict[str, Any]) -> int | None:
@@ -1037,6 +1089,7 @@ async def health() -> dict[str, Any]:
     return {
         "mode": config.MODE,
         "rounds_available": _rounds_available(),
+        "decoy_media_ready": _decoy_media_ready_count(),
         "voice_model": config.MODEL_VOICE,
         "tts_voice": getattr(config, "TTS_VOICE", "eve"),
         "image_model": config.MODEL_IMAGE,
@@ -1049,6 +1102,7 @@ async def health() -> dict[str, Any]:
         ),
         "gif_round_mode": getattr(config, "GIF_ROUND_MODE", "alternate"),
         "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
+        "imagine_fast": os.environ.get("ARCADE_IMAGINE_FAST", "1") != "0",
     }
 
 
