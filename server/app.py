@@ -156,7 +156,7 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "timer": None,
             "guess_counter": 0,
             "rounds_played": 0,
-            "match_rounds": int(getattr(config, "MATCH_ROUNDS", 5) or 5),
+            "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
             # Stems of human GIFs used on recent gif rounds — for diversity.
             "recent_gif_stems": [],
             "arena": room_id in ARENA_ROOMS,
@@ -167,7 +167,7 @@ def _get_room(room_id: str) -> dict[str, Any]:
         ROOMS[room_id] = room
     # Backfill fields for rooms created before this build.
     room.setdefault("results", None)
-    room.setdefault("match_rounds", int(getattr(config, "MATCH_ROUNDS", 5) or 5))
+    room.setdefault("match_rounds", int(getattr(config, "MATCH_ROUNDS", 6) or 6))
     room.setdefault("rounds_played", 0)
     return room
 
@@ -292,7 +292,7 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
     # Who picked which reply is public at reveal and only at reveal. During
     # guessing it would leak strategy, so the strip rule keeps it server side.
     at_reveal = room["phase"] == "reveal"
-    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     rounds_played = int(room.get("rounds_played") or 0)
     return {
         "t": "state",
@@ -374,7 +374,7 @@ async def _auto_advance(room: dict[str, Any], delay: float) -> None:
     if ROOMS.get(room["room_id"]) is not room or not room["players"]:
         return
     phase = room["phase"]
-    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     if phase == "lobby":
         await _start_round(room)
         return
@@ -411,7 +411,7 @@ async def _round_timer(room: dict[str, Any]) -> None:
 async def _start_round(room: dict[str, Any]) -> None:
     _cancel_timer(room)
     _cancel_auto(room)
-    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     rounds_played = int(room.get("rounds_played") or 0)
 
     # Coming from results / finished match in lobby → wipe board for a new match.
@@ -507,7 +507,7 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     room["phase"] = "reveal"
     room["deadline_at"] = None
     standings = _standings(room)
-    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     rounds_played = int(room.get("rounds_played") or 0)
     final_round = rounds_played >= match_rounds
     room["reveal"] = {
@@ -559,7 +559,7 @@ async def _enter_results(room: dict[str, Any]) -> None:
         co_champs = tied if len(tied) > 1 else []
     else:
         co_champs = []
-    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     room["phase"] = "results"
     room["deadline_at"] = None
     room["reveal"] = None
@@ -689,7 +689,7 @@ async def health() -> dict[str, Any]:
         "image_model": config.MODEL_IMAGE,
         "video_model": getattr(config, "MODEL_VIDEO", ""),
         "gif_round_mode": getattr(config, "GIF_ROUND_MODE", "alternate"),
-        "match_rounds": int(getattr(config, "MATCH_ROUNDS", 5) or 5),
+        "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
     }
 
 
@@ -1015,7 +1015,7 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 # load bearing and never dead.
                 phase = room["phase"]
                 match_rounds = int(
-                    room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5
+                    room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6
                 )
                 if phase == "lobby":
                     await _start_round(room)

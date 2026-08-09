@@ -38,9 +38,9 @@ GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "alternate").strip().lowe
 # Match length: after this many rounds the room opens a results screen
 # instead of looping forever. Override with ARCADE_MATCH_ROUNDS (1–20).
 try:
-    MATCH_ROUNDS = int(os.environ.get("ARCADE_MATCH_ROUNDS", "5") or "5")
+    MATCH_ROUNDS = int(os.environ.get("ARCADE_MATCH_ROUNDS", "6") or "6")
 except ValueError:
-    MATCH_ROUNDS = 5
+    MATCH_ROUNDS = 6
 MATCH_ROUNDS = max(1, min(20, MATCH_ROUNDS))
 # Soft idle on the results screen before returning to lobby (scores kept
 # until RESTART). Manual RESTART / HOME work immediately.
