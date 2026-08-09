@@ -2775,7 +2775,8 @@ const DEFAULT_TOPIC_GROUPS = [
   { id: "gaming", label: "GAMING", blurb: "games · studios · esports", topics: ["gaming"], count: 0 },
   { id: "sports", label: "SPORTS", blurb: "NBA · soccer · baseball", topics: ["sports", "nba", "baseball", "soccer"], count: 0 },
   { id: "science", label: "SCIENCE & SPACE", blurb: "research · NASA · cosmos", topics: ["science", "space"], count: 0 },
-  { id: "lifestyle", label: "LIFESTYLE", blurb: "food · travel · fitness · cars", topics: ["food", "travel", "fitness", "cars", "books", "photography"], count: 0 },
+  { id: "food", label: "FOOD", blurb: "cooking · restaurants · recipes", topics: ["food"], count: 0 },
+  { id: "lifestyle", label: "LIFESTYLE", blurb: "travel · fitness · cars · books", topics: ["travel", "fitness", "cars", "books", "photography"], count: 0 },
 ];
 // Older clients/servers used a mega entertainment bucket.
 const LEGACY_TOPIC_GROUP_MAP = { entertainment: "movies_tv" };
@@ -2835,13 +2836,27 @@ function toggleTopicGroup(id) {
   id = LEGACY_TOPIC_GROUP_MAP[id] || id;
   if (!id || id === "random") {
     selectedTopicGroups = [];
+    lockedThemePayload = null;
     renderTopicChips();
     return;
   }
   const idx = selectedTopicGroups.indexOf(id);
   if (idx >= 0) selectedTopicGroups.splice(idx, 1);
   else selectedTopicGroups.push(id);
+  // Live preview of what will be sent (multi-select = union of member topics).
+  lockedThemePayload = null;
   renderTopicChips();
+  try {
+    const label = formatTopicFilterLabel(selectedTopicsPayload());
+    if ($("createHint") && (lobbyMode === "solo" || lobbyMode === "create")) {
+      const base = lobbyMode === "solo"
+        ? "Practice alone. "
+        : "Share the code (or QR) after you enter. ";
+      $("createHint").textContent = selectedTopicGroups.length
+        ? (base + "Filter ON · " + label + " — all 6 posts stay in this mix.")
+        : (base + "Filter OFF · RANDOM MIX — posts from every theme.");
+    }
+  } catch (e) { /* ignore */ }
 }
 
 /** Resolve chip id → member topic slugs (defaults if catalog is thin). */

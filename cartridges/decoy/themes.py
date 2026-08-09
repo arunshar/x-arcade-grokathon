@@ -53,10 +53,16 @@ TOPIC_CATALOG: list[dict[str, Any]] = [
         "topics": ["science", "space"],
     },
     {
+        "id": "food",
+        "label": "FOOD",
+        "blurb": "cooking · restaurants · recipes",
+        "topics": ["food"],
+    },
+    {
         "id": "lifestyle",
         "label": "LIFESTYLE",
-        "blurb": "food · travel · fitness · cars",
-        "topics": ["food", "travel", "fitness", "cars", "books", "photography"],
+        "blurb": "travel · fitness · cars · books",
+        "topics": ["travel", "fitness", "cars", "books", "photography"],
     },
 ]
 
