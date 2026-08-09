@@ -1213,6 +1213,17 @@ function handleState(s) {
       }
     });
   }
+  if (s.phase === "results" && was !== "results") {
+    unlockAudio();
+    try { playHost("win"); } catch (e) { /* ignore */ }
+    requestAnimationFrame(() => {
+      const panel = $("screen-results");
+      if (panel && !panel.hidden && panel.scrollIntoView) {
+        try { panel.scrollIntoView({ behavior: "smooth", block: "start" }); }
+        catch (e) { try { panel.scrollIntoView(true); } catch (e2) { /* ignore */ } }
+      }
+    });
+  }
   try { commentary.onState(s, was); } catch (e) { /* never break the game on voice */ }
   prevPhase = was;
   render(s);
@@ -1308,15 +1319,32 @@ function renderLiveStandings(s) {
 
 // ---------- rendering ----------
 function render(s) {
-  $("roundCounter").textContent = "RND " + String(roundNo).padStart(2, "0");
+  const matchRounds = s.match_rounds || 0;
+  const played = s.rounds_played || roundNo || 0;
+  if (matchRounds > 0 && (s.phase === "guessing" || s.phase === "reveal")) {
+    $("roundCounter").textContent =
+      "RND " + String(played).padStart(2, "0") + "/" + String(matchRounds).padStart(2, "0");
+  } else if (s.phase === "results") {
+    $("roundCounter").textContent = "FINAL";
+  } else {
+    $("roundCounter").textContent = "RND " + String(roundNo).padStart(2, "0");
+  }
   const screened = !!(s.round && s.round.safety && s.round.safety.screened);
   $("safetyChip").hidden = !screened;
   renderTopPoints(s);
 
-  const inLobby = s.phase === "lobby";
+  const phase = s.phase || "lobby";
+  const inLobby = phase === "lobby";
+  const inResults = phase === "results";
+  const inGame = phase === "guessing" || phase === "reveal";
   $("screen-lobby").hidden = !inLobby;
-  $("screen-game").hidden = inLobby;
-  if (inLobby) renderLobby(s); else renderGame(s);
+  $("screen-game").hidden = !inGame;
+  const resultsScreen = $("screen-results");
+  if (resultsScreen) resultsScreen.hidden = !inResults;
+
+  if (inLobby) renderLobby(s);
+  else if (inResults) renderResults(s);
+  else renderGame(s);
 }
 
 function renderLobby(s) {
@@ -1393,8 +1421,20 @@ setInterval(() => {
     $("waitLine").textContent = autoCountdownText(state, "ROUND STARTS");
   }
   if (state.phase === "reveal" && !$("revealPanel").hidden) {
-    const t = autoCountdownText(state, "NEXT ROUND");
+    const final = !!(state.match_over || (state.reveal && state.reveal.final_round));
+    const label = final ? "RESULTS" : "NEXT ROUND";
+    const t = autoCountdownText(state, label);
     if (t) $("nextBtn").textContent = t + " · TAP TO SKIP";
+  }
+  if (state.phase === "results") {
+    const wait = $("resultsWait");
+    if (wait) {
+      const t = autoCountdownText(state, "RETURNING TO LOBBY");
+      if (t) {
+        wait.hidden = false;
+        wait.textContent = t;
+      }
+    }
   }
 }, 500);
 
@@ -1783,6 +1823,122 @@ function renderReveal(s) {
   } else {
     img.hidden = true;
   }
+
+  const next = $("nextBtn");
+  if (next) {
+    const final = !!(s.match_over || s.reveal.final_round);
+    next.textContent = final ? "SEE RESULTS" : "NEXT ROUND";
+  }
+}
+
+function renderResults(s) {
+  const res = s.results || {};
+  const board = (res.standings && res.standings.length)
+    ? res.standings
+    : getStandings(s);
+  const title = $("resultsTitle");
+  const sub = $("resultsSub");
+  const list = $("resultsBoard");
+  if (!list) return;
+
+  const champ = res.champion || null;
+  const co = res.co_champions || [];
+  const house = !!res.house_wins || (!champ && !co.length);
+  const matchN = res.match_rounds || s.match_rounds || board.length || 0;
+  const played = res.rounds_played || s.rounds_played || matchN;
+
+  if (title) {
+    title.classList.toggle("is-house", house);
+    if (house) title.textContent = "HOUSE WINS THE MATCH";
+    else if (co.length > 1) title.textContent = "DRAW";
+    else if (champ === myName) title.textContent = "YOU WIN THE MATCH";
+    else if (champ) title.textContent = String(champ).toUpperCase() + " WINS";
+    else title.textContent = "FINAL SCORES";
+  }
+  if (sub) {
+    if (co.length > 1) {
+      sub.textContent = "Tied at the top: " + co.join(" · ")
+        + " · " + played + "/" + matchN + " rounds";
+    } else {
+      sub.textContent = played + " of " + matchN + " rounds · first correct = +1 pt";
+    }
+  }
+
+  list.innerHTML = "";
+  if (!board.length) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "NO SCORES";
+    list.appendChild(li);
+  }
+  board.forEach((p) => {
+    const li = document.createElement("li");
+    if (p.rank === 1 && (p.score || 0) > 0) li.classList.add("is-leader");
+    if (p.name === myName) li.classList.add("is-me");
+    const rank = document.createElement("span");
+    rank.className = "rb-rank";
+    rank.textContent = "#" + (p.rank || "—");
+    const who = document.createElement("span");
+    who.className = "rb-name";
+    who.textContent = p.name === myName ? "YOU" : p.name;
+    const pts = document.createElement("span");
+    pts.className = "rb-pts";
+    pts.textContent = (p.score || 0) + " PTS";
+    li.append(rank, who, pts);
+    list.appendChild(li);
+  });
+}
+
+/** Leave room and return to the mode picker (HOME). */
+function goHome() {
+  try { unlockAudio(); } catch (e) { /* ignore */ }
+  try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
+  if (joined && myRoom) {
+    try { send({ t: "home", room: myRoom }); } catch (e) { /* ignore */ }
+  }
+  joined = false;
+  myName = "";
+  myRoom = "";
+  iAmHost = false;
+  myGuessSlot = null;
+  lastRoundId = null;
+  roundNo = 0;
+  firstRoundOfSession = true;
+  state = null;
+  try {
+    $("nameInput").disabled = false;
+    $("roomInput").disabled = false;
+    if ($("createdRoomDisplay")) $("createdRoomDisplay").disabled = false;
+    if ($("joinBtn")) $("joinBtn").disabled = false;
+    if ($("createEnterBtn")) $("createEnterBtn").disabled = false;
+    if ($("modeCreateBtn")) $("modeCreateBtn").disabled = false;
+    if ($("modeJoinBtn")) $("modeJoinBtn").disabled = false;
+    if ($("modeSoloBtn")) $("modeSoloBtn").disabled = false;
+    if ($("modeMockBtn")) $("modeMockBtn").disabled = false;
+  } catch (e) { /* ignore */ }
+  showModePick();
+  $("screen-lobby").hidden = false;
+  $("screen-game").hidden = true;
+  const rs = $("screen-results");
+  if (rs) rs.hidden = true;
+  $("myPoints").hidden = true;
+  $("leadChip").hidden = true;
+  $("roundCounter").textContent = "RND 00";
+  setConn("HOME");
+  // Drop mock socket so a fresh connect is clean.
+  if (MOCK) {
+    try { sock = mockSocket(handleRaw); } catch (e) { /* ignore */ }
+  }
+}
+
+function sendRestart() {
+  try { unlockAudio(); } catch (e) { /* ignore */ }
+  try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
+  firstRoundOfSession = true;
+  roundNo = 0;
+  lastRoundId = null;
+  myGuessSlot = null;
+  send({ t: "restart", room: myRoom });
 }
 
 // ---------- timer (display only, server enforces the real deadline) ----------
@@ -2050,6 +2206,12 @@ function sendNext() {
 }
 $("startBtn").addEventListener("click", () => sendNext());
 $("nextBtn").addEventListener("click", () => sendNext());
+if ($("restartBtn")) {
+  $("restartBtn").addEventListener("click", withAudioUnlock(() => sendRestart()));
+}
+if ($("homeBtn")) {
+  $("homeBtn").addEventListener("click", withAudioUnlock(() => goHome()));
+}
 // Join form submit also counts as a user gesture for audio.
 $("lobbyForm").addEventListener("submit", () => { try { unlockAudio(); } catch (e) { /* ignore */ } }, true);
 
@@ -2136,17 +2298,21 @@ function mockSocket(onMessage) {
     },
   ];
 
+  const MATCH_ROUNDS = 2; // short mock match
   let phase = "lobby";
   let players = [];
   let ri = -1;
+  let roundsPlayed = 0;
   let roundStart = 0;
   let reveal = null;
+  let results = null;
   let deadlineTimer = 0;
   let botTimer = 0;
+  let autoTimer = 0;
   const emit = (obj) => setTimeout(() => onMessage(JSON.stringify(obj)), 40);
 
   function publicRound() {
-    if (ri < 0) return null;
+    if (ri < 0 || phase === "results" || phase === "lobby") return null;
     const r = JSON.parse(JSON.stringify(ROUNDS[ri % ROUNDS.length]));
     if (phase === "guessing") {
       delete r.decoy_slot;
@@ -2175,19 +2341,34 @@ function mockSocket(onMessage) {
       standings: mockStandings(),
       round: publicRound(),
       reveal,
+      results,
       deadline_ms: left,
+      match_rounds: MATCH_ROUNDS,
+      rounds_played: roundsPlayed,
+      match_over: phase === "results" || (phase === "reveal" && roundsPlayed >= MATCH_ROUNDS),
     });
   }
   function currentRound() { return ROUNDS[ri % ROUNDS.length]; }
 
   function startRound() {
+    if (roundsPlayed >= MATCH_ROUNDS && phase !== "lobby") {
+      enterResults();
+      return;
+    }
+    if (phase === "results" || (phase === "lobby" && roundsPlayed >= MATCH_ROUNDS)) {
+      roundsPlayed = 0;
+      for (const p of players) { p.score = 0; p.streak = 0; }
+    }
     ri += 1;
+    roundsPlayed += 1;
     phase = "guessing";
     reveal = null;
+    results = null;
     roundStart = Date.now();
     for (const p of players) p.guessed = false;
     clearTimeout(deadlineTimer);
     clearTimeout(botTimer);
+    clearTimeout(autoTimer);
     deadlineTimer = setTimeout(() => doReveal(null), 30000);
     botTimer = setTimeout(() => {
       const bot = players.find((p) => p.name === "GLITCH");
@@ -2201,6 +2382,7 @@ function mockSocket(onMessage) {
     phase = "reveal";
     clearTimeout(deadlineTimer);
     clearTimeout(botTimer);
+    clearTimeout(autoTimer);
     const r = currentRound();
     const points_awarded = [];
     for (const p of players) {
@@ -2213,6 +2395,7 @@ function mockSocket(onMessage) {
       }
     }
     const board = mockStandings();
+    const finalRound = roundsPlayed >= MATCH_ROUNDS;
     reveal = {
       decoy_slot: r.decoy_slot,
       rationale: r.decoy_rationale,
@@ -2220,15 +2403,55 @@ function mockSocket(onMessage) {
       leaderboard: board.slice(0, 5),
       points_awarded,
       share_card_url: "static-assets/cards/decoy-3f2710c0a9e6_demo.jpg",
+      final_round: finalRound,
+      match_rounds: MATCH_ROUNDS,
+      rounds_played: roundsPlayed,
     };
     push();
+    autoTimer = setTimeout(() => {
+      if (finalRound) enterResults();
+      else startRound();
+    }, 4000);
+  }
+
+  function enterResults() {
+    phase = "results";
+    reveal = null;
+    clearTimeout(autoTimer);
+    const board = mockStandings();
+    const top = board[0];
+    const champ = top && (top.score || 0) > 0 ? top.name : null;
+    results = {
+      standings: board,
+      champion: champ,
+      co_champions: [],
+      rounds_played: roundsPlayed,
+      match_rounds: MATCH_ROUNDS,
+      house_wins: !champ,
+    };
+    push();
+  }
+
+  function restartMatch() {
+    roundsPlayed = 0;
+    results = null;
+    reveal = null;
+    for (const p of players) {
+      p.score = 0;
+      p.streak = 0;
+      p.guessed = false;
+    }
+    phase = "lobby";
+    startRound();
   }
 
   return {
     send(text) {
       const m = JSON.parse(text);
       if (m.t === "join") {
-        players.push({ name: m.name, score: 0, streak: 0, guessed: false });
+        if (!players.find((p) => p.name === m.name)) {
+          players.push({ name: m.name, score: 0, streak: 0, guessed: false });
+        }
         push();
         setTimeout(() => {
           if (!players.find((p) => p.name === "GLITCH")) {
@@ -2237,7 +2460,17 @@ function mockSocket(onMessage) {
           }
         }, 900);
       } else if (m.t === "next") {
-        startRound();
+        if (phase === "results") restartMatch();
+        else if (phase === "reveal" && roundsPlayed >= MATCH_ROUNDS) enterResults();
+        else startRound();
+      } else if (m.t === "restart") {
+        restartMatch();
+      } else if (m.t === "home") {
+        players = players.filter((p) => p.name !== myName);
+        phase = "lobby";
+        results = null;
+        reveal = null;
+        push();
       } else if (m.t === "guess" && phase === "guessing") {
         const p = players.find((x) => x.name === myName);
         if (p && !p.guessed) {

@@ -151,10 +151,12 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "players": {},
             "round": None,
             "reveal": None,
+            "results": None,
             "deadline_at": None,
             "timer": None,
             "guess_counter": 0,
             "rounds_played": 0,
+            "match_rounds": int(getattr(config, "MATCH_ROUNDS", 5) or 5),
             # Stems of human GIFs used on recent gif rounds — for diversity.
             "recent_gif_stems": [],
             "arena": room_id in ARENA_ROOMS,
@@ -163,6 +165,10 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "auto_deadline_at": None,
         }
         ROOMS[room_id] = room
+    # Backfill fields for rooms created before this build.
+    room.setdefault("results", None)
+    room.setdefault("match_rounds", int(getattr(config, "MATCH_ROUNDS", 5) or 5))
+    room.setdefault("rounds_played", 0)
     return room
 
 
@@ -286,6 +292,8 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
     # Who picked which reply is public at reveal and only at reveal. During
     # guessing it would leak strategy, so the strip rule keeps it server side.
     at_reveal = room["phase"] == "reveal"
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    rounds_played = int(room.get("rounds_played") or 0)
     return {
         "t": "state",
         "room": room["room_id"],
@@ -306,7 +314,16 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
         "standings": _standings(room),
         "round": _round_view(room),
         "reveal": room["reveal"],
+        "results": room.get("results"),
         "deadline_ms": _deadline_ms(room),
+        "match_rounds": match_rounds,
+        "rounds_played": rounds_played,
+        # True on the last reveal of the match (NEXT → results, not another round).
+        "match_over": room["phase"] == "results"
+        or (
+            room["phase"] == "reveal"
+            and rounds_played >= match_rounds
+        ),
     }
 
 
@@ -356,13 +373,26 @@ async def _auto_advance(room: dict[str, Any], delay: float) -> None:
         return
     if ROOMS.get(room["room_id"]) is not room or not room["players"]:
         return
-    if room["phase"] in ("lobby", "reveal"):
+    phase = room["phase"]
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    if phase == "lobby":
         await _start_round(room)
+        return
+    if phase == "reveal":
+        # Last round finished → results. Otherwise continue the match.
+        if int(room.get("rounds_played") or 0) >= match_rounds:
+            await _enter_results(room)
+        else:
+            await _start_round(room)
+        return
+    if phase == "results":
+        # Soft return to lobby so a new match can arm; scores stay until restart.
+        await _return_to_lobby(room, reset_scores=False)
 
 
 def _auto_ms(room: dict[str, Any]) -> int | None:
     """Milliseconds until the session clock advances, for the countdown UI."""
-    if room["phase"] not in ("lobby", "reveal") or room["auto_deadline_at"] is None:
+    if room["phase"] not in ("lobby", "reveal", "results") or room["auto_deadline_at"] is None:
         return None
     remaining = room["auto_deadline_at"] - asyncio.get_running_loop().time()
     return max(0, int(remaining * 1000))
@@ -381,9 +411,29 @@ async def _round_timer(room: dict[str, Any]) -> None:
 async def _start_round(room: dict[str, Any]) -> None:
     _cancel_timer(room)
     _cancel_auto(room)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    rounds_played = int(room.get("rounds_played") or 0)
+
+    # Coming from results / finished match in lobby → wipe board for a new match.
+    if room["phase"] == "results" or (
+        room["phase"] == "lobby" and rounds_played >= match_rounds
+    ):
+        room["rounds_played"] = 0
+        room["recent_gif_stems"] = []
+        for p in room["players"].values():
+            p.score = 0
+            p.streak = 0
+        rounds_played = 0
+
+    # Reveal after the last round should open results, not start another.
+    if room["phase"] == "reveal" and rounds_played >= match_rounds:
+        await _enter_results(room)
+        return
+
+    room["results"] = None
     rnd = await _next_round()
     # Mix text rounds (classic replies) with GIF rounds (human gifs + Imagine).
-    session_index = int(room.get("rounds_played") or 0)
+    session_index = rounds_played
     room["rounds_played"] = session_index + 1
     recent = set(room.get("recent_gif_stems") or [])
     try:
@@ -413,6 +463,7 @@ async def _start_round(room: dict[str, Any]) -> None:
         room["recent_gif_stems"] = (stems + prev)[:12]
     room["round"] = rnd
     room["reveal"] = None
+    room["results"] = None
     room["phase"] = "guessing"
     room["guess_counter"] = 0
     for p in room["players"].values():
@@ -435,6 +486,8 @@ async def _start_round(room: dict[str, Any]) -> None:
 async def _do_reveal(room: dict[str, Any]) -> None:
     _cancel_timer(room)
     rnd = room["round"]
+    if rnd is None:
+        return
     decoy_slot = rnd["decoy_slot"]
     # Winner is the first correct guess in server arrival order. The client's
     # self-reported ms is display data only and never decides the winner.
@@ -454,6 +507,9 @@ async def _do_reveal(room: dict[str, Any]) -> None:
     room["phase"] = "reveal"
     room["deadline_at"] = None
     standings = _standings(room)
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    rounds_played = int(room.get("rounds_played") or 0)
+    final_round = rounds_played >= match_rounds
     room["reveal"] = {
         "decoy_slot": decoy_slot,
         "rationale": rnd.get("decoy_rationale", ""),
@@ -473,9 +529,11 @@ async def _do_reveal(room: dict[str, Any]) -> None:
         # Demo mode attaches the committed card instantly. Live mode starts
         # with no card and a background task fills it in a few seconds later.
         "share_card_url": None if config.MODE == "live" else DEMO_CARD_URL,
+        "final_round": final_round,
+        "match_rounds": match_rounds,
+        "rounds_played": rounds_played,
     }
-    # Arm the session clock: the next round starts itself after the reveal
-    # has had time to land. Anyone tapping NEXT ROUND just skips the wait.
+    # Arm the session clock: next round, or results after the last round.
     _schedule_auto(room, config.REVEAL_SECONDS)
     await _broadcast(room)
     if config.MODE == "live":
@@ -485,6 +543,82 @@ async def _do_reveal(room: dict[str, Any]) -> None:
             and rnd.get("decoy_media_status") != "ready"
         ):
             asyncio.create_task(_attach_decoy_imagine_gif(room, rnd))
+
+
+async def _enter_results(room: dict[str, Any]) -> None:
+    """End the match: final standings, no more automatic rounds."""
+    _cancel_timer(room)
+    _cancel_auto(room)
+    standings = _standings(room)
+    champion = None
+    if standings and (standings[0].get("score") or 0) > 0:
+        # Tie at the top → house / draw (list all tied names).
+        top = standings[0]["score"]
+        tied = [row["name"] for row in standings if row["score"] == top]
+        champion = tied[0] if len(tied) == 1 else None
+        co_champs = tied if len(tied) > 1 else []
+    else:
+        co_champs = []
+    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5)
+    room["phase"] = "results"
+    room["deadline_at"] = None
+    room["reveal"] = None
+    room["results"] = {
+        "standings": standings,
+        "champion": champion,
+        "co_champions": co_champs,
+        "rounds_played": int(room.get("rounds_played") or 0),
+        "match_rounds": match_rounds,
+        "house_wins": champion is None and not co_champs,
+    }
+    # Soft idle timer — returns to lobby without wiping scores (restart does that).
+    delay = float(getattr(config, "RESULTS_SECONDS", 45) or 45)
+    _schedule_auto(room, delay)
+    await _broadcast(room)
+
+
+async def _return_to_lobby(room: dict[str, Any], *, reset_scores: bool) -> None:
+    """Park the room in lobby. Optional full score reset for a new match."""
+    _cancel_timer(room)
+    _cancel_auto(room)
+    room["phase"] = "lobby"
+    room["round"] = None
+    room["reveal"] = None
+    room["results"] = None
+    room["deadline_at"] = None
+    room["guess_counter"] = 0
+    if reset_scores:
+        room["rounds_played"] = 0
+        room["recent_gif_stems"] = []
+        for p in room["players"].values():
+            p.score = 0
+            p.streak = 0
+            p.guessed = False
+            p.guess_slot = None
+            p.guess_order = None
+            p.client_ms = None
+    if room["players"]:
+        _schedule_auto(room, config.LOBBY_SECONDS)
+    await _broadcast(room)
+
+
+async def _restart_match(room: dict[str, Any]) -> None:
+    """Reset scores and immediately start round 1 of a new match."""
+    _cancel_timer(room)
+    _cancel_auto(room)
+    room["rounds_played"] = 0
+    room["recent_gif_stems"] = []
+    room["results"] = None
+    room["reveal"] = None
+    for p in room["players"].values():
+        p.score = 0
+        p.streak = 0
+        p.guessed = False
+        p.guess_slot = None
+        p.guess_order = None
+        p.client_ms = None
+    room["phase"] = "lobby"
+    await _start_round(room)
 
 
 async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: str) -> None:
@@ -555,6 +689,7 @@ async def health() -> dict[str, Any]:
         "image_model": config.MODEL_IMAGE,
         "video_model": getattr(config, "MODEL_VIDEO", ""),
         "gif_round_mode": getattr(config, "GIF_ROUND_MODE", "alternate"),
+        "match_rounds": int(getattr(config, "MATCH_ROUNDS", 5) or 5),
     }
 
 
@@ -873,13 +1008,48 @@ async def ws_endpoint(ws: WebSocket) -> None:
 
             elif t == "next":
                 room = ROOMS.get(room_id)
-                if room is None or joined is None:
+                if room is None or joined is None or not room["players"]:
                     continue
                 # Any joined player may skip the wait. The session clock will
                 # advance on its own either way, so this button can never be
                 # load bearing and never dead.
-                if room["phase"] in ("lobby", "reveal") and room["players"]:
+                phase = room["phase"]
+                match_rounds = int(
+                    room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 5) or 5
+                )
+                if phase == "lobby":
                     await _start_round(room)
+                elif phase == "reveal":
+                    if int(room.get("rounds_played") or 0) >= match_rounds:
+                        await _enter_results(room)
+                    else:
+                        await _start_round(room)
+                elif phase == "results":
+                    # PLAY AGAIN from results.
+                    await _restart_match(room)
+
+            elif t == "restart":
+                room = ROOMS.get(room_id)
+                if room is None or joined is None or not room["players"]:
+                    continue
+                await _restart_match(room)
+
+            elif t == "home":
+                # Leave the room cleanly; client returns to the mode picker.
+                room = ROOMS.get(room_id)
+                if room is None or joined is None:
+                    continue
+                name = joined[1]
+                player = room["players"].get(name)
+                if player is not None and player.ws is ws:
+                    room["players"].pop(name, None)
+                joined = None
+                if room["players"]:
+                    await _broadcast(room)
+                else:
+                    _cancel_timer(room)
+                    _cancel_auto(room)
+                    ROOMS.pop(room_id, None)
 
     except WebSocketDisconnect:
         pass

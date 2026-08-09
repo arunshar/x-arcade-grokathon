@@ -763,6 +763,97 @@ main {
   backdrop-filter: blur(6px);
 }
 
+/* ---------- match results ---------- */
+#screen-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 16px calc(28px + var(--safe-bottom));
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+#screen-results[hidden] { display: none !important; }
+.results-kicker {
+  letter-spacing: 3px;
+  color: var(--cyan);
+}
+.results-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 8vw, 52px);
+  letter-spacing: 5px;
+  color: var(--text);
+  text-shadow: 0 0 16px var(--cyan-glow);
+}
+.results-title.is-house { color: var(--red); text-shadow: 0 0 14px var(--red-glow); }
+.results-sub {
+  color: var(--mut);
+  letter-spacing: 1px;
+  font-size: 13px;
+  max-width: 36em;
+}
+.results-board {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 4px;
+}
+.results-board li {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  text-align: left;
+}
+.results-board li.is-leader {
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.16);
+}
+.results-board li.is-me {
+  outline: 1px solid rgba(0, 229, 255, 0.4);
+}
+.results-board .rb-rank {
+  font-family: var(--font-display);
+  letter-spacing: 2px;
+  color: var(--mut);
+}
+.results-board li.is-leader .rb-rank { color: #fbbf24; }
+.results-board .rb-name {
+  letter-spacing: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.results-board .rb-pts {
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(420px, 100%);
+  margin-top: 8px;
+}
+.results-actions .big-btn { width: 100%; }
+.mode-btn-alt {
+  background: transparent;
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+}
+.mode-btn-alt:hover:not(:disabled) {
+  background: var(--cyan-soft);
+  color: var(--text);
+}
+
 /* small screens / phones */
 @media (max-width: 620px) {
   .wordmark { font-size: 18px; letter-spacing: 2px; }
