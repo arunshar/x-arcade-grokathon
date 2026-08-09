@@ -49,6 +49,19 @@ try:
 except ValueError:
     MATCH_ROUNDS = 6
 MATCH_ROUNDS = max(1, min(20, MATCH_ROUNDS))
+# Multiplayer lobby size. Solo rooms stay 1-seat (enforced separately).
+try:
+    MULTIPLAYER_MIN_PLAYERS = int(os.environ.get("ARCADE_MP_MIN_PLAYERS", "2") or "2")
+except ValueError:
+    MULTIPLAYER_MIN_PLAYERS = 2
+try:
+    MULTIPLAYER_MAX_PLAYERS = int(os.environ.get("ARCADE_MP_MAX_PLAYERS", "5") or "5")
+except ValueError:
+    MULTIPLAYER_MAX_PLAYERS = 5
+MULTIPLAYER_MIN_PLAYERS = max(2, min(10, MULTIPLAYER_MIN_PLAYERS))
+MULTIPLAYER_MAX_PLAYERS = max(
+    MULTIPLAYER_MIN_PLAYERS, min(10, MULTIPLAYER_MAX_PLAYERS)
+)
 # Soft idle on the results screen before returning to lobby (scores kept
 # until RESTART). Manual RESTART / HOME work immediately.
 try:

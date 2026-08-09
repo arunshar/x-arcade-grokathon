@@ -1584,7 +1584,26 @@ function stripFakePlayers(s) {
 function handleRaw(text) {
   let msg = null;
   try { msg = JSON.parse(text); } catch (e) { return; }
-  if (msg && msg.t === "state") handleState(stripFakePlayers(msg));
+  if (!msg || !msg.t) return;
+  if (msg.t === "state") {
+    handleState(stripFakePlayers(msg));
+    return;
+  }
+  if (msg.t === "error") {
+    const detail = String(msg.detail || "");
+    const m = String(msg.message || "Could not join room.");
+    if (detail === "room_full" || detail === "solo_full") {
+      setConn(m.toUpperCase());
+      try {
+        if ($("waitLine")) {
+          $("waitLine").hidden = false;
+          $("waitLine").textContent = m.toUpperCase();
+        }
+      } catch (e) { /* ignore */ }
+    } else {
+      setConn(m.toUpperCase());
+    }
+  }
 }
 
 function connect() {
@@ -2053,22 +2072,34 @@ function renderLobby(s) {
     start.textContent = "START GAME";
     if (wait) wait.hidden = true;
   } else {
-    // Multiplayer: host starts manually — no lobby countdown.
+    // Multiplayer: min 2 to start, max 5 in room; host START only.
+    const maxPlayers = (typeof s.max_players === "number") ? s.max_players : 5;
+    const n = players.length;
+    const full = !!(s.room_full) || n >= maxPlayers;
     start.hidden = false;
     start.disabled = !canStart;
-    start.textContent = canStart
-      ? (iAmHost ? "START GAME" : "WAITING FOR HOST")
-      : ("NEED " + minPlayers + " PLAYERS");
+    if (!iAmHost) {
+      start.textContent = canStart ? "WAITING FOR HOST" : ("NEED " + minPlayers + " PLAYERS");
+    } else if (!canStart) {
+      start.textContent = "NEED " + minPlayers + "–" + maxPlayers + " PLAYERS";
+    } else {
+      start.textContent = "START GAME";
+    }
     if (wait) {
       wait.hidden = false;
       if (!canStart) {
         wait.textContent = "WAITING FOR PLAYERS · "
-          + players.length + "/" + minPlayers;
+          + n + "/" + minPlayers + " min · max " + maxPlayers;
+      } else if (full) {
+        wait.textContent = iAmHost
+          ? ("ROOM FULL · " + n + "/" + maxPlayers + " · TAP START WHEN READY")
+          : ("ROOM FULL · " + n + "/" + maxPlayers + " · WAITING FOR HOST…");
       } else if (iAmHost) {
-        wait.textContent = "READY · " + players.length
+        wait.textContent = "READY · " + n + "/" + maxPlayers
           + " PLAYERS · TAP START WHEN READY";
       } else {
-        wait.textContent = "READY · WAITING FOR HOST TO START…";
+        wait.textContent = "READY · " + n + "/" + maxPlayers
+          + " · WAITING FOR HOST TO START…";
       }
     }
   }

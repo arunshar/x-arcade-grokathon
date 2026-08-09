@@ -240,12 +240,25 @@ def _allows_solo(room: dict[str, Any]) -> bool:
 
 
 def _min_players_to_start(room: dict[str, Any]) -> int:
-    """Solo rooms: 1. Normal multiplayer rooms: 2."""
-    return 1 if _allows_solo(room) else 2
+    """Solo rooms: 1. Normal multiplayer rooms: 2 (configurable)."""
+    if _allows_solo(room):
+        return 1
+    return int(getattr(config, "MULTIPLAYER_MIN_PLAYERS", 2) or 2)
+
+
+def _max_players(room: dict[str, Any]) -> int:
+    """Solo rooms: 1 seat. Multiplayer: max 5 (configurable)."""
+    if _allows_solo(room):
+        return 1
+    return int(getattr(config, "MULTIPLAYER_MAX_PLAYERS", 5) or 5)
 
 
 def _enough_players_to_start(room: dict[str, Any]) -> bool:
     return len(room.get("players") or {}) >= _min_players_to_start(room)
+
+
+def _room_is_full(room: dict[str, Any]) -> bool:
+    return len(room.get("players") or {}) >= _max_players(room)
 
 
 def _lobby_auto_starts(room: dict[str, Any]) -> bool:
@@ -939,7 +952,9 @@ def _public_state(room: dict[str, Any]) -> dict[str, Any]:
         # Topic filter chosen at room create ([] = random mix).
         "topic_filter": list(room.get("topic_filter") or []),
         "min_players": _min_players_to_start(room),
+        "max_players": _max_players(room),
         "can_start": _enough_players_to_start(room),
+        "room_full": _room_is_full(room),
         # True on the last reveal of the match (NEXT → results, not another round).
         "match_over": room["phase"] == "results"
         or (
@@ -2042,21 +2057,21 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 room = _get_room(room_id)
                 existing = room["players"].get(name)
                 is_new_player = existing is None
-                # Solo practice rooms are 1-seat only (vs the house). A second
-                # device must not appear on the scoreboard as an "extra player".
-                solo_room = _allows_solo(room)
-                if (
-                    solo_room
-                    and is_new_player
-                    and room["players"]
-                    and name not in room["players"]
-                ):
+                # Capacity: solo = 1 seat; multiplayer = max 5 (reconnects OK).
+                if is_new_player and _room_is_full(room):
+                    detail = "solo_full" if _allows_solo(room) else "room_full"
+                    msg_txt = (
+                        "This solo room is already in use."
+                        if detail == "solo_full"
+                        else f"Room is full (max {_max_players(room)} players)."
+                    )
                     try:
                         await ws.send_json(
                             {
                                 "t": "error",
-                                "detail": "solo_full",
-                                "message": "This solo room is already in use.",
+                                "detail": detail,
+                                "message": msg_txt,
+                                "max_players": _max_players(room),
                             }
                         )
                     except Exception:

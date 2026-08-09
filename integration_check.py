@@ -329,18 +329,45 @@ async def main() -> int:
     finally:
         config.MATCH_ROUNDS = max(64, len(servable) + 5)
 
-    log("== multiplayer lobby refuses to start with one player ==")
+    log("== multiplayer lobby: min 2 to start, max 5 seats ==")
     try:
         async with websockets.connect(url) as m1:
             await m1.send(json.dumps({"t": "join", "room": "DUO1", "name": "A"}))
             state = await recv_state(m1, "A")
             check(state.get("min_players") == 2, "multiplayer min_players is 2")
+            check(state.get("max_players") == 5, "multiplayer max_players is 5")
             check(state.get("can_start") is False, "one player cannot start multiplayer")
             await m1.send(json.dumps({"t": "next", "room": "DUO1"}))
             state = await recv_state(m1, "A")
             check(state["phase"] == "lobby", "next with one player stays in lobby")
+        # Fill a room to 5, 6th join is rejected.
+        seats = []
+        try:
+            for i in range(5):
+                ws = await websockets.connect(url)
+                seats.append(ws)
+                await ws.send(json.dumps({
+                    "t": "join", "room": "FULL5", "name": f"P{i}", "arena": i == 0,
+                }))
+                st = await recv_state(ws, f"P{i}")
+            check(len(st.get("players") or []) == 5, "five players can join multiplayer")
+            check(st.get("room_full") is True, "room_full is true at 5")
+            async with websockets.connect(url) as extra:
+                await extra.send(json.dumps({
+                    "t": "join", "room": "FULL5", "name": "P5",
+                }))
+                raw = await asyncio.wait_for(extra.recv(), timeout=5)
+                err = json.loads(raw)
+                check(err.get("t") == "error" and err.get("detail") == "room_full",
+                      "sixth join is rejected as room_full")
+        finally:
+            for ws in seats:
+                try:
+                    await ws.close()
+                except Exception:
+                    pass
     except Exception as exc:
-        check(False, f"multiplayer min-players check errored: {exc}")
+        check(False, f"multiplayer capacity check errored: {exc}")
 
     server.should_exit = True
     await serve_task
