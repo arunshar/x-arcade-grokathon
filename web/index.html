@@ -102,48 +102,61 @@
 
   <!-- Screens 2 and 3: round and reveal share the arena, reveal decorates it -->
   <section id="screen-game" class="screen" hidden>
-    <div class="arena-top">
-      <article class="post-card" id="postCard">
-        <div class="post-head">
-          <div class="avatar" id="postAvatar">?</div>
-          <div class="post-who">
-            <span class="post-author" id="postAuthor">@handle</span>
-            <span class="post-topic" id="postTopic">topic</span>
+    <div class="game-layout">
+      <div class="game-main">
+        <div class="arena-top">
+          <article class="post-card" id="postCard">
+            <div class="post-head">
+              <div class="avatar" id="postAvatar">?</div>
+              <div class="post-who">
+                <span class="post-author" id="postAuthor">@handle</span>
+                <span class="post-topic" id="postTopic">topic</span>
+              </div>
+            </div>
+            <p class="post-text" id="postText"></p>
+            <!-- Legacy post art kept hidden; Imagine art is on each reply card. -->
+            <div class="round-art" id="roundArt" hidden>
+              <div class="round-art-label">GROK IMAGINE</div>
+              <div class="round-art-frame">
+                <img id="roundArtImg" class="round-art-img" alt="" hidden>
+                <div class="round-art-pending" id="roundArtPending" hidden></div>
+              </div>
+            </div>
+          </article>
+          <div class="timer-wrap" id="timerWrap">
+            <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+              <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="timer-num" id="timerNum">30</div>
           </div>
         </div>
-        <p class="post-text" id="postText"></p>
-        <!-- Legacy post art kept hidden; Imagine art is on each reply card. -->
-        <div class="round-art" id="roundArt" hidden>
-          <div class="round-art-label">GROK IMAGINE</div>
-          <div class="round-art-frame">
-            <img id="roundArtImg" class="round-art-img" alt="" hidden>
-            <div class="round-art-pending" id="roundArtPending" hidden></div>
+
+        <div class="opp-strip" id="oppStrip"></div>
+
+        <div class="replies" id="replies"></div>
+
+        <div class="reveal-panel" id="revealPanel" hidden>
+          <div class="winner-banner" id="winnerBanner">HOUSE WINS</div>
+          <p class="points-flash" id="pointsFlash" hidden></p>
+          <div class="section-label reveal-standings-label">STANDINGS</div>
+          <div class="score-strip" id="scoreStrip"></div>
+          <div class="share-card-frame">
+            <img class="share-card" id="shareCard" alt="share card" hidden>
           </div>
+          <button class="big-btn btn-start btn-next" id="nextBtn" type="button">NEXT ROUND</button>
         </div>
-      </article>
-      <div class="timer-wrap" id="timerWrap">
-        <svg class="timer-ring" viewBox="0 0 120 120" aria-hidden="true">
-          <circle class="ring-track" cx="60" cy="60" r="52"></circle>
-          <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"></circle>
-        </svg>
-        <div class="timer-num" id="timerNum">30</div>
       </div>
-    </div>
 
-    <div class="live-standings" id="liveStandings" aria-label="standings"></div>
-    <div class="opp-strip" id="oppStrip"></div>
-
-    <div class="replies" id="replies"></div>
-
-    <div class="reveal-panel" id="revealPanel" hidden>
-      <div class="winner-banner" id="winnerBanner">HOUSE WINS</div>
-      <p class="points-flash" id="pointsFlash" hidden></p>
-      <div class="section-label reveal-standings-label">STANDINGS</div>
-      <div class="score-strip" id="scoreStrip"></div>
-      <div class="share-card-frame">
-        <img class="share-card" id="shareCard" alt="share card" hidden>
-      </div>
-      <button class="big-btn btn-start btn-next" id="nextBtn" type="button">NEXT ROUND</button>
+      <!-- Live side scoreboard: all players + scores during guessing & reveal -->
+      <aside class="side-scoreboard" id="sideScoreboard" aria-label="live scoreboard">
+        <div class="sb-head">
+          <span class="sb-title">SCOREBOARD</span>
+          <span class="sb-meta" id="sbMeta">LIVE</span>
+        </div>
+        <ol class="sb-list" id="liveStandings"></ol>
+        <p class="sb-foot" id="sbFoot">+1 first correct each round</p>
+      </aside>
     </div>
   </section>
 

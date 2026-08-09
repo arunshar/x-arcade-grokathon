@@ -1286,34 +1286,110 @@ function renderTopPoints(s) {
   }
 }
 
+/**
+ * Live side scoreboard — every player, ranked, with score + streak + lock state.
+ * Updates on every state broadcast during guessing and reveal.
+ */
 function renderLiveStandings(s) {
   const box = $("liveStandings");
+  const aside = $("sideScoreboard");
+  const meta = $("sbMeta");
+  const foot = $("sbFoot");
   if (!box) return;
-  box.innerHTML = "";
-  if (s.phase === "lobby") return;
+
+  const phase = s.phase || "";
+  const show = phase === "guessing" || phase === "reveal";
+  if (aside) aside.hidden = !show;
+  document.body.classList.toggle("has-scoreboard", show);
+  if (!show) {
+    box.innerHTML = "";
+    return;
+  }
+
   const board = getStandings(s);
-  if (!board.length) return;
+  const playersByName = {};
+  for (const p of s.players || []) {
+    if (p && p.name) playersByName[p.name] = p;
+  }
 
-  const label = document.createElement("span");
-  label.className = "ls-label";
-  label.textContent = "PTS";
-  box.appendChild(label);
+  const matchRounds = s.match_rounds || 0;
+  const played = s.rounds_played || 0;
+  if (meta) {
+    meta.classList.remove("is-live", "is-reveal");
+    if (phase === "reveal") {
+      meta.textContent = "REVEAL";
+      meta.classList.add("is-reveal");
+    } else {
+      meta.textContent = matchRounds
+        ? ("RND " + played + "/" + matchRounds)
+        : "LIVE";
+      meta.classList.add("is-live");
+    }
+  }
+  if (foot) {
+    const n = board.length;
+    foot.textContent = n
+      ? (n + " PLAYER" + (n === 1 ? "" : "S") + " · +1 FIRST CORRECT")
+      : "+1 FIRST CORRECT EACH ROUND";
+  }
 
-  board.forEach((p) => {
-    const el = document.createElement("span");
-    el.className = "live-pill"
-      + (p.rank === 1 && (p.score || 0) > 0 ? " is-leader" : "")
-      + (p.name === myName ? " is-me" : "");
+  box.innerHTML = "";
+  board.forEach((row) => {
+    const live = playersByName[row.name] || {};
+    const isMe = row.name === myName;
+    const isLead = row.rank === 1 && (row.score || 0) > 0;
+    const locked = !!(live.guessed || (isMe && myGuessSlot !== null));
+    const streak = row.streak || live.streak || 0;
+
+    const li = document.createElement("li");
+    li.className = "sb-row"
+      + (isLead ? " is-leader" : "")
+      + (isMe ? " is-me" : "")
+      + (locked && phase === "guessing" ? " is-locked" : "");
+    li.setAttribute("aria-label",
+      "#" + (row.rank || "?") + " " + row.name + " " + (row.score || 0) + " points");
+
     const rank = document.createElement("span");
-    rank.className = "ls-rank";
-    rank.textContent = "#" + (p.rank || "?");
+    rank.className = "sb-rank";
+    rank.textContent = "#" + (row.rank || "—");
+
+    const who = document.createElement("div");
+    who.className = "sb-who";
     const name = document.createElement("span");
-    name.textContent = p.name === myName ? "YOU" : p.name;
+    name.className = "sb-name";
+    name.textContent = isMe ? "YOU" : String(row.name || "?");
+    const status = document.createElement("span");
+    status.className = "sb-status";
+    if (phase === "guessing") {
+      status.textContent = locked ? "LOCKED IN" : "PICKING…";
+    } else {
+      // Reveal: show whether they got it (guess_slot only public at reveal).
+      const decoy = s.reveal && typeof s.reveal.decoy_slot === "number"
+        ? s.reveal.decoy_slot
+        : null;
+      if (decoy !== null && typeof live.guess_slot === "number") {
+        status.textContent = live.guess_slot === decoy ? "HIT" : "MISS";
+      } else {
+        status.textContent = "—";
+      }
+    }
+    who.append(name, status);
+
+    const scoreCol = document.createElement("div");
+    scoreCol.className = "sb-score-col";
     const pts = document.createElement("span");
-    pts.className = "ls-pts";
-    pts.textContent = String(p.score || 0);
-    el.append(rank, name, pts);
-    box.appendChild(el);
+    pts.className = "sb-pts";
+    pts.textContent = String(row.score || 0);
+    scoreCol.appendChild(pts);
+    if (streak > 1) {
+      const st = document.createElement("span");
+      st.className = "sb-streak";
+      st.textContent = streak + "× STREAK";
+      scoreCol.appendChild(st);
+    }
+
+    li.append(rank, who, scoreCol);
+    box.appendChild(li);
   });
 }
 
@@ -1341,6 +1417,12 @@ function render(s) {
   $("screen-game").hidden = !inGame;
   const resultsScreen = $("screen-results");
   if (resultsScreen) resultsScreen.hidden = !inResults;
+  // Clear side scoreboard chrome when leaving the arena.
+  if (!inGame) {
+    document.body.classList.remove("has-scoreboard");
+    const aside = $("sideScoreboard");
+    if (aside) aside.hidden = true;
+  }
 
   if (inLobby) renderLobby(s);
   else if (inResults) renderResults(s);

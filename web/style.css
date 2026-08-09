@@ -154,8 +154,188 @@ main {
   margin: 0 auto;
   padding: 18px 14px calc(60px + var(--safe-bottom));
 }
+/* Wider stage when the side scoreboard is visible */
+body.has-scoreboard main {
+  max-width: 1180px;
+}
 
 .screen { display: flex; flex-direction: column; gap: 18px; }
+
+/* Game: main arena + sticky side scoreboard */
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.game-main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* ---------- live side scoreboard ---------- */
+.side-scoreboard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 12px 10px;
+  box-shadow: 0 0 22px rgba(0, 229, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.sb-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+}
+.sb-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.25);
+}
+.sb-meta {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--mut);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sb-meta.is-live {
+  color: var(--cyan);
+  animation: sbPulse 1.6s ease-in-out infinite;
+}
+.sb-meta.is-reveal { color: #fbbf24; animation: none; }
+@keyframes sbPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.sb-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  max-height: min(62vh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sb-list:empty::after {
+  content: "NO PLAYERS";
+  display: block;
+  text-align: center;
+  color: var(--mut);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 12px 4px;
+}
+.sb-row {
+  display: grid;
+  grid-template-columns: 2.2em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.sb-row.is-leader {
+  border-left-color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.14);
+}
+.sb-row.is-me {
+  outline: 1px solid rgba(0, 229, 255, 0.45);
+  background: rgba(0, 229, 255, 0.05);
+}
+.sb-row.is-locked {
+  border-color: rgba(0, 229, 255, 0.28);
+}
+.sb-rank {
+  color: var(--mut);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.sb-row.is-leader .sb-rank { color: #fbbf24; }
+.sb-who {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sb-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+.sb-status {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--mut);
+  text-transform: uppercase;
+}
+.sb-row.is-locked .sb-status { color: var(--cyan); }
+.sb-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.sb-pts {
+  color: var(--cyan);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.sb-row.is-leader .sb-pts { color: #fbbf24; }
+.sb-streak {
+  font-size: 10px;
+  color: var(--mut);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+.sb-foot {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--mut);
+  text-align: center;
+  margin: 0;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+/* Desktop / tablet landscape: sticky rail on the right */
+@media (min-width: 900px) {
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+    gap: 18px;
+  }
+  .side-scoreboard {
+    position: sticky;
+    top: calc(64px + var(--safe-top));
+    max-height: calc(100dvh - 80px - var(--safe-top) - var(--safe-bottom));
+  }
+  .sb-list { max-height: none; flex: 1 1 auto; }
+}
+/* Extra-wide arena: roomier scoreboard */
+@media (min-width: 1100px) {
+  .game-layout { grid-template-columns: minmax(0, 1fr) 280px; }
+}
 
 /* the hidden attribute always wins, even over display rules above */
 [hidden] { display: none !important; }
@@ -338,42 +518,6 @@ main {
   letter-spacing: 1px;
   white-space: nowrap;
 }
-
-/* Compact ranked strip during guessing / always under the post */
-.live-standings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  min-height: 0;
-}
-.live-standings:empty { display: none; }
-.live-standings .ls-label {
-  font-size: 10px;
-  letter-spacing: 2px;
-  color: var(--mut);
-  margin-right: 2px;
-}
-.live-pill {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  font-size: 11px;
-  letter-spacing: 1px;
-  padding: 5px 10px;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--text);
-  max-width: 100%;
-}
-.live-pill .ls-rank { color: var(--mut); }
-.live-pill .ls-pts { color: var(--cyan); font-weight: 700; }
-.live-pill.is-leader {
-  border-color: rgba(251, 191, 36, 0.55);
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
-}
-.live-pill.is-leader .ls-rank { color: #fbbf24; }
-.live-pill.is-me { outline: 1px solid rgba(0, 229, 255, 0.5); }
 
 .points-flash {
   font-size: 14px;
@@ -866,6 +1010,16 @@ main {
   /* Larger tap targets on the join form */
   .big-btn { min-height: 54px; }
   main { padding-left: 12px; padding-right: 12px; }
+  /* Compact scoreboard above the post on phones */
+  .side-scoreboard { order: -1; padding: 10px; }
+  .sb-list {
+    max-height: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px;
+  }
+  .sb-row { padding: 7px 8px; }
+  .sb-foot { display: none; }
 }
 
 /* QR join block on the big screen / host laptop */
