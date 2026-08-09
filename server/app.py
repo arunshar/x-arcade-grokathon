@@ -1632,6 +1632,19 @@ async def tts_line(payload: dict[str, Any] = Body(...)) -> Response:
         raise HTTPException(status_code=400, detail="text is required")
     if len(text) > 400:
         raise HTTPException(status_code=400, detail="text too long (max 400)")
+    # Last-ditch: never synthesize host prompt / instruction dumps.
+    try:
+        from services.host_agent import line_is_safe as _tts_line_ok
+
+        if not _tts_line_ok(text, reveal=True):
+            raise HTTPException(status_code=400, detail="text rejected (not a host line)")
+    except HTTPException:
+        raise
+    except Exception:
+        # host_agent optional in stripped deploys — length cap above still applies
+        low = text.lower()
+        if "you are the live commentator" in low or "output only the" in low:
+            raise HTTPException(status_code=400, detail="text rejected (not a host line)")
     try:
         from services.voice_host import synthesize
     except ImportError:

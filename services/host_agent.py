@@ -353,18 +353,131 @@ def _extract_chat_text(response: dict[str, Any]) -> str:
     return str(content or "").strip()
 
 
+# Model sometimes dumps the system/user prompt instead of a host line.
+# Reject anything that looks like instructions, JSON, or skill markdown.
+_PROMPT_ECHO_RE = re.compile(
+    r"(?i)"
+    r"("
+    r"you are the live commentator"
+    r"|output only the (spoken )?line"
+    r"|write the next commentator"
+    r"|pre-?reveal safety"
+    r"|never break these"
+    r"|do not introduce yourself"
+    r"|one short punchy sentence"
+    r"|no hashtags,? no emojis"
+    r"|recent_lines"
+    r"|observation json"
+    r"|\"instruction\"\s*:"
+    r"|\"observation\"\s*:"
+    r"|reply with only the spoken"
+    r"|phase-aware"
+    r"|sports-desk arcade"
+    r"|never name the decoy"
+    r"|pick_reply \(1-5\)"
+    r"|##\s*(style|variety|what you may)"
+    r"|^\s*[-*]\s+(never|do not|you may|one short)"
+    r")"
+)
+
+_LABEL_PREFIX_RE = re.compile(
+    r"(?i)^\s*("
+    r"line|host|commentator|commentary|announcer|output|response|answer"
+    r"|spoken line|say this|here'?s? (the|a) line"
+    r")\s*[:\-–—]\s*"
+)
+
+_STAGE_DIR_RE = re.compile(r"^\s*[\(\[]?(pause|laughs?|cheers?|crowd|sfx)[\)\]]?\s*", re.I)
+
+
+def _strip_wrapping_quotes(s: str) -> str:
+    s = (s or "").strip()
+    if len(s) >= 2 and s[0] == s[-1] and s[0] in "\"'“”‘’":
+        return s[1:-1].strip()
+    # Smart-quote pairs
+    if len(s) >= 2 and s[0] in "“‘" and s[-1] in "”’":
+        return s[1:-1].strip()
+    return s
+
+
+def _looks_like_prompt_echo(text: str) -> bool:
+    """True if text is instructions/JSON/skill dump rather than a host line."""
+    raw = (text or "").strip()
+    if not raw:
+        return True
+    # Multi-line instruction dumps / markdown skill files
+    if raw.count("\n") >= 2:
+        return True
+    if raw.lstrip().startswith(("{", "[", "```", "##", "###")):
+        return True
+    # JSON-ish observation echo
+    if '"event"' in raw and ('"phase"' in raw or '"standings"' in raw):
+        return True
+    if _PROMPT_ECHO_RE.search(raw):
+        return True
+    # Bullet laundry list of rules
+    if raw.count(" - ") >= 2 or raw.count("\n-") >= 2:
+        return True
+    # Way too long for arcade host (spoken line ~12 words)
+    if len(raw) > 280:
+        return True
+    words = raw.split()
+    if len(words) > 40:
+        return True
+    return False
+
+
+def _candidate_lines(text: str) -> list[str]:
+    """Split model output into candidate spoken lines (best first)."""
+    raw = (text or "").strip()
+    if not raw:
+        return []
+    # Drop fenced blocks entirely if the model wrapped junk
+    raw = re.sub(r"```.*?```", " ", raw, flags=re.S)
+    parts: list[str] = []
+    for chunk in re.split(r"[\n\r]+", raw):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        # Drop pure markdown headers / bullets of rules
+        if re.match(r"^#{1,6}\s", chunk):
+            continue
+        if re.match(r"^[-*•]\s+(never|do not|you may|one short|no hashtags)", chunk, re.I):
+            continue
+        chunk = _LABEL_PREFIX_RE.sub("", chunk)
+        chunk = _STAGE_DIR_RE.sub("", chunk)
+        chunk = _strip_wrapping_quotes(chunk)
+        chunk = re.sub(r"\s+", " ", chunk).strip()
+        # Strip trailing label junk like " (line)" 
+        chunk = re.sub(r"\s*\((line|spoken|output)\)\s*$", "", chunk, flags=re.I).strip()
+        if chunk:
+            parts.append(chunk)
+    # If single blob with sentence breaks and first part is meta, try sentences
+    if len(parts) == 1 and len(parts[0]) > 100:
+        sents = re.split(r"(?<=[.!?])\s+", parts[0])
+        if len(sents) > 1:
+            parts = [s.strip() for s in sents if s.strip()] + parts
+    return parts
+
+
 def _clean_line(text: str) -> str:
-    line = (text or "").strip()
-    if len(line) >= 2 and line[0] == line[-1] and line[0] in "\"'":
-        line = line[1:-1].strip()
-    line = re.sub(r"\s+", " ", line.split("\n")[0]).strip()
-    if len(line) > 220:
-        line = line[:220].rsplit(" ", 1)[0] or line[:220]
-    return line
+    """Return one short speakable host line, or '' if nothing usable."""
+    for cand in _candidate_lines(text):
+        if _looks_like_prompt_echo(cand):
+            continue
+        line = cand
+        if len(line) > 180:
+            line = line[:180].rsplit(" ", 1)[0] or line[:180]
+        line = line.strip()
+        if len(line) >= 2:
+            return line
+    return ""
 
 
 def line_is_safe(line: str, *, reveal: bool) -> bool:
     if not line or len(line) < 2:
+        return False
+    if _looks_like_prompt_echo(line):
         return False
     if reveal:
         return True
@@ -385,32 +498,31 @@ def generate_line(observation: dict[str, Any]) -> dict[str, Any]:
 
     system = system_prompt_for(reveal=reveal)
     avoid = obs.get("recent_lines") or []
-    instruction = "Write the next commentator line for this moment."
+    # Keep the user turn short and imperative so the model is less likely
+    # to parrot a long instruction block or dump JSON keys out loud.
+    bits = [
+        "Speak the next DECOY host line for this moment.",
+        "Reply with ONLY that one short sentence — no quotes, labels, JSON, or rules.",
+    ]
     if avoid:
-        instruction += (
-            " Do NOT repeat or paraphrase any recent_lines. "
-            "Make this line clearly different from all of them."
-        )
+        bits.append("Do not repeat or paraphrase any recent_lines in the observation.")
     if obs.get("event") == "round_start":
-        instruction += (
-            " This is a NEW ROUND opener — invent a fresh angle "
-            "(scoreboard, topic, pressure, rivalry, or cold open)."
+        bits.append(
+            "New round opener: fresh angle (scoreboard, topic, pressure, rivalry, or cold open)."
         )
-    user_blob = {
-        "instruction": instruction,
-        "observation": obs,
-    }
+    user_content = (
+        "\n".join(bits)
+        + "\n\nObservation:\n"
+        + json.dumps(obs, ensure_ascii=False)
+    )
     agent_model = getattr(config, "MODEL_AGENT", None) or config.MODEL_TEXT
     payload = {
         "model": agent_model,
         "temperature": 0.85 if reveal else 0.75,
-        "max_tokens": 60,
+        "max_tokens": 48,
         "messages": [
             {"role": "system", "content": system},
-            {
-                "role": "user",
-                "content": json.dumps(user_blob, ensure_ascii=False),
-            },
+            {"role": "user", "content": user_content},
         ],
     }
     t0 = time.perf_counter()
