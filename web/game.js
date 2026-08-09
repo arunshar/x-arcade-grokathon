@@ -3602,10 +3602,7 @@ function mockSocket(onMessage) {
     clearTimeout(botTimer);
     clearTimeout(autoTimer);
     deadlineTimer = setTimeout(() => doReveal(null), 30000);
-    botTimer = setTimeout(() => {
-      const bot = players.find((p) => p.name === "GLITCH");
-      if (bot && phase === "guessing") { bot.guessed = true; push(); }
-    }, 5200 + Math.random() * 2000);
+    // No GLITCH bot — mock/solo is you vs the house only.
     push();
   }
 
