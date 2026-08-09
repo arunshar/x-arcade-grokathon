@@ -61,6 +61,17 @@ DEMO_TOPICS = [
     "space",
     "nba",
     "travel",
+    # Still more topics so matches stop cycling the same 12 threads.
+    "tv",
+    "books",
+    "cars",
+    "fitness",
+    "weather",
+    "startups",
+    "photography",
+    "baseball",
+    "soccer",
+    "memes",
 ]
 
 POST_SCHEMA: dict[str, Any] = {
@@ -329,6 +340,41 @@ TOPIC_QUERIES = {
         "music releases, artists, concerts, or music news from a music-focused "
         "account"
     ),
+    "tv": (
+        "TV shows, streaming series, season finales, or television news. Skip "
+        "pure politics"
+    ),
+    "books": (
+        "books, authors, publishing, or reading culture from a bookish account"
+    ),
+    "cars": (
+        "cars, EVs, auto industry, racing, or car reviews. Skip pure politics"
+    ),
+    "fitness": (
+        "fitness, training, running, gym culture, or sports science tips"
+    ),
+    "weather": (
+        "weather events, climate observation, storms, or meteorology — not "
+        "culture-war climate politics"
+    ),
+    "startups": (
+        "startup launches, funding news, or founder product posts with real "
+        "discussion"
+    ),
+    "photography": (
+        "photography tips, camera gear, or photo critique threads"
+    ),
+    "baseball": (
+        "MLB baseball games, trades, or player news. Skip other sports"
+    ),
+    "soccer": (
+        "soccer or football match discussion, transfers, or Premier League / "
+        "world football news"
+    ),
+    "memes": (
+        "a light internet-culture or meme discussion thread with real sentence "
+        "replies, not just image spam. Keep it clean and non-political"
+    ),
 }
 
 
@@ -357,16 +403,16 @@ def _find_prompt(topic: str, broad: bool) -> str:
     avoid = _existing_post_ids()
     avoid_clause = ""
     if avoid:
-        sample = ", ".join(sorted(avoid)[:12])
+        sample = ", ".join(sorted(avoid, key=lambda x: x)[-24:])
         avoid_clause = (
             f" Do NOT pick any of these already-used post ids: {sample}."
         )
     if broad:
         return (
-            f"Search X for any popular post from the last 7 days related to {topic_query} "
+            f"Search X for any popular post from the last 14 days related to {topic_query} "
             "with a healthy reply count, at least 5 replies. Pick one whose replies "
             "are full sentences, not just emoji. Prefer a DIFFERENT thread than the "
-            "most over-quoted viral posts."
+            "most over-quoted viral posts. Maximize novelty vs common demo threads."
             f"{avoid_clause} "
             "Return the numeric post id, the post text verbatim, the author handle, "
             "and the canonical x.com post url."
@@ -676,14 +722,31 @@ def build_round(topic: str, live: bool = False) -> dict[str, Any]:
     live=False replays recorded fixtures and never touches the network.
     live=True calls the xAI API, and with ARCADE_RECORD=1 also records
     fixtures under fixtures/api/ for offline replay.
+    Rejects posts already in the committed pool so refreshes stay novel.
     """
     store = _make_store(live)
-    try:
-        post = _find_post(store, topic)
-        replies = _fetch_replies(store, post)
-    except RoundBuildError:
-        post = _find_post(store, topic, broad=True)
-        replies = _fetch_replies(store, post)
+    known = _existing_post_ids()
+    last_error: Exception | None = None
+    post: dict[str, Any] | None = None
+    replies: list[dict[str, Any]] | None = None
+    for broad in (False, True, True):
+        try:
+            candidate = _find_post(store, topic, broad=broad)
+            pid = str(candidate.get("post_id") or "")
+            if pid and pid in known:
+                raise RoundBuildError(
+                    f"post {pid} already in pool — need a different thread"
+                )
+            got = _fetch_replies(store, candidate)
+            post, replies = candidate, got
+            break
+        except RoundBuildError as err:
+            last_error = err
+            continue
+    if post is None or replies is None:
+        raise RoundBuildError(
+            f"could not build novel round for {topic!r}: {last_error}"
+        )
     thread = {**post, "replies": replies}
     decoy_text, rationale = _write_decoy(store, thread)
     round_dict = _assemble(topic, thread, decoy_text, rationale)
@@ -696,13 +759,35 @@ def build_round(topic: str, live: bool = False) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def _build_and_save(topic: str, live: bool) -> dict[str, Any]:
-    round_dict = build_round(topic, live=live)
+def _save_round(topic: str, round_dict: dict[str, Any], *, replace_canonical: bool) -> Path:
+    """Write round JSON. Keeps unique files so older threads stay in the pool.
+
+    Always writes ``decoy_{topic}_{shortid}.json``. Optionally also updates
+    the canonical ``decoy_{topic}.json`` pointer used by older tooling.
+    """
     ROUNDS_DIR.mkdir(parents=True, exist_ok=True)
-    path = ROUNDS_DIR / f"decoy_{topic}.json"
-    path.write_text(
-        json.dumps(round_dict, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    rid = str(round_dict.get("round_id") or "decoy-unknown")
+    short = rid.replace("decoy-", "")[:12]
+    path = ROUNDS_DIR / f"decoy_{topic}_{short}.json"
+    text = json.dumps(round_dict, ensure_ascii=False, indent=2) + "\n"
+    path.write_text(text, encoding="utf-8")
+    if replace_canonical:
+        canon = ROUNDS_DIR / f"decoy_{topic}.json"
+        # Only overwrite canonical when it is the same thread or missing —
+        # never delete other variants.
+        canon.write_text(text, encoding="utf-8")
+    return path
+
+
+def _build_and_save(
+    topic: str,
+    live: bool,
+    *,
+    replace_canonical: bool = False,
+) -> dict[str, Any]:
+    round_dict = build_round(topic, live=live)
+    path = _save_round(topic, round_dict, replace_canonical=replace_canonical)
+    round_dict["_saved_as"] = path.name
     return round_dict
 
 
@@ -711,24 +796,64 @@ def main() -> int:
     parser.add_argument("--topic", help="single topic to build")
     parser.add_argument("--all", action="store_true", help="build every demo topic")
     parser.add_argument("--live", action="store_true", help="call the real API")
+    parser.add_argument(
+        "--variants",
+        type=int,
+        default=1,
+        help="how many distinct threads to pull per topic (default 1)",
+    )
+    parser.add_argument(
+        "--replace-canonical",
+        action="store_true",
+        help="also write decoy_{topic}.json (latest). Default keeps unique files only.",
+    )
+    parser.add_argument(
+        "--new-topics-only",
+        action="store_true",
+        help="with --all, only build topics that have no round file yet",
+    )
     args = parser.parse_args()
 
     topics = DEMO_TOPICS if args.all else ([args.topic] if args.topic else [])
     if not topics:
         parser.error("pass --topic NAME or --all")
 
+    variants = max(1, min(8, int(args.variants or 1)))
+    if args.new_topics_only:
+        existing_topics = set()
+        for p in ROUNDS_DIR.glob("decoy_*.json"):
+            # decoy_ai.json / decoy_ai_abc123.json → ai
+            name = p.stem  # decoy_ai or decoy_ai_abc
+            parts = name.split("_", 2)
+            if len(parts) >= 2:
+                existing_topics.add(parts[1])
+        topics = [t for t in topics if t not in existing_topics]
+        if not topics:
+            print("no new topics to build")
+            return 0
+
     failed: list[str] = []
+    built = 0
     for topic in topics:
-        try:
-            round_dict = _build_and_save(topic, live=args.live)
-            print(
-                f"OK {topic}: {round_dict['round_id']} "
-                f"decoy_slot={round_dict['decoy_slot']} "
-                f"url={round_dict['source']['post_url']}"
-            )
-        except (RoundBuildError, ValueError) as error:
-            failed.append(topic)
-            print(f"FAIL {topic}: {error}")
+        for v in range(variants):
+            label = f"{topic}" if variants == 1 else f"{topic}#{v + 1}"
+            try:
+                round_dict = _build_and_save(
+                    topic,
+                    live=args.live,
+                    replace_canonical=bool(args.replace_canonical) and v == 0,
+                )
+                built += 1
+                print(
+                    f"OK {label}: {round_dict['round_id']} "
+                    f"file={round_dict.get('_saved_as')} "
+                    f"decoy_slot={round_dict['decoy_slot']} "
+                    f"url={round_dict['source']['post_url']}"
+                )
+            except (RoundBuildError, ValueError) as error:
+                failed.append(label)
+                print(f"FAIL {label}: {error}")
+    print(f"built={built} failed={len(failed)} pool={len(list(ROUNDS_DIR.glob('decoy_*.json')))}")
     if failed:
         print(f"failed topics: {', '.join(failed)}")
     return 1 if failed else 0
