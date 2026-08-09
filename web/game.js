@@ -1991,12 +1991,38 @@ function renderReveal(s) {
   });
 
   const img = $("shareCard");
-  if (s.reveal.share_card_url) {
-    img.src = s.reveal.share_card_url;
-    img.hidden = false;
-    img.onerror = () => { img.hidden = true; };
-  } else {
-    img.hidden = true;
+  const frame = img && img.parentElement;
+  if (img) {
+    const url = s.reveal.share_card_url || "";
+    const pending = !!s.reveal.share_card_pending;
+    if (frame) {
+      frame.classList.toggle("is-pending", pending && !!url);
+      frame.classList.toggle("is-ready", !pending && !!url);
+    }
+    if (url) {
+      // Only reset src when it changes — avoids flicker/reload on rebroadcast.
+      if (img.getAttribute("data-src") !== url) {
+        img.setAttribute("data-src", url);
+        img.hidden = false;
+        img.classList.remove("is-ready");
+        img.onload = () => { img.classList.add("is-ready"); };
+        img.onerror = () => {
+          // Fall back to demo poster if a live path 404s.
+          if (url.indexOf("decoy-3f2710c0a9e6_demo") < 0) {
+            img.src = "/static-assets/cards/decoy-3f2710c0a9e6_demo.jpg";
+            img.setAttribute("data-src", img.src);
+          } else {
+            img.hidden = true;
+          }
+        };
+        img.src = url;
+      } else {
+        img.hidden = false;
+      }
+    } else {
+      img.hidden = true;
+      img.removeAttribute("data-src");
+    }
   }
 
   const next = $("nextBtn");

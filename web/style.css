@@ -908,6 +908,23 @@ body.has-scoreboard main {
   border: 1px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
+  position: relative;
+}
+.share-card-frame.is-pending::after {
+  content: "PRINTING…";
+  position: absolute;
+  inset: auto 10px 10px auto;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  background: rgba(4, 7, 11, 0.75);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  padding: 4px 8px;
+  pointer-events: none;
+}
+.share-card-frame.is-pending .share-card {
+  opacity: 0.55;
+  filter: saturate(0.7);
 }
 
 .share-card {
@@ -917,7 +934,12 @@ body.has-scoreboard main {
   border: 0;
   border-radius: 0;
   display: block;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
+.share-card.is-ready { opacity: 1; }
+.share-card-frame.is-pending .share-card.is-ready { opacity: 0.55; }
+.share-card-frame.is-ready .share-card.is-ready { opacity: 1; }
 
 .share-card[hidden] { display: none !important; }
 

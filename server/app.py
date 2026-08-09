@@ -815,18 +815,35 @@ async def _do_reveal(room: dict[str, Any]) -> None:
             for row in standings[:5]
         ],
         "points_awarded": points_awarded,
-        # Demo mode attaches the committed card instantly. Live mode starts
-        # with no card and a background task fills it in a few seconds later.
-        "share_card_url": None if config.MODE == "live" else DEMO_CARD_URL,
+        # Always show a card immediately. Live upgrades from cache/API in
+        # the background; demo uses the committed poster.
+        "share_card_url": DEMO_CARD_URL,
+        "share_card_pending": config.MODE == "live",
         "final_round": final_round,
         "match_rounds": match_rounds,
         "rounds_played": rounds_played,
     }
+    # Instant cache hit (same round/winner or topic+winner) before paint.
+    if config.MODE == "live":
+        try:
+            from services.card_forge import find_cached_share_card
+
+            display = winner if winner != "house" else "The House"
+            cached = find_cached_share_card(rnd, display)
+            if cached is not None and cached.is_file():
+                room["reveal"]["share_card_url"] = (
+                    "/static-assets/cards/" + cached.name
+                )
+                room["reveal"]["share_card_pending"] = False
+        except Exception:
+            pass
     # Arm the session clock: next round, or results after the last round.
     _schedule_auto(room, config.REVEAL_SECONDS)
     await _broadcast(room)
     if config.MODE == "live":
-        asyncio.create_task(_attach_live_card(room, rnd, winner))
+        # Only hit Imagine when we still need a fresh card.
+        if room.get("reveal", {}).get("share_card_pending"):
+            asyncio.create_task(_attach_live_card(room, rnd, winner))
         if rnd.get("format") == "gif" and rnd.get("decoy_media_status") != "ready":
             asyncio.create_task(_attach_decoy_imagine_gif(room, rnd, force=True))
 
@@ -911,9 +928,9 @@ async def _restart_match(room: dict[str, Any]) -> None:
 async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: str) -> None:
     """Render the live share card off the event loop, then re-broadcast.
 
-    card_forge takes about 6.5 seconds per image, so the reveal itself is
-    never delayed by it. Any failure here leaves the reveal without a card
-    and the game keeps going.
+    card_forge is ~6.5s on a cold Imagine call; disk cache is near-instant.
+    Reveal already shows DEMO_CARD_URL as a placeholder so the slot is never
+    empty while we wait.
     """
     reveal = room.get("reveal")
     if reveal is None:
@@ -925,11 +942,15 @@ async def _attach_live_card(room: dict[str, Any], rnd: dict[str, Any], winner: s
         path = await asyncio.to_thread(make_share_card, rnd, display)
         url = "/static-assets/cards/" + path.name
     except Exception as exc:
-        # Keep the game moving; log so live Imagine failures are visible.
+        # Keep the game moving; leave the placeholder card up.
         print(f"card_forge failed: {exc}", file=sys.stderr)
+        if room.get("reveal") is reveal:
+            reveal["share_card_pending"] = False
+            await _broadcast(room)
         return
     if room.get("reveal") is reveal and room["phase"] == "reveal":
         reveal["share_card_url"] = url
+        reveal["share_card_pending"] = False
         await _broadcast(room)
 
 
