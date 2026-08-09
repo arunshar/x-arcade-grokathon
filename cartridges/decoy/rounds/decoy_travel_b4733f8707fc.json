@@ -1,0 +1,48 @@
+{
+  "round_id": "decoy-b4733f8707fc",
+  "source": {
+    "post_text": "I hate running around in circles trying to get wet in the shower.\nThere is no way I could travel often with these crappy hotel showers.\nI even unscrewed the shower head  to remove the restrictor valve but there wasn't one.\nAre there hotels that don't do this?",
+    "post_author": "@RandyGoat",
+    "post_url": "https://x.com/RandyGoat/status/2086256718690779155",
+    "topic": "travel"
+  },
+  "replies": [
+    {
+      "slot": 0,
+      "text": "You’re in a hotel what do you expect?",
+      "author": "@Bocephus1127",
+      "is_decoy": false
+    },
+    {
+      "slot": 1,
+      "text": "living out of motels most of my adult life working on the road, first thing i always do is change out the shower head. kept one in my shave kit with roll of Teflon tape.",
+      "author": "@Deplorable_Dave",
+      "is_decoy": false
+    },
+    {
+      "slot": 2,
+      "text": "There are, yes.",
+      "author": "@MBursheim",
+      "is_decoy": false
+    },
+    {
+      "slot": 3,
+      "text": "I've noticed higher-end places and some overseas hotels skip the low-flow setups entirely so the pressure feels normal, though it really depends on local rules and the specific property.",
+      "author": "decoy",
+      "is_decoy": true
+    },
+    {
+      "slot": 4,
+      "text": "We stayed at this fabulous hotel in Calcutta. The water pressure in the shower was stellar. Better than at home.",
+      "author": "@centerepublican",
+      "is_decoy": false
+    }
+  ],
+  "decoy_slot": 3,
+  "decoy_rationale": "The reply feels slightly too polished and explanatory with oddly balanced hedging about variables.",
+  "safety": {
+    "screened": true,
+    "gate_codes": []
+  },
+  "seed": 160245983
+}
