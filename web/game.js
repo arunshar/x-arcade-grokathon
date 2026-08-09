@@ -1473,8 +1473,62 @@ if (MOCK) {
 }
 
 // ---------- transport ----------
+// Outbox: join/start often fire on the same click that opens audio; the WS
+// may not be OPEN yet. Dropped joins used to lose the theme filter forever.
+const wsOutbox = [];
+
+function wsIsOpen() {
+  if (!sock) return false;
+  // Mock transport has no browser readyState — treat as always open.
+  if (MOCK) return typeof sock.send === "function";
+  return sock.readyState === 1; // OPEN
+}
+
 function send(obj) {
-  try { sock.send(JSON.stringify(obj)); } catch (e) { /* retry loop reconnects */ }
+  if (!obj || typeof obj !== "object") return;
+  if (!wsIsOpen()) {
+    // Coalesce join messages — only the latest join matters.
+    if (obj.t === "join") {
+      for (let i = wsOutbox.length - 1; i >= 0; i--) {
+        if (wsOutbox[i] && wsOutbox[i].t === "join") wsOutbox.splice(i, 1);
+      }
+    }
+    wsOutbox.push(obj);
+    return;
+  }
+  try {
+    sock.send(JSON.stringify(obj));
+  } catch (e) {
+    wsOutbox.push(obj);
+  }
+}
+
+function flushWsOutbox() {
+  if (!wsIsOpen() || !wsOutbox.length) return;
+  const batch = wsOutbox.splice(0, wsOutbox.length);
+  for (let i = 0; i < batch.length; i++) {
+    try {
+      sock.send(JSON.stringify(batch[i]));
+    } catch (e) {
+      // Put back and stop — reconnect will retry.
+      wsOutbox.unshift.apply(wsOutbox, batch.slice(i));
+      return;
+    }
+  }
+}
+
+/** Host join payload — always includes frozen theme so reconnects keep filter. */
+function buildJoinPayload() {
+  const payload = {
+    t: "join",
+    room: myRoom,
+    name: myName,
+    arena: !!(iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)),
+  };
+  if (payload.arena) {
+    Object.assign(payload, activeThemePayload());
+  }
+  return payload;
 }
 
 function handleRaw(text) {
@@ -1484,13 +1538,26 @@ function handleRaw(text) {
 }
 
 function connect() {
-  if (MOCK) { sock = mockSocket(handleRaw); setConn("MOCK LINK ACTIVE"); return; }
+  if (MOCK) {
+    sock = mockSocket(handleRaw);
+    setConn("MOCK LINK ACTIVE");
+    flushWsOutbox();
+    return;
+  }
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
   const ws = new WebSocket(`${proto}//${location.host}/ws`);
   sock = ws;
   ws.addEventListener("open", () => {
     setConn("LINKED");
-    if (joined) send({ t: "join", room: myRoom, name: myName, arena: iAmHost });
+    // Re-join with theme locked at enter — never a bare join that wipes topics.
+    if (joined && myRoom && myName) {
+      // Prefer a fresh join at the front; drop stale queued joins.
+      for (let i = wsOutbox.length - 1; i >= 0; i--) {
+        if (wsOutbox[i] && wsOutbox[i].t === "join") wsOutbox.splice(i, 1);
+      }
+      wsOutbox.unshift(buildJoinPayload());
+    }
+    flushWsOutbox();
   });
   ws.addEventListener("message", (ev) => handleRaw(ev.data));
   ws.addEventListener("close", () => { setConn("LINK LOST, RETRYING..."); setTimeout(connect, 1500); });
@@ -2556,6 +2623,8 @@ function goHome() {
   myRoom = "";
   iAmHost = false;
   pendingSoloStart = false;
+  lockedThemePayload = null;
+  wsOutbox.length = 0;
   myGuessSlot = null;
   lastRoundId = null;
   roundNo = 0;
@@ -2601,7 +2670,7 @@ function sendRestart() {
   const payload = { t: "restart", room: myRoom };
   if (iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)) {
     payload.arena = true;
-    Object.assign(payload, themePayloadFields());
+    Object.assign(payload, activeThemePayload());
   }
   send(payload);
 }
@@ -2693,7 +2762,9 @@ function isSoloFriendlyRoom(room) {
 }
 
 /** Topic filter for create/solo lobby. Empty = random mix. */
-let selectedTopicGroups = []; // catalog group ids, e.g. ["ai","movies"]
+let selectedTopicGroups = []; // catalog group ids, e.g. ["sports","gaming"]
+/** Frozen at ENTER / START GAME so reconnect + START always re-send the same filter. */
+let lockedThemePayload = null;
 let topicCatalog = null; // from GET /topics
 // Keep in sync with cartridges/decoy/themes.py TOPIC_CATALOG
 const DEFAULT_TOPIC_GROUPS = [
@@ -2824,10 +2895,28 @@ function themePayloadFields() {
     .map((id) => LEGACY_TOPIC_GROUP_MAP[String(id || "").toLowerCase()] || String(id || "").toLowerCase())
     .filter((id) => id && id !== "random");
   return {
-    topics: topics,
-    topic_groups: groups,
-    topic_filter: topics,
+    topics: topics.slice(),
+    topic_groups: groups.slice(),
+    topic_filter: topics.slice(),
   };
+}
+
+/** Theme frozen at join, or live chip selection before join. */
+function activeThemePayload() {
+  if (lockedThemePayload && typeof lockedThemePayload === "object") {
+    return {
+      topics: (lockedThemePayload.topics || []).slice(),
+      topic_groups: (lockedThemePayload.topic_groups || []).slice(),
+      topic_filter: (lockedThemePayload.topic_filter || lockedThemePayload.topics || []).slice(),
+    };
+  }
+  return themePayloadFields();
+}
+
+/** Snapshot chip selection so later reconnects cannot drop the theme. */
+function lockThemeFromChips() {
+  lockedThemePayload = themePayloadFields();
+  return lockedThemePayload;
 }
 
 function formatTopicFilterLabel(topics) {
@@ -2854,6 +2943,7 @@ function formatTopicFilterLabel(topics) {
 function showModePick() {
   lobbyMode = null;
   pendingSoloStart = false;
+  lockedThemePayload = null;
   $("modePick").hidden = false;
   $("lobbyForm").hidden = true;
   $("createFields").hidden = true;
@@ -2886,6 +2976,7 @@ function showLobbyForm(mode) {
 
   if (isSolo) {
     iAmHost = true;
+    lockedThemePayload = null; // fresh pick each solo setup
     const code = generatedSoloRoomCode();
     $("createdRoomDisplay").value = code;
     $("roomInput").value = code;
@@ -2981,19 +3072,22 @@ function doJoin(opts) {
   if ($("modeSoloBtn")) $("modeSoloBtn").disabled = true;
   if ($("modeMockBtn")) $("modeMockBtn").disabled = true;
   if ($("backToModeBtn")) $("backToModeBtn").hidden = true;
+  // Freeze theme NOW (before chips lock / catalog race) so reconnect keeps it.
+  if (iAmHost || solo || lobbyMode === "solo") {
+    lockThemeFromChips();
+  }
   // Lock topic chips after enter.
   const chipBox = $("topicChips");
   if (chipBox) {
     chipBox.querySelectorAll("button").forEach((b) => { b.disabled = true; });
   }
 
-  // arena:true marks creator/host. topics: filter X posts for this room
-  // (empty = random mix). Only applied for the creator on the server.
-  const payload = { t: "join", room: myRoom, name: myName, arena: iAmHost };
-  if (iAmHost || solo || lobbyMode === "solo") {
-    Object.assign(payload, themePayloadFields());
-  }
-  send(payload);
+  // Join (queued if WS not open yet) — always carries locked theme for host.
+  send(buildJoinPayload());
+
+  const themeLabel = formatTopicFilterLabel(
+    (lockedThemePayload && lockedThemePayload.topics) || selectedTopicsPayload()
+  );
 
   if (solo || isSoloFriendlyRoom(myRoom)) {
     // Solo practice: no share code / QR — just start.
@@ -3002,7 +3096,7 @@ function doJoin(opts) {
     $("startBtn").disabled = false;
     $("startBtn").textContent = "START GAME";
     if ($("waitLine")) $("waitLine").hidden = true;
-    setConn("SOLO PRACTICE · STARTING…");
+    setConn("SOLO · " + themeLabel + " · STARTING…");
     return;
   }
 
@@ -3013,7 +3107,7 @@ function doJoin(opts) {
     $("startBtn").hidden = false;
     $("startBtn").disabled = false;
     $("waitLine").hidden = true;
-    setConn("ROOM " + myRoom + " · YOU ARE HOST. TAP START WHEN READY.");
+    setConn("ROOM " + myRoom + " · " + themeLabel + " · TAP START");
   } else {
     $("startBtn").hidden = true;
     $("startBtn").disabled = true;
@@ -3035,6 +3129,8 @@ function beginSoloGame() {
   $("createdRoomDisplay").value = code;
   $("roomInput").value = code;
   lobbyMode = "solo";
+  // Lock chips → theme before join so the first message is correct.
+  lockThemeFromChips();
   pendingSoloStart = true;
   $("startBtn").disabled = true;
   $("startBtn").textContent = "STARTING…";
@@ -3122,10 +3218,10 @@ function sendNext() {
   // Player moved on — cut leftover reveal/hype immediately.
   try { voiceQueue.bump(); commentary.onAdvance(null, null); } catch (e) { /* ignore */ }
   const payload = { t: "next", room: myRoom };
-  // Re-assert theme on START so the server never deals a random mix by mistake.
+  // Re-assert frozen theme on START so the server never deals a random mix.
   if (iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)) {
     payload.arena = true;
-    Object.assign(payload, themePayloadFields());
+    Object.assign(payload, activeThemePayload());
   }
   send(payload);
 }
@@ -3380,6 +3476,7 @@ function mockSocket(onMessage) {
   }
 
   return {
+    readyState: 1, // OPEN — so the shared send() outbox flushes
     send(text) {
       const m = JSON.parse(text);
       if (m.t === "join") {

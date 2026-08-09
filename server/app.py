@@ -364,13 +364,23 @@ def _apply_room_topics(
     *,
     allow: bool,
 ) -> None:
-    """Set room topic_filter from client msg when the sender may choose it."""
+    """Set room topic_filter from client msg when the sender may choose it.
+
+    Omitted topic keys leave the existing filter alone (reconnect-safe).
+    An explicit empty list means RANDOM. A non-empty list always replaces.
+    """
     if not allow:
         return
     parsed = _topics_from_client_msg(msg)
     if parsed is None:
         return
+    prev = [str(t).lower() for t in (room.get("topic_filter") or []) if t]
     room["topic_filter"] = parsed
+    if parsed != prev:
+        print(
+            f"room {room.get('room_id')}: topic_filter -> {parsed}",
+            file=sys.stderr,
+        )
 
 
 def _load_rounds_matching_topics(topic_filter: set[str]) -> list[dict[str, Any]]:
@@ -1049,7 +1059,31 @@ async def _start_round(room: dict[str, Any]) -> None:
         return
 
     room["results"] = None
+    # Snapshot filter before deal — _next_round must honor this exactly.
+    deal_filter = {
+        str(t).lower()
+        for t in (room.get("topic_filter") or [])
+        if str(t or "").strip()
+    }
     rnd = await _next_round(room)
+    # Hard assert: never ship an off-theme post into a filtered room.
+    got_topic = _round_topic(rnd)
+    if deal_filter and got_topic not in deal_filter:
+        print(
+            f"room {room.get('room_id')}: OFF-THEME deal {got_topic!r} "
+            f"not in {sorted(deal_filter)} — re-picking",
+            file=sys.stderr,
+        )
+        # Force a themed pick from disk; never keep the bad card.
+        disk = _load_rounds_matching_topics(deal_filter)
+        if disk:
+            alt = _pick_from_candidates(disk, exclude=set(), prefer_media=False)
+            if alt is not None:
+                rnd = alt
+            else:
+                rnd = copy.deepcopy(disk[0])
+                decoy_queue.randomize_decoy_position(rnd)
+                rnd["safety"] = safety_screen.screen_round(rnd)
     # Track served round so the next picks stay different.
     rid = str(rnd.get("round_id") or "")
     if rid:
@@ -1057,6 +1091,11 @@ async def _start_round(room: dict[str, Any]) -> None:
         # Remember enough ids to cover most of the pool (cap 40).
         keep = max(12, min(40, decoy_queue.round_count() - 1))
         room["recent_round_ids"] = ([rid] + prev_ids)[:keep]
+    print(
+        f"room {room.get('room_id')}: deal topic={_round_topic(rnd)!r} "
+        f"filter={sorted(deal_filter) or 'RANDOM'} rid={rid}",
+        file=sys.stderr,
+    )
     # Mix text rounds (classic replies) with GIF rounds (human gifs + Imagine).
     session_index = rounds_played
     room["rounds_played"] = session_index + 1
