@@ -948,28 +948,50 @@ async def _start_round(room: dict[str, Any]) -> None:
 
 
 async def _do_reveal(room: dict[str, Any]) -> None:
+    # Idempotent: timer + last-guess can both fire; only score once.
+    if room.get("phase") != "guessing":
+        return
     _cancel_timer(room)
     rnd = room["round"]
     if rnd is None:
+        room["phase"] = "reveal"
         return
-    decoy_slot = rnd["decoy_slot"]
-    # Winner is the first correct guess in server arrival order. The client's
-    # self-reported ms is display data only and never decides the winner.
-    correct = [p for p in room["players"].values() if p.guess_slot == decoy_slot]
-    correct.sort(key=lambda p: p.guess_order if p.guess_order is not None else 1 << 30)
-    winner = correct[0].name if correct else "house"
-    # Scoring: first correct guess in server order gets +1 point and keeps a
-    # streak. Everyone else resets streak. House wins award no points.
-    points_awarded: list[dict[str, Any]] = []
-    for p in room["players"].values():
-        if p.name == winner:
-            p.score += 1
-            p.streak += 1
-            points_awarded.append({"name": p.name, "delta": 1, "reason": "first_correct"})
-        else:
-            p.streak = 0
+    # Flip phase before any await so a concurrent reveal cannot double-score.
     room["phase"] = "reveal"
     room["deadline_at"] = None
+
+    try:
+        decoy_slot = int(rnd.get("decoy_slot"))
+    except (TypeError, ValueError):
+        decoy_slot = rnd.get("decoy_slot")
+
+    def _slot_of(player: PlayerState) -> int | None:
+        raw = player.guess_slot
+        if raw is None or isinstance(raw, bool):
+            return None
+        try:
+            return int(raw)
+        except (TypeError, ValueError):
+            return None
+
+    # Everyone who picked the decoy scores. First correct still "wins" the
+    # round banner / share card; others who were also right keep their point.
+    correct = [p for p in room["players"].values() if _slot_of(p) == decoy_slot]
+    correct.sort(
+        key=lambda p: p.guess_order if p.guess_order is not None else 1 << 30
+    )
+    winner = correct[0].name if correct else "house"
+    points_awarded: list[dict[str, Any]] = []
+    correct_names = {p.name for p in correct}
+    for p in room["players"].values():
+        if p.name in correct_names:
+            p.score += 1
+            p.streak += 1
+            reason = "first_correct" if p.name == winner else "correct"
+            points_awarded.append({"name": p.name, "delta": 1, "reason": reason})
+        else:
+            p.streak = 0
+    # room phase already reveal
     standings = _standings(room)
     match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
     rounds_played = int(room.get("rounds_played") or 0)
@@ -1688,12 +1710,24 @@ async def ws_endpoint(ws: WebSocket) -> None:
                 if room is None or room["phase"] != "guessing" or joined is None:
                     continue
                 player = room["players"].get(joined[1])
-                slot = msg.get("slot")
+                raw_slot = msg.get("slot")
+                # Coerce JSON numbers (reject bool — bool is a subclass of int).
+                slot: int | None
+                if isinstance(raw_slot, bool) or raw_slot is None:
+                    slot = None
+                elif isinstance(raw_slot, int):
+                    slot = raw_slot
+                elif isinstance(raw_slot, float) and raw_slot == int(raw_slot):
+                    slot = int(raw_slot)
+                else:
+                    try:
+                        slot = int(raw_slot)  # type: ignore[arg-type]
+                    except (TypeError, ValueError):
+                        slot = None
                 if (
                     player is None
                     or player.guessed
-                    or not isinstance(slot, int)
-                    or isinstance(slot, bool)
+                    or slot is None
                     or not 0 <= slot < config.REPLIES_PER_ROUND
                 ):
                     continue

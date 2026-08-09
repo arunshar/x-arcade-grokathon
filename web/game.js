@@ -1271,7 +1271,7 @@ function renderTopPoints(s) {
       ? ("YOU " + myScore + " · LEAD")
       : ("YOU " + myScore + " PTS");
     meChip.classList.toggle("leading", iLead && (leader.score || 0) > 0);
-    meChip.title = "Your points (first correct guess each round = +1)";
+    meChip.title = "Your points (+1 each round you spot the decoy)";
   }
   if (leadChip) {
     if (leader && board.length > 0) {
@@ -1974,22 +1974,22 @@ function renderReveal(s) {
     banner.classList.remove("house");
   }
 
-  // Flash who scored this round (+1 for first correct).
+  // Flash who scored this round (+1 each correct pick).
   const flash = $("pointsFlash");
   if (flash) {
     const awarded = s.reveal.points_awarded || [];
-    if (!w || w === "house") {
+    if (!awarded.length) {
       flash.hidden = false;
       flash.textContent = "NO POINTS THIS ROUND";
-    } else if (awarded.length) {
+    } else if (awarded.length === 1) {
       const a = awarded[0];
       flash.hidden = false;
       flash.textContent = (a.name === myName ? "YOU" : a.name)
-        + " +" + (a.delta || 1) + " POINT"
-        + ((a.delta || 1) === 1 ? "" : "S");
+        + " +" + (a.delta || 1) + " POINT";
     } else {
       flash.hidden = false;
-      flash.textContent = (w === myName ? "YOU" : w) + " +1 POINT";
+      const names = awarded.map((a) => (a.name === myName ? "YOU" : a.name));
+      flash.textContent = names.join(" · ") + " +1 EACH";
     }
   }
 
@@ -2089,7 +2089,7 @@ function renderResults(s) {
       sub.textContent = "Tied at the top: " + co.join(" · ")
         + " · " + played + "/" + matchN + " rounds";
     } else {
-      sub.textContent = played + " of " + matchN + " rounds · first correct = +1 pt";
+      sub.textContent = played + " of " + matchN + " rounds · correct = +1 pt";
     }
   }
 
