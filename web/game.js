@@ -3401,7 +3401,7 @@ function mockSocket(onMessage) {
     },
   ];
 
-  const MATCH_ROUNDS = 2; // short mock match
+  const MATCH_ROUNDS = 6; // same length as live multiplayer
   let phase = "lobby";
   let players = [];
   let ri = -1;

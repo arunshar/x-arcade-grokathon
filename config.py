@@ -42,12 +42,16 @@ GIF_ROUND_MODE = (os.environ.get("ARCADE_GIF_MODE") or "alternate").strip().lowe
 # Set ARCADE_IMAGINE_DECOY=0 only for offline demos that pre-bake certified files.
 IMAGINE_DECOY_REQUIRED = os.environ.get("ARCADE_IMAGINE_DECOY", "1") != "0"
 # Match length: after this many rounds the room opens a results screen
-# instead of looping forever. Override with ARCADE_MATCH_ROUNDS (1–20).
+# instead of looping forever. Multiplayer and solo both play a full set.
+# Override with ARCADE_MATCH_ROUNDS (1–20). Default is always 6.
 try:
     MATCH_ROUNDS = int(os.environ.get("ARCADE_MATCH_ROUNDS", "6") or "6")
 except ValueError:
     MATCH_ROUNDS = 6
 MATCH_ROUNDS = max(1, min(20, MATCH_ROUNDS))
+# Never accidentally ship a 1–2 round “demo short” in multiplayer.
+if MATCH_ROUNDS < 6 and os.environ.get("ARCADE_ALLOW_SHORT_MATCH", "") != "1":
+    MATCH_ROUNDS = 6
 # Soft idle on the results screen before returning to lobby (scores kept
 # until RESTART). Manual RESTART / HOME work immediately.
 try:

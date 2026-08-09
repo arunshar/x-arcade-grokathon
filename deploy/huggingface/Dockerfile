@@ -11,6 +11,8 @@ COPY . .
 ENV ARCADE_MODE=demo
 # Mix classic text rounds with GIF/Imagine rounds (same as local default).
 ENV ARCADE_GIF_MODE=alternate
+# Full multiplayer match length (not a 2-round short demo).
+ENV ARCADE_MATCH_ROUNDS=6
 # Prefer prebaked decoy mp4s; when generating live, use the fast path
 # (text brief + short T2V, no vision still) so rounds are not stuck on "loading".
 ENV ARCADE_IMAGINE_FAST=1

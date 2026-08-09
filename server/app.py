@@ -262,6 +262,7 @@ def _get_room(room_id: str) -> dict[str, Any]:
             "timer": None,
             "guess_counter": 0,
             "rounds_played": 0,
+            # Always the live config value (default 6) — never a stale short match.
             "match_rounds": int(getattr(config, "MATCH_ROUNDS", 6) or 6),
             # Stems of human GIFs used on recent gif rounds — for diversity.
             "recent_gif_stems": [],
@@ -279,7 +280,9 @@ def _get_room(room_id: str) -> dict[str, Any]:
         ROOMS[room_id] = room
     # Backfill fields for rooms created before this build.
     room.setdefault("results", None)
-    room.setdefault("match_rounds", int(getattr(config, "MATCH_ROUNDS", 6) or 6))
+    # Refresh every access so rooms created under an old short cap (e.g. 2)
+    # pick up the current 6-round match length.
+    room["match_rounds"] = int(getattr(config, "MATCH_ROUNDS", 6) or 6)
     room.setdefault("rounds_played", 0)
     room.setdefault("recent_gif_stems", [])
     room.setdefault("gif_session_salt", secrets.token_hex(4))
@@ -1022,7 +1025,11 @@ async def _start_round(room: dict[str, Any]) -> None:
     # round can never serve this round's media.
     room["media_token"] = None
     room["media_files"] = {}
-    match_rounds = int(room.get("match_rounds") or getattr(config, "MATCH_ROUNDS", 6) or 6)
+    # Pin match length every round start (config default = 6).
+    match_rounds = int(getattr(config, "MATCH_ROUNDS", 6) or 6)
+    if match_rounds < 6 and os.environ.get("ARCADE_ALLOW_SHORT_MATCH", "") != "1":
+        match_rounds = 6
+    room["match_rounds"] = match_rounds
     rounds_played = int(room.get("rounds_played") or 0)
 
     # Coming from results / finished match in lobby → wipe board for a new match.
