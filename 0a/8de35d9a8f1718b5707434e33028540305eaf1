@@ -1,0 +1,19 @@
+integration_check.py
+  s_da6f3933cdb62d::t_dc16d71ef4a499 35-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "0a8de35d9a8f1718b5707434e33028540305eaf1",
+  "prompts": {},
+  "sessions": {
+    "s_da6f3933cdb62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8480ebca-13ab-4786-b8dd-d1ff3107bf99",
+        "model": "claude-fable-5"
+      },
+      "human_author": "X Arcade <noreply@users.noreply.github.com>"
+    }
+  }
+}
