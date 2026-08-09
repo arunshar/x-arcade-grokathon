@@ -1525,20 +1525,32 @@ function buildJoinPayload() {
     name: myName,
     arena: !!(iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom)),
   };
-  if (payload.arena) {
-    const theme = activeThemePayload();
-    const topics = theme.topics || [];
-    if (topics.length) {
-      // Non-empty filter — always re-assert.
-      Object.assign(payload, theme);
-    } else if (theme._explicitRandom) {
-      // Host deliberately chose RANDOM.
-      Object.assign(payload, theme);
-      payload.clear_topics = true;
-      payload.topics_random = true;
-    }
-    // else: omit topic keys so a reconnect cannot clear a set filter.
+  if (payload.arena) attachThemeToPayload(payload);
+  return payload;
+}
+
+/** Attach theme fields to a WS payload without wiping a good server filter. */
+function attachThemeToPayload(payload) {
+  const theme = activeThemePayload();
+  const topics = theme.topics || [];
+  if (topics.length) {
+    Object.assign(payload, {
+      topics: topics.slice(),
+      topic_groups: (theme.topic_groups || []).slice(),
+      topic_filter: topics.slice(),
+    });
+    return payload;
   }
+  if (theme._explicitRandom) {
+    Object.assign(payload, {
+      topics: [],
+      topic_groups: [],
+      topic_filter: [],
+      clear_topics: true,
+      topics_random: true,
+    });
+  }
+  // Empty + not explicit random → omit keys (keep server filter).
   return payload;
 }
 
@@ -1546,15 +1558,10 @@ function buildJoinPayload() {
 function pushThemeToServer() {
   if (!joined || !myRoom) return;
   if (!(iAmHost || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom))) return;
-  const theme = activeThemePayload();
-  const msg = Object.assign(
-    { t: "set_topics", room: myRoom, arena: true },
-    theme
-  );
-  if (theme._explicitRandom || !(theme.topics || []).length) {
-    msg.clear_topics = true;
-    msg.topics_random = true;
-  }
+  const msg = { t: "set_topics", room: myRoom, arena: true };
+  attachThemeToPayload(msg);
+  // Only send if we actually attached a theme decision.
+  if (!("topics" in msg) && !msg.clear_topics) return;
   send(msg);
 }
 
@@ -2895,7 +2902,33 @@ function isSoloFriendlyRoom(room) {
 let selectedTopicGroups = []; // catalog group ids, e.g. ["sports","gaming"]
 /** Frozen at ENTER / START GAME so reconnect + START always re-send the same filter. */
 let lockedThemePayload = null;
+/** True after the user taps any theme chip (including RANDOM). */
+let themeTouched = false;
 let topicCatalog = null; // from GET /topics
+
+function persistThemeSelection() {
+  try {
+    sessionStorage.setItem(
+      "decoy_theme",
+      JSON.stringify({
+        groups: selectedTopicGroups.slice(),
+        locked: lockedThemePayload,
+        touched: themeTouched,
+      })
+    );
+  } catch (e) { /* ignore */ }
+}
+
+function restoreThemeSelection() {
+  try {
+    const raw = sessionStorage.getItem("decoy_theme");
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data.groups)) selectedTopicGroups = data.groups.slice();
+    if (data.locked && typeof data.locked === "object") lockedThemePayload = data.locked;
+    themeTouched = !!data.touched;
+  } catch (e) { /* ignore */ }
+}
 // Keep in sync with cartridges/decoy/themes.py TOPIC_CATALOG
 const DEFAULT_TOPIC_GROUPS = [
   { id: "random", label: "RANDOM", blurb: "any topic", topics: [], count: 0 },
@@ -2988,20 +3021,21 @@ function renderTopicChips() {
 }
 
 function toggleTopicGroup(id) {
-  // Multiplayer host may change themes in lobby after enter; solo locks earlier.
-  const mpHostLobby = joined && iAmHost && lobbyMode === "create"
-    && state && state.phase === "lobby";
-  if (joined && !mpHostLobby) return;
+  // Multiplayer host may change themes anytime in lobby (even before first state).
+  const hostLobby = joined && iAmHost
+    && (lobbyMode === "create" || lobbyMode === "solo" || isSoloFriendlyRoom(myRoom))
+    && (!state || state.phase === "lobby");
+  if (joined && !hostLobby) return;
+  themeTouched = true;
   id = String(id || "").toLowerCase();
   id = LEGACY_TOPIC_GROUP_MAP[id] || id;
   if (!id || id === "random") {
     selectedTopicGroups = [];
     lockedThemePayload = null;
     renderTopicChips();
-    if (mpHostLobby) {
-      lockThemeFromChips();
-      pushThemeToServer();
-    }
+    lockThemeFromChips(); // marks explicit random
+    if (hostLobby || joined) pushThemeToServer();
+    persistThemeSelection();
     return;
   }
   const idx = selectedTopicGroups.indexOf(id);
@@ -3010,6 +3044,7 @@ function toggleTopicGroup(id) {
   // Live preview of what will be sent (multi-select = union of member topics).
   lockedThemePayload = null;
   renderTopicChips();
+  lockThemeFromChips();
   try {
     const label = formatTopicFilterLabel(selectedTopicsPayload());
     if ($("createHint") && (lobbyMode === "solo" || lobbyMode === "create")) {
@@ -3023,11 +3058,11 @@ function toggleTopicGroup(id) {
         : (base + "Filter OFF · RANDOM MIX — posts from every theme.");
     }
   } catch (e) { /* ignore */ }
-  // Multiplayer host: push live so auto-start / guest lobby see the filter.
-  if (mpHostLobby) {
-    lockThemeFromChips();
+  // Host in lobby: push live so guests + START always see the filter.
+  if (hostLobby || (joined && iAmHost && (!state || state.phase === "lobby"))) {
     pushThemeToServer();
   }
+  persistThemeSelection();
 }
 
 /** If we locked a theme but the server still shows RANDOM, re-push it. */
@@ -3122,12 +3157,26 @@ function activeThemePayload() {
 
 /** Snapshot chip selection so later reconnects cannot drop the theme. */
 function lockThemeFromChips() {
-  lockedThemePayload = themePayloadFields();
-  // Remember intentional RANDOM so reconnect can clear; empty without this
-  // flag means "don't send topics" (keep server filter).
-  lockedThemePayload._explicitRandom = !(lockedThemePayload.topics || []).length;
+  const fromChips = themePayloadFields();
+  const chipTopics = fromChips.topics || [];
+  if (chipTopics.length) {
+    // User has real theme chips on.
+    lockedThemePayload = fromChips;
+    lockedThemePayload._explicitRandom = false;
+  } else if (themeTouched) {
+    // User explicitly chose RANDOM (or cleared all themes).
+    lockedThemePayload = fromChips;
+    lockedThemePayload._explicitRandom = true;
+  } else if (lockedThemePayload && (lockedThemePayload.topics || []).length) {
+    // Chips look empty but we already locked a filter — keep it (don't wipe).
+  } else {
+    // Untouched default — not an explicit clear.
+    lockedThemePayload = fromChips;
+    lockedThemePayload._explicitRandom = false;
+  }
   themeResyncTries = 0;
   try { updateTopicSelectionStatus(lockedThemePayload.topics); } catch (e) { /* ignore */ }
+  persistThemeSelection();
   return lockedThemePayload;
 }
 
